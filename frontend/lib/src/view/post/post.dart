@@ -1,3 +1,4 @@
+import 'package:atproto/core.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/src/model/oauth/oauth_repository.dart';
 import 'package:provider/provider.dart';
@@ -40,13 +41,19 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           enabled: _titleExists && _contentExists,
                           onPressed: () {
                             if (formKey.currentState!.saveAndValidate()) {
-                              print(
-                                  "Form Values: ${formKey.currentState!.value["title"]}, ${formKey.currentState!.value["content"]}");
-                            }
-                            if (oauth.atProtoSession != null) {
-                              print("Implementing posting soon!");
-                            } else {
-                              print("Please log in!");
+                              if (oauth.atProtoSession != null) {
+                                oauth.atProtoSession!.repo.createRecord(
+                                    collection:
+                                        NSID.create('feed.boshi.app', 'post'),
+                                    record: {
+                                      "title":
+                                          formKey.currentState!.value["title"],
+                                      "content":
+                                          formKey.currentState!.value["content"]
+                                    });
+                              } else {
+                                print("Please log in!");
+                              }
                             }
                           },
                           child: const Text("Post"));
