@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:frontend/src/model/oauth/oauth_repository.dart';
 import 'package:frontend/src/view/login/redirect.dart';
+import 'package:frontend/src/view/post/post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -34,6 +35,10 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/',
           builder: (context, state) => MyHomePage(title: "hello"),
+        ),
+        GoRoute(
+          path: '/post',
+          builder: (context, state) => CreatePostPage(),
         ),
         GoRoute(
           path: '/login',

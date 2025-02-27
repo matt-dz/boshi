@@ -95,8 +95,8 @@ class OAuthRepository extends ChangeNotifier {
       _atProto = atp.ATProto.fromOAuthSession(newSession);
 
       notifyListeners();
-    } on ArgumentError {
-      rethrow;
+    } on ArgumentError catch (e) {
+      print(e.message);
     }
   }
 }
