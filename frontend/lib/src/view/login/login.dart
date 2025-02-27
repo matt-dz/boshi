@@ -35,17 +35,39 @@ class _LoginPageState extends State<LoginPage> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             ShadInputFormField(
-                                id: 'login_input_form',
-                                label: const Text("Identity"),
-                                placeholder: const Text('Enter your identity'),
-                                description: const Text(
-                                    "Login with any identifier on the atprotocol"),
-                                validator: (v) {
-                                  if (v.isEmpty) {
-                                    return 'Identifier must not be empty';
-                                  }
-                                  return null;
-                                }),
+                              textAlign: TextAlign.center,
+                              id: 'auth_provider',
+                              label: const Center(
+                                  child: Text(
+                                "Account Provider",
+                                style: TextStyle(height: 0.2),
+                              )),
+                              initialValue: 'bsky.social',
+                              description: const Center(
+                                child: Text("Choose your account provider.",
+                                    style: TextStyle(height: 0.2)),
+                              ),
+                              validator: (v) {
+                                if (v.isEmpty) {
+                                  return 'Provider must not be empty.\nDefault value is \'bsky.social\'';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 32),
+                            ShadInputFormField(
+                              id: 'identity',
+                              label: const Text("Identity"),
+                              placeholder: const Text('Enter your identity'),
+                              description: const Text(
+                                  "Login with any identifier on the atprotocol"),
+                              validator: (v) {
+                                if (v.isEmpty) {
+                                  return 'Identifier must not be empty.';
+                                }
+                                return null;
+                              },
+                            ),
                             const SizedBox(height: 16),
                             Consumer<OAuthRepository>(
                               builder: (context, oauth, child) {
@@ -54,10 +76,11 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed: () async {
                                     if (formKey.currentState!
                                         .saveAndValidate()) {
+                                      oauth.service = formKey
+                                          .currentState!.value["auth_provider"];
                                       Uri authUri = await oauth
                                           .getAuthorizationURI(formKey
-                                              .currentState!
-                                              .value["login_input_form"]);
+                                              .currentState!.value["identity"]);
                                       if (!await launchUrl(authUri)) {
                                         throw Exception(
                                             'Could not launch $authUri');

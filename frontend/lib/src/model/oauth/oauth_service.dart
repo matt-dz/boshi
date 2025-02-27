@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:js_interop';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,6 +64,9 @@ class OAuthService {
         );
 
         final session = await client.callback(Uri.base.toString(), context);
+
+        await setSessionVars(session);
+
         final atProtoSession = atp.ATProto.fromOAuthSession(session);
         return (session, atProtoSession);
       } else {
@@ -71,6 +75,51 @@ class OAuthService {
     } on OAuthException {
       rethrow;
     } on ArgumentError {
+      rethrow;
+    }
+  }
+
+  Future<OAuthSession> getStoredOAuthSession() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final sessionVars = prefs.getString('session-vars');
+      if (sessionVars != null) {
+        final sessionMap = json.decode(sessionVars);
+        return OAuthSession(
+            accessToken: sessionMap['accessToken'],
+            refreshToken: sessionMap['refreshToken'],
+            tokenType: sessionMap['tokenType'],
+            scope: sessionMap['scope'],
+            expiresAt: DateTime.parse(sessionMap['expiresAt']),
+            sub: sessionMap['sub'],
+            $dPoPNonce: sessionMap['\$dPoPNonce'],
+            $publicKey: sessionMap['\$publicKey'],
+            $privateKey: sessionMap['\$privateKey']);
+      } else {
+        throw ArgumentError("No session stored");
+      }
+    } on ArgumentError {
+      rethrow;
+    }
+  }
+
+  Future<void> setSessionVars(OAuthSession session) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          "session-vars",
+          json.encode({
+            "accessToken": session.accessToken,
+            "refreshToken": session.refreshToken,
+            "tokenType": session.tokenType,
+            "scope": session.scope,
+            "expiresAt": session.expiresAt.toString(),
+            "sub": session.sub,
+            "\$dPoPNonce": session.$dPoPNonce,
+            "\$publicKey": session.$publicKey,
+            "\$privateKey": session.$privateKey,
+          }));
+    } catch (e) {
       rethrow;
     }
   }

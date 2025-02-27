@@ -7,9 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:frontend/src/model/oauth/oauth_service.dart';
 
 class OAuthRepository extends ChangeNotifier {
-  OAuthRepository({required Uri clientId}) : _clientId = clientId;
+  OAuthRepository({required Uri clientId, this.service = "bsky.social"})
+      : _clientId = clientId;
 
   final Uri _clientId;
+
+  String service;
   late OAuthClientMetadata _oAuthClientMetadata;
   late OAuthClient _oAuthClient;
   late OAuthContext _oAuthContext;
@@ -22,7 +25,7 @@ class OAuthRepository extends ChangeNotifier {
 
   final OAuthService _oAuthService = OAuthService();
 
-  Future<void> getOAuthClient() async {
+  Future<void> generateOAuthClient() async {
     if (_clientId.isScheme('http')) {
       _oAuthClientMetadata = OAuthClientMetadata.fromJson({
         "client_id": "${_clientId.scheme}://${_clientId.host}",
@@ -41,12 +44,12 @@ class OAuthRepository extends ChangeNotifier {
           await _oAuthService.getClientMetadata(_clientId.toString());
     }
 
-    _oAuthClient = OAuthClient(_oAuthClientMetadata);
+    _oAuthClient = OAuthClient(_oAuthClientMetadata, service: service);
   }
 
   Future<Uri> getAuthorizationURI(String identity) async {
     try {
-      await getOAuthClient();
+      await generateOAuthClient();
 
       final (uri, context) = await _oAuthService.getOAuthAuthorizationURI(
         _oAuthClient,
@@ -63,9 +66,9 @@ class OAuthRepository extends ChangeNotifier {
     }
   }
 
-  Future<void> getSession(String callback) async {
+  Future<void> generateSession(String callback) async {
     try {
-      await getOAuthClient();
+      await generateOAuthClient();
 
       final (oAuthSession, atProto) = await OAuthService().getOAuthSession(
         _oAuthClient,
@@ -78,6 +81,22 @@ class OAuthRepository extends ChangeNotifier {
       notifyListeners();
     } on OAuthException {
       rethrow;
+    } on ArgumentError {
+      rethrow;
+    }
+  }
+
+  Future<void> refreshSession() async {
+    try {
+      await generateOAuthClient();
+
+      final session = await OAuthService().getStoredOAuthSession();
+      _oAuthSession = session;
+      final newSession = await _oAuthClient.refresh(session);
+      await _oAuthService.setSessionVars(newSession);
+      _atProto = atp.ATProto.fromOAuthSession(newSession);
+
+      notifyListeners();
     } on ArgumentError {
       rethrow;
     }

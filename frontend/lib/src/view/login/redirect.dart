@@ -25,7 +25,13 @@ class _RedirectPageState extends State<RedirectPage> {
     });
 
     return Center(
-      child: const Text("Redirecting..."),
+      child: const Text("Redirecting...",
+          style: TextStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.normal,
+            color: Colors.black,
+            decoration: TextDecoration.none,
+          )),
     );
   }
 }

@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
               builder: (context, state) =>
                   Consumer<OAuthRepository>(builder: (context, oauth, child) {
                 if (oauth.atProtoSession == null) {
-                  oauth.getSession(Uri.base.toString());
+                  oauth.generateSession(Uri.base.toString());
                 }
                 return RedirectPage(atpSession: oauth.atProtoSession);
               }),
@@ -91,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
               if (oauth.atProtoSession != null) {
                 return Text("Your session: ${oauth.atProtoSession?.identity}");
               } else {
+                oauth.refreshSession();
                 return Text("Please sign in.");
               }
             }),
