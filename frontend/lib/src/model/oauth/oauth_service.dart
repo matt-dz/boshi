@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:js_interop';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -105,14 +106,8 @@ class OAuthService {
   Future<void> setSessionVars(OAuthSession session) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString(
-          "session-vars",
-          json.encode(
-            session,
-            toEncodable: (object) {
-              return object.toString();
-            },
-          ));
+      await prefs.setString("session-vars",
+          "{\"accessToken\": \"${session.accessToken}\", \"refreshToken\": \"${session.refreshToken}\", \"tokenType\": \"${session.tokenType}\", \"scope\": \"${session.scope}\", \"expiresAt\": \"${session.expiresAt.toString()}\", \"sub\": \"${session.sub}\", \"\$dPoPNonce\": \"${session.$dPoPNonce}\", \"\$publicKey\": \"${session.$publicKey}\", \"\$privateKey\": \"${session.$privateKey}\"}");
     } catch (e) {
       rethrow;
     }
