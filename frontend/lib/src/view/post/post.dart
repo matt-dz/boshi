@@ -1,6 +1,7 @@
 import 'package:atproto/core.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/src/model/oauth/oauth_repository.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -33,7 +34,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ShadButton.ghost(
-                        height: 30, width: 120, child: const Text("Cancel")),
+                        height: 30,
+                        width: 120,
+                        onPressed: () {
+                          context.go("/");
+                        },
+                        child: const Text("Cancel")),
                     Consumer<OAuthRepository>(builder: (context, oauth, child) {
                       return ShadButton.ghost(
                           height: 30,
