@@ -68,9 +68,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 } catch (e) {
                                   rethrow;
                                 }
-                              } else {
-                                print("Please log in!");
-                              }
+                              } else {}
                             }
                           },
                           child: const Text("Post"));
