@@ -45,18 +45,29 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           height: 30,
                           width: 120,
                           enabled: _titleExists && _contentExists,
-                          onPressed: () {
+                          onPressed: () async {
                             if (formKey.currentState!.saveAndValidate()) {
                               if (oauth.atProtoSession != null) {
-                                oauth.atProtoSession!.repo.createRecord(
-                                    collection:
-                                        NSID.create('feed.boshi.app', 'post'),
-                                    record: {
-                                      "title":
-                                          formKey.currentState!.value["title"],
-                                      "content":
-                                          formKey.currentState!.value["content"]
-                                    });
+                                try {
+                                  final ref = await oauth.atProtoSession!.repo
+                                      .createRecord(
+                                          collection: NSID.create(
+                                              'feed.boshi.app', 'post'),
+                                          record: {
+                                        "title": formKey
+                                            .currentState!.value["title"],
+                                        "content": formKey
+                                            .currentState!.value["content"]
+                                      });
+                                  if (ref.status == HttpStatus.ok) {
+                                    if (context.mounted) context.go("/");
+                                  } else {
+                                    throw Exception(
+                                        "Failed to create record with status: ${ref.status}");
+                                  }
+                                } catch (e) {
+                                  rethrow;
+                                }
                               } else {
                                 print("Please log in!");
                               }
