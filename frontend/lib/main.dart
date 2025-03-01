@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -18,7 +17,6 @@ import 'package:frontend/data/repositories/oauth.dart';
 import 'main_development.dart' as dev;
 
 void main() {
-  usePathUrlStrategy();
   dev.main();
   // runApp(
   //   MultiProvider(
