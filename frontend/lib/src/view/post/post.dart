@@ -68,7 +68,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 } catch (e) {
                                   rethrow;
                                 }
-                              } else {}
+                              } else {
+                                print("No session");
+                              }
+                            } else {
+                              print("Failed to validate state");
                             }
                           },
                           child: const Text("Post"));
