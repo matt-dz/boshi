@@ -1,7 +1,28 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+
+import 'package:frontend/ui/login/view/login.dart';
+import 'package:frontend/data/repositories/oauth.dart';
+import 'package:frontend/ui/login/view/login_redirect.dart';
+
+import 'package:frontend/ui/home/widgets/home_screen.dart';
+
 void main() {
-  runApp(const MyApp());
+  usePathUrlStrategy();
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+          create: (context) => OAuthRepository(
+              clientId: Uri.base.isScheme("http")
+                  ? Uri.base
+                  : Uri.parse("${Uri.base.origin}/oauth/client-metadata.json")))
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -10,34 +31,48 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+            path: '/', builder: (context, state) => HomeScreen(title: "Boshi")),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => LoginPage(),
+          routes: [
+            GoRoute(
+              path: '/redirect',
+              builder: (context, state) =>
+                  Consumer<OAuthRepository>(builder: (context, oauth, child) {
+                if (oauth.atProtoSession == null) {
+                  oauth.generateSession(Uri.base.toString());
+                }
+                return RedirectPage(atpSession: oauth.atProtoSession);
+              }),
+            ),
+          ],
+        ),
+      ],
+    );
+
+    return ShadApp.materialRouter(
+      materialThemeBuilder: (context, theme) {
+        return theme.copyWith();
+      },
+      routerConfig: router,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,19 +86,17 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+          children: [
+            Consumer<OAuthRepository>(builder: (context, oauth, child) {
+              if (oauth.atProtoSession != null) {
+                return Text("Your session: ${oauth.atProtoSession?.identity}");
+              } else {
+                oauth.refreshSession();
+                return Text("Please sign in.");
+              }
+            }),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

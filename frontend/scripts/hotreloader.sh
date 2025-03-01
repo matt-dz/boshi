@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -euo pipefail
 PIDFILE="/tmp/flutter.pid"
 if [[ "${1-}" != "" && -e $PIDFILE ]]; then

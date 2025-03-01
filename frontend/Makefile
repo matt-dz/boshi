@@ -8,7 +8,7 @@ TAG ?= latest
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 PLATFORM ?= linux/arm64
 
-DEVICE_ID ?= macos
+DEVICE_ID ?= chrome
 
 all:
 	scripts/start.sh &

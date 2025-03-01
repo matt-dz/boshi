@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:frontend/src/model/oauth/oauth_repository.dart';
+import 'package:frontend/data/repositories/oauth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

@@ -2,7 +2,7 @@
   "client_id": "https://<URL>.deguzman.cloud/oauth/client-metadata.json",
   "client_name": "Boshi",
   "client_uri": "https://<URL>.deguzman.cloud",
-  "redirect_uris": ["https://<URL>.deguzman.cloud"],
+  "redirect_uris": ["https://<URL>.deguzman.cloud/login/redirect/"],
   "grant_types": ["authorization_code", "refresh_token"],
   "scope": "atproto transition:generic",
   "response_types": ["code"],

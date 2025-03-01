@@ -1,5 +1,4 @@
 #!/bin/bash
-
 while true
 do
     find lib/ -name '*.dart' | \

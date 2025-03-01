@@ -2,7 +2,7 @@ import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
 import 'package:flutter/material.dart';
 
-import 'package:frontend/src/model/oauth/oauth_service.dart';
+import 'package:frontend/data/services/oauth.dart';
 
 class OAuthRepository extends ChangeNotifier {
   OAuthRepository({required Uri clientId, this.service = "bsky.social"})
