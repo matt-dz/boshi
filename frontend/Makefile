@@ -8,6 +8,12 @@ TAG ?= latest
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 PLATFORM ?= linux/arm64
 
+DEVICE_ID ?= chrome
+
+all:
+	scripts/start.sh &
+	flutter run -d ${DEVICE_ID} --pid-file /tmp/flutter.pid
+
 docker:
 	@echo "Building $(BUILD_NAME)"
 	host=$$(../scripts/generate-subdomain.sh).deguzman.cloud && \

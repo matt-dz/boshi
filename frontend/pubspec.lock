@@ -493,6 +493,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.0"
+  phosphor_flutter:
+    dependency: "direct main"
+    description:
+      name: phosphor_flutter
+      sha256: "8a14f238f28a0b54842c5a4dc20676598dd4811fcba284ed828bd5a262c11fde"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   platform:
     dependency: transitive
     description:
@@ -529,10 +537,10 @@ packages:
     dependency: "direct main"
     description:
       name: shadcn_ui
-      sha256: "0c086976723e9d1257c0e9a06217e2369f7dd764c3986be6b1d1e5b1b73b60b7"
+      sha256: c624e8cbcac72a978233802e86e172896188798bcb9bb1e00c5e1f6f56cf5003
       url: "https://pub.dev"
     source: hosted
-    version: "0.20.0"
+    version: "0.21.0"
   shared_preferences:
     dependency: "direct main"
     description:

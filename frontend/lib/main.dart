@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:frontend/src/model/oauth/oauth_repository.dart';
-import 'package:frontend/src/view/login/redirect.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/src/view/login/login.dart';
+import 'package:frontend/ui/login/view/login.dart';
+import 'package:frontend/data/repositories/oauth.dart';
+import 'package:frontend/ui/login/view/login_redirect.dart';
+
+import 'package:frontend/ui/home/widgets/home_screen.dart';
 
 void main() {
   usePathUrlStrategy();
@@ -32,9 +34,7 @@ class MyApp extends StatelessWidget {
     final router = GoRouter(
       routes: [
         GoRoute(
-          path: '/',
-          builder: (context, state) => MyHomePage(title: "hello"),
-        ),
+            path: '/', builder: (context, state) => HomeScreen(title: "Boshi")),
         GoRoute(
           path: '/login',
           builder: (context, state) => LoginPage(),
@@ -63,16 +63,16 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
