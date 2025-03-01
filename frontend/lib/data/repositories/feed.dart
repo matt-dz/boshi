@@ -1,0 +1,1 @@
+/* Retrieves and formats data from the feed service */

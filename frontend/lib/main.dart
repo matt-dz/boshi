@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/ui/login/view/login.dart';
+import 'package:frontend/ui/login/view_model/login.dart';
 import 'package:frontend/data/repositories/oauth.dart';
-import 'package:frontend/ui/login/view/login_redirect.dart';
+import 'package:frontend/ui/login/view_model/login_redirect.dart';
 
 import 'package:frontend/ui/home/widgets/home_screen.dart';
 
