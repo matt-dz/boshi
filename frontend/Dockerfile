@@ -1,8 +1,9 @@
 # Build flutter project
 FROM --platform=$BUILDPLATFORM ghcr.io/cirruslabs/flutter:stable AS build
+ARG BUILD_TARGET
 WORKDIR /app
 COPY . .
-RUN flutter build web
+RUN flutter build web -t $BUILD_TARGET
 
 
 # Serve project with nginx
