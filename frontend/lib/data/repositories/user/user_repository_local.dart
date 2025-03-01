@@ -4,7 +4,7 @@ import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
 import 'user_repository.dart';
 
-class UserRepositoryLocal extends UserRepository {
+class UserRepositoryLocal implements UserRepository {
   UserRepositoryLocal({required LocalDataService localDataService})
       : _localDataService = localDataService;
 

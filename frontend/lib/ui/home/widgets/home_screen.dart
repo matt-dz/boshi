@@ -5,9 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:frontend/ui/core/ui/header.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.title});
+import '../view_model/home_viewmodel.dart';
 
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key, required this.title, required this.viewModel});
+
+  final HomeViewModel viewModel;
   final String title;
 
   @override
@@ -17,26 +20,30 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Header(title: widget.title),
-          Expanded(
-            child: Center(
-              child:
-                  Consumer<OAuthRepository>(builder: (context, oauth, child) {
-                if (oauth.atProtoSession != null) {
-                  return Text(
-                      'Your session: ${oauth.atProtoSession?.identity}',);
-                } else {
-                  oauth.refreshSession();
-                  return Text('Please sign in.');
-                }
-              },),
-            ),
-          ),
-          Footer(),
-        ],
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          children: [
+            Header(title: widget.title),
+            // Expanded(
+            //   child: Center(
+            //     child: Consumer<OAuthRepository>(
+            //       builder: (context, oauth, child) {
+            //         if (oauth.atProtoSession != null) {
+            //           return Text(
+            //             'Your session: ${oauth.atProtoSession?.identity}',
+            //           );
+            //         } else {
+            //           oauth.refreshSession();
+            //           return Text('Please sign in.');
+            //         }
+            //       },
+            //     ),
+            //   ),
+            // ),
+            Footer(),
+          ],
+        ),
       ),
     );
   }

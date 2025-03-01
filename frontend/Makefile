@@ -9,10 +9,15 @@ BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 PLATFORM ?= linux/arm64
 
 DEVICE_ID ?= chrome
+MAIN_STAGING = lib/main_staging.dart
+DEV_STAGING = lib/main_development.dart
 
 all:
 	scripts/start.sh &
-	flutter run -d ${DEVICE_ID} --pid-file /tmp/flutter.pid
+	flutter run -d ${DEVICE_ID} --target ${DEV_STAGING} --pid-file /tmp/flutter.pid
+
+staging:
+	flutter run -d ${DEVICE_ID} --target ${MAIN_STAGING}
 
 docker:
 	@echo "Building $(BUILD_NAME)"

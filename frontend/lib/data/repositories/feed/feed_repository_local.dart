@@ -4,7 +4,7 @@ import 'package:frontend/data/services/local/local_data_service.dart';
 
 import 'feed_repository.dart';
 
-class FeedRepositoryLocal extends FeedRepository {
+class FeedRepositoryLocal implements FeedRepository {
   FeedRepositoryLocal({required LocalDataService localDataService})
       : _localDataService = localDataService;
 

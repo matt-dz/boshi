@@ -4,7 +4,7 @@ import 'package:frontend/data/services/api/api_client.dart';
 
 import 'user_repository.dart';
 
-class UserRepositoryRemote extends UserRepository {
+class UserRepositoryRemote implements UserRepository {
   UserRepositoryRemote({required ApiClient apiClient}) : _apiClient = apiClient;
 
   final ApiClient _apiClient;
@@ -13,4 +13,5 @@ class UserRepositoryRemote extends UserRepository {
   @override
   Future<Result<User>> getUser() async {
     return await _apiClient.getUser();
+  }
 }

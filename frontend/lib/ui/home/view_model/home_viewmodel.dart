@@ -1,4 +1,3 @@
-/* Retrieve feed from the feed repository */
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
@@ -12,8 +11,9 @@ import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/utils/command.dart';
 
-class FeedViewModel extends ChangeNotifier {
-  FeedViewModel({
+/// ViewModel for the Feed page
+class HomeViewModel extends ChangeNotifier {
+  HomeViewModel({
     required FeedRepository feedRepository,
     required UserRepository userRepository,
   })  : _feedRepository = feedRepository,

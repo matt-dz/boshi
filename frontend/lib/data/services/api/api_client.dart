@@ -6,9 +6,9 @@ import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
 
 class ApiClient {
-  ApiClient(String? host, int? port, HttpClient Function()? clientFactory)
-      : _host = host ?? EnvironmentConfig.backendHost,
-        _port = port ?? int.parse(EnvironmentConfig.backendPort),
+  ApiClient({String? host, int? port, HttpClient Function()? clientFactory})
+      : _host = host ?? 'localhost',
+        _port = port ?? 8080,
         _clientFactory = clientFactory ?? HttpClient.new;
 
   final String _host;
