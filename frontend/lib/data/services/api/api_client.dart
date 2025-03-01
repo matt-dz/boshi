@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/config/environment.dart';
 import 'package:frontend/domain/models/post/post.dart';
@@ -18,6 +17,11 @@ class ApiClient {
 
   // TODO: Implement the getFeed method
   Future<Result<List<Post>>> getFeed() async {
+    return Result.error(throw UnimplementedError());
+  }
+
+  // TODO: Implement the getUser method
+  Future<Result<User>> getUser() async {
     return Result.error(throw UnimplementedError());
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/config/environment.dart';
 import 'package:frontend/domain/models/post/post.dart';
@@ -156,5 +157,11 @@ class LocalDataService {
         comments: [],
       ),
     ];
+  }
+
+  Future<Result<User>> getUser() async {
+    return Result.ok(
+      User(id: '1', username: 'anonymous1', school: 'University of Florida'),
+    );
   }
 }

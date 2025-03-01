@@ -1,1 +1,0 @@
-/* Display feed from the feed view model */
