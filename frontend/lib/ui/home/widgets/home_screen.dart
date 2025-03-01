@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/repositories/oauth.dart';
-import 'package:provider/provider.dart';
 
 import 'package:frontend/ui/core/ui/header.dart';
 import 'package:frontend/ui/core/ui/footer.dart';

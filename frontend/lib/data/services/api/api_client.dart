@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:js_interop';
 
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/domain/models/post/post.dart';
