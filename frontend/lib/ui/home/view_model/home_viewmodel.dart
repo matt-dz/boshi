@@ -10,6 +10,7 @@ import 'package:frontend/data/repositories/user/user_repository.dart';
 
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/utils/command.dart';
+import 'package:frontend/utils/logger.dart';
 
 /// ViewModel for the Feed page
 class HomeViewModel extends ChangeNotifier {
@@ -31,25 +32,27 @@ class HomeViewModel extends ChangeNotifier {
   List<Post> _posts = [];
   UnmodifiableListView<Post> get posts => UnmodifiableListView(_posts);
 
-  // TODO: Add logging
   Future<Result> _load() async {
     try {
+      logger.d('Retrieving feed');
       final feedResult = await _feedRepository.getFeed();
       switch (feedResult) {
         case Ok<List<Post>>():
           _posts = feedResult.value;
         case Error<List<Post>>():
+          logger.e('Error loading feed: ${feedResult.error}');
           return feedResult;
       }
 
+      logger.d('Retrieving user');
       final userResult = await _userRepository.getUser();
       switch (userResult) {
         case Ok<User>():
           _user = userResult.value;
-          return userResult;
         case Error<User>():
-          return userResult;
+          logger.e('Error retrieving user: ${userResult.error}');
       }
+      return userResult;
     } finally {
       notifyListeners();
     }
