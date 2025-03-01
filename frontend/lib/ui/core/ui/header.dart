@@ -19,11 +19,11 @@ class _HeaderState extends State<Header> {
             padding: EdgeInsets.fromLTRB(0, 12, 0, 12),
             child: TextButton(
               child: Text('Boshi',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),),
               onPressed: () {
                 print('Boshi pressed!');
               },
-            )),
+            ),),
         ShadDivider.horizontal(margin: EdgeInsets.zero),
       ],
     );

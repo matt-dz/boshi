@@ -17,12 +17,12 @@ void main() {
     providers: [
       ChangeNotifierProvider(
           create: (context) => OAuthRepository(
-              clientId: Uri.base.isScheme("http")
+              clientId: Uri.base.isScheme('http')
                   ? Uri.base
-                  : Uri.parse("${Uri.base.origin}/oauth/client-metadata.json")))
+                  : Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),),),
     ],
     child: const MyApp(),
-  ));
+  ),);
 }
 
 class MyApp extends StatelessWidget {
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
     final router = GoRouter(
       routes: [
         GoRoute(
-            path: '/', builder: (context, state) => HomeScreen(title: "Boshi")),
+            path: '/', builder: (context, state) => HomeScreen(title: 'Boshi'),),
         GoRoute(
           path: '/login',
           builder: (context, state) => LoginPage(),
@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
                   oauth.generateSession(Uri.base.toString());
                 }
                 return RedirectPage(atpSession: oauth.atProtoSession);
-              }),
+              },),
             ),
           ],
         ),
@@ -89,12 +89,12 @@ class _HomePageState extends State<HomePage> {
           children: [
             Consumer<OAuthRepository>(builder: (context, oauth, child) {
               if (oauth.atProtoSession != null) {
-                return Text("Your session: ${oauth.atProtoSession?.identity}");
+                return Text('Your session: ${oauth.atProtoSession?.identity}');
               } else {
                 oauth.refreshSession();
-                return Text("Please sign in.");
+                return Text('Please sign in.');
               }
-            }),
+            },),
           ],
         ),
       ),

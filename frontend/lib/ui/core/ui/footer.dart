@@ -31,7 +31,7 @@ class Footer extends StatelessWidget {
                       ),
                       IconButton(
                         icon: Icon(PhosphorIconsRegular.graduationCap,
-                            size: _iconSize),
+                            size: _iconSize,),
                         onPressed: () {
                           print('school pressed!');
                         },
@@ -75,7 +75,7 @@ class Footer extends StatelessWidget {
                   ),
                 ),
               ],
-            )),
+            ),),
       ],
     );
     // return AppBar(

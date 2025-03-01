@@ -18,20 +18,20 @@ class _RedirectPageState extends State<RedirectPage> {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        if (widget.atpSession != null) context.go("/");
+        if (widget.atpSession != null) context.go('/');
       } on OAuthException {
         rethrow;
       }
     });
 
     return Center(
-      child: const Text("Redirecting...",
+      child: const Text('Redirecting...',
           style: TextStyle(
             fontSize: 18.0,
             fontWeight: FontWeight.normal,
             color: Colors.black,
             decoration: TextDecoration.none,
-          )),
+          ),),
     );
   }
 }

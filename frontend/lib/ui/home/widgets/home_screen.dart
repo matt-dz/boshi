@@ -27,12 +27,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   Consumer<OAuthRepository>(builder: (context, oauth, child) {
                 if (oauth.atProtoSession != null) {
                   return Text(
-                      "Your session: ${oauth.atProtoSession?.identity}");
+                      'Your session: ${oauth.atProtoSession?.identity}',);
                 } else {
                   oauth.refreshSession();
-                  return Text("Please sign in.");
+                  return Text('Please sign in.');
                 }
-              }),
+              },),
             ),
           ),
           Footer(),
