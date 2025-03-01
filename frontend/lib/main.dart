@@ -11,18 +11,22 @@ import 'package:frontend/ui/login/view_model/login_redirect.dart';
 
 import 'package:frontend/ui/home/widgets/home_screen.dart';
 
-void main() {
+Future<void> main() async {
   usePathUrlStrategy();
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
           create: (context) => OAuthRepository(
-              clientId: Uri.base.isScheme('http')
-                  ? Uri.base
-                  : Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),),),
-    ],
-    child: const MyApp(),
-  ),);
+            clientId: Uri.base.isScheme('http')
+                ? Uri.base
+                : Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),
+          ),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -34,20 +38,23 @@ class MyApp extends StatelessWidget {
     final router = GoRouter(
       routes: [
         GoRoute(
-            path: '/', builder: (context, state) => HomeScreen(title: 'Boshi'),),
+          path: '/',
+          builder: (context, state) => HomeScreen(title: 'Boshi'),
+        ),
         GoRoute(
           path: '/login',
           builder: (context, state) => LoginPage(),
           routes: [
             GoRoute(
               path: '/redirect',
-              builder: (context, state) =>
-                  Consumer<OAuthRepository>(builder: (context, oauth, child) {
-                if (oauth.atProtoSession == null) {
-                  oauth.generateSession(Uri.base.toString());
-                }
-                return RedirectPage(atpSession: oauth.atProtoSession);
-              },),
+              builder: (context, state) => Consumer<OAuthRepository>(
+                builder: (context, oauth, child) {
+                  if (oauth.atProtoSession == null) {
+                    oauth.generateSession(Uri.base.toString());
+                  }
+                  return RedirectPage(atpSession: oauth.atProtoSession);
+                },
+              ),
             ),
           ],
         ),
@@ -87,14 +94,17 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Consumer<OAuthRepository>(builder: (context, oauth, child) {
-              if (oauth.atProtoSession != null) {
-                return Text('Your session: ${oauth.atProtoSession?.identity}');
-              } else {
-                oauth.refreshSession();
-                return Text('Please sign in.');
-              }
-            },),
+            Consumer<OAuthRepository>(
+              builder: (context, oauth, child) {
+                if (oauth.atProtoSession != null) {
+                  return Text(
+                      'Your session: ${oauth.atProtoSession?.identity}');
+                } else {
+                  oauth.refreshSession();
+                  return Text('Please sign in.');
+                }
+              },
+            ),
           ],
         ),
       ),
