@@ -1,6 +1,8 @@
-String timeSincePosting(DateTime time) {
+import 'package:frontend/domain/models/content_item/content_item.dart';
+
+String timeSincePosting(ContentItem contentItem) {
   final currentTime = DateTime.now().toUtc();
-  final timeDifference = currentTime.difference(time.toUtc());
+  final timeDifference = currentTime.difference(contentItem.timestamp.toUtc());
 
   if (timeDifference.inDays >= 7) {
     return '${timeDifference.inDays ~/ 7}w';

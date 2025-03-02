@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/domain/models/reply/reply.dart';
-import 'package:frontend/utils/thread.dart';
+import 'package:frontend/utils/content_item.dart';
 
 class ReplyWidget extends StatelessWidget {
   const ReplyWidget({
@@ -45,7 +45,7 @@ class ReplyWidget extends StatelessWidget {
                 ),
                 Text(
                   '${reply.author.school}'
-                  ' ・ ${timeSincePosting(reply.timestamp)}',
+                  ' ・ ${timeSincePosting(reply)}',
                   style: TextStyle(
                     color: Colors.grey.shade700,
                     fontSize: 12,

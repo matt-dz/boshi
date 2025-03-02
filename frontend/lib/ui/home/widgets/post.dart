@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/domain/models/post/post.dart';
-import 'package:frontend/utils/thread.dart';
+import 'package:frontend/utils/content_item.dart';
 
 class PostWidget extends StatelessWidget {
   const PostWidget({
@@ -42,7 +42,7 @@ class PostWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${post.author.school} ・ ${timeSincePosting(post.timestamp)}',
+                  '${post.author.school} ・ ${timeSincePosting(post)}',
                   style: TextStyle(
                     color: Colors.grey.shade700,
                     fontSize: 12,
