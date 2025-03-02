@@ -2,10 +2,10 @@ import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
 import 'package:flutter/material.dart';
 
-import 'package:frontend/src/model/oauth/oauth_service.dart';
+import 'package:frontend/data/services/oauth.dart';
 
 class OAuthRepository extends ChangeNotifier {
-  OAuthRepository({required Uri clientId, this.service = "bsky.social"})
+  OAuthRepository({required Uri clientId, this.service = 'bsky.social'})
       : _clientId = clientId;
 
   final Uri _clientId;
@@ -26,16 +26,16 @@ class OAuthRepository extends ChangeNotifier {
   Future<void> generateOAuthClient() async {
     if (_clientId.isScheme('http')) {
       _oAuthClientMetadata = OAuthClientMetadata.fromJson({
-        "client_id": "${_clientId.scheme}://${_clientId.host}",
-        "client_name": "Boshi",
-        "client_uri": _clientId.toString(),
-        "redirect_uris": ["http://127.0.0.1:${_clientId.port}/"],
-        "grant_types": ["authorization_code", "refresh_token"],
-        "scope": "atproto",
-        "response_types": ["code"],
-        "token_endpoint_auth_method": "none",
-        "application_type": "web",
-        "dpop_bound_access_tokens": true
+        'client_id': '${_clientId.scheme}://${_clientId.host}',
+        'client_name': 'Boshi',
+        'client_uri': _clientId.toString(),
+        'redirect_uris': ['http://127.0.0.1:${_clientId.port}/'],
+        'grant_types': ['authorization_code', 'refresh_token'],
+        'scope': 'atproto',
+        'response_types': ['code'],
+        'token_endpoint_auth_method': 'none',
+        'application_type': 'web',
+        'dpop_bound_access_tokens': true,
       });
     } else {
       _oAuthClientMetadata =

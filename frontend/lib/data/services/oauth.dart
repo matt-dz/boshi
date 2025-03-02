@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:js_interop';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -52,9 +51,9 @@ class OAuthService {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      final codeVerifier = prefs.getString("oauth-code-verifier");
-      final state = prefs.getString("oauth-state");
-      final dpopNonce = prefs.getString("oauth-dpop-nonce");
+      final codeVerifier = prefs.getString('oauth-code-verifier');
+      final state = prefs.getString('oauth-state');
+      final dpopNonce = prefs.getString('oauth-dpop-nonce');
 
       if (codeVerifier != null && state != null && dpopNonce != null) {
         final context = OAuthContext(
@@ -70,7 +69,7 @@ class OAuthService {
         final atProtoSession = atp.ATProto.fromOAuthSession(session);
         return (session, atProtoSession);
       } else {
-        throw ArgumentError("Context not set");
+        throw ArgumentError('Context not set');
       }
     } on OAuthException {
       rethrow;
@@ -92,11 +91,11 @@ class OAuthService {
             scope: sessionMap['scope'],
             expiresAt: DateTime.parse(sessionMap['expiresAt']),
             sub: sessionMap['sub'],
-            $dPoPNonce: sessionMap['\$dPoPNonce'],
-            $publicKey: sessionMap['\$publicKey'],
-            $privateKey: sessionMap['\$privateKey']);
+            $dPoPNonce: sessionMap[r'$dPoPNonce'],
+            $publicKey: sessionMap[r'$publicKey'],
+            $privateKey: sessionMap[r'$privateKey'],);
       } else {
-        throw ArgumentError("No session stored");
+        throw ArgumentError('No session stored');
       }
     } on ArgumentError {
       rethrow;
@@ -107,18 +106,18 @@ class OAuthService {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString(
-          "session-vars",
+          'session-vars',
           json.encode({
-            "accessToken": session.accessToken,
-            "refreshToken": session.refreshToken,
-            "tokenType": session.tokenType,
-            "scope": session.scope,
-            "expiresAt": session.expiresAt.toString(),
-            "sub": session.sub,
-            "\$dPoPNonce": session.$dPoPNonce,
-            "\$publicKey": session.$publicKey,
-            "\$privateKey": session.$privateKey,
-          }));
+            'accessToken': session.accessToken,
+            'refreshToken': session.refreshToken,
+            'tokenType': session.tokenType,
+            'scope': session.scope,
+            'expiresAt': session.expiresAt.toString(),
+            'sub': session.sub,
+            r'$dPoPNonce': session.$dPoPNonce,
+            r'$publicKey': session.$publicKey,
+            r'$privateKey': session.$privateKey,
+          }),);
     } catch (e) {
       rethrow;
     }
