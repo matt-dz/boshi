@@ -41,23 +41,19 @@ class Footer extends StatelessWidget {
                         logger.d('school pressed!');
                       },
                     ),
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
+                    IconButton(
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        shape: CircleBorder(),
                       ),
-                      child: IconButton(
-                        icon: Icon(
-                          PhosphorIconsRegular.plus,
-                          color: Colors.white,
-                          size: _iconSize,
-                        ),
-                        onPressed: () {
-                          logger.d('plus pressed!');
-                        },
+                      icon: Icon(
+                        PhosphorIconsRegular.plus,
+                        size: _iconSize,
+                        color: Colors.white,
                       ),
+                      onPressed: () {
+                        logger.d('plus pressed!');
+                      },
                     ),
                     IconButton(
                       icon: Icon(PhosphorIconsRegular.bell, size: _iconSize),
