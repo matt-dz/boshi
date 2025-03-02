@@ -51,7 +51,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     validator: (v) {
                       if (v.isEmpty) {
-                        return "Provider must not be empty.\nDefault value is 'bsky.social'";
+                        return 'Provider must not be empty.'
+                            "Default value is 'bsky.social'";
                       }
                       return null;
                     },

@@ -64,6 +64,6 @@ List<SingleChildWidget> get providersLocal {
       create: (context) => FeedRepositoryLocal(
         localDataService: context.read<LocalDataService>(),
       ) as FeedRepository,
-    )
+    ),
   ];
 }

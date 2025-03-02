@@ -35,7 +35,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
             author: User(
                 id: '1',
                 username: 'anonymous1',
-                school: 'University of Florida'),
+                school: 'University of Florida',),
             content: 'This is a reply',
             timestamp: DateTime.now(),
             reactions: {},

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
+import 'package:frontend/utils/logger.dart';
+
 class Footer extends StatelessWidget {
   const Footer({super.key});
 
@@ -26,7 +28,7 @@ class Footer extends StatelessWidget {
                     IconButton(
                       icon: Icon(PhosphorIconsRegular.house, size: _iconSize),
                       onPressed: () {
-                        print('pencil pressed!');
+                        logger.d('pencil pressed!');
                       },
                     ),
                     IconButton(
@@ -35,7 +37,7 @@ class Footer extends StatelessWidget {
                         size: _iconSize,
                       ),
                       onPressed: () {
-                        print('school pressed!');
+                        logger.d('school pressed!');
                       },
                     ),
                     Stack(
@@ -56,7 +58,7 @@ class Footer extends StatelessWidget {
                             size: _iconSize,
                           ),
                           onPressed: () {
-                            print('plus pressed!');
+                            logger.d('plus pressed!');
                           },
                         ),
                       ],
@@ -64,13 +66,13 @@ class Footer extends StatelessWidget {
                     IconButton(
                       icon: Icon(PhosphorIconsRegular.bell, size: _iconSize),
                       onPressed: () {
-                        print('bell pressed!');
+                        logger.d('bell pressed!');
                       },
                     ),
                     IconButton(
                       icon: Icon(PhosphorIconsRegular.user, size: _iconSize),
                       onPressed: () {
-                        print('person pressed!');
+                        logger.d('person pressed!');
                       },
                     ),
                   ],

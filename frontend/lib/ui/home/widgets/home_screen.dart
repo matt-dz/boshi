@@ -35,22 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     posts: widget.viewModel.posts,
                   ),
                 ),
-                // Expanded(
-                //   child: Center(
-                //     child: Consumer<OAuthRepository>(
-                //       builder: (context, oauth, child) {
-                //         if (oauth.atProtoSession != null) {
-                //           return Text(
-                //             'Your session: ${oauth.atProtoSession?.identity}',
-                //           );
-                //         } else {
-                //           oauth.refreshSession();
-                //           return Text('Please sign in.');
-                //         }
-                //       },
-                //     ),
-                //   ),
-                // ),
                 Footer(),
               ],
             );
