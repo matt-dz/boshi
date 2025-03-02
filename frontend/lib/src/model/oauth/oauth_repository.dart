@@ -4,24 +4,28 @@ import 'package:flutter/material.dart';
 
 import 'package:frontend/src/model/oauth/oauth_service.dart';
 
-class OAuthRepository extends ChangeNotifier {
+class OAuthRepository with ChangeNotifier {
   OAuthRepository({required Uri clientId, this.service = "bsky.social"})
       : _clientId = clientId;
 
   final Uri _clientId;
-
+  final OAuthService _oAuthService = OAuthService();
   String service;
+
   late OAuthClientMetadata _oAuthClientMetadata;
   late OAuthClient _oAuthClient;
   late OAuthContext _oAuthContext;
   OAuthSession? _oAuthSession;
   atp.ATProto? _atProto;
 
-  OAuthContext? get oAuthContext => _oAuthContext;
+  OAuthContext get oAuthContext => _oAuthContext;
   OAuthSession? get oAuthSession => _oAuthSession;
   atp.ATProto? get atProtoSession => _atProto;
 
-  final OAuthService _oAuthService = OAuthService();
+  void setService(String newService) {
+    service = newService;
+    notifyListeners();
+  }
 
   Future<void> generateOAuthClient() async {
     if (_clientId.isScheme('http')) {

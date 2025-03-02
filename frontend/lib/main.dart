@@ -92,9 +92,15 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            FilledButton(
+                onPressed: () {
+                  context.go("/post");
+                },
+                child: const Text("Post")),
             Consumer<OAuthRepository>(builder: (context, oauth, child) {
               if (oauth.atProtoSession != null) {
-                return Text("Your session: ${oauth.atProtoSession?.identity}");
+                return Text(
+                    "Your session: ${oauth.atProtoSession!.oAuthSession!.expiresAt}");
               } else {
                 oauth.refreshSession();
                 return Text("Please sign in.");
