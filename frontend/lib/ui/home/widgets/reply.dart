@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/domain/models/post/post.dart';
+import 'package:frontend/domain/models/reply/reply.dart';
 import 'package:frontend/utils/thread.dart';
 
-class PostWidget extends StatelessWidget {
-  const PostWidget({
+class ReplyWidget extends StatelessWidget {
+  const ReplyWidget({
     super.key,
-    required this.post,
+    required this.reply,
+    required this.replyDepth,
   });
 
-  final Post post;
+  final Reply reply;
+  final int replyDepth;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(8, 16, 8, 16),
+      padding: EdgeInsets.fromLTRB((8 + replyDepth * 50).toDouble(), 16, 8, 16),
       child: Container(
         padding: EdgeInsets.all(8),
         width: 450,
@@ -35,14 +37,15 @@ class PostWidget extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '${post.author.username} ',
+                  '${reply.author.username} ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                   ),
                 ),
                 Text(
-                  '${post.author.school} ・ ${timeSincePosting(post.timestamp)}',
+                  '${reply.author.school}'
+                  ' ・ ${timeSincePosting(reply.timestamp)}',
                   style: TextStyle(
                     color: Colors.grey.shade700,
                     fontSize: 12,
@@ -51,14 +54,7 @@ class PostWidget extends StatelessWidget {
               ],
             ),
             Text(
-              post.title,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-            Text(
-              post.content,
+              reply.content,
             ),
           ],
         ),

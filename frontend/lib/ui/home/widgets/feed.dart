@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/domain/models/post/post.dart';
 
-import 'post.dart';
+import 'thread.dart';
 
 class FeedWidget extends StatelessWidget {
   const FeedWidget({
@@ -33,7 +33,7 @@ class FeedWidget extends StatelessWidget {
         Column(
           children: [
             for (final post in posts)
-              PostWidget(
+              Thread(
                 key: Key(post.id),
                 post: post,
               ),
