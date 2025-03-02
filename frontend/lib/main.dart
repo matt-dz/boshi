@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:frontend/src/model/oauth/oauth_repository.dart';
 import 'package:frontend/src/view/login/redirect.dart';
+import 'package:frontend/src/view/post/post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -34,6 +35,10 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/',
           builder: (context, state) => MyHomePage(title: "hello"),
+        ),
+        GoRoute(
+          path: '/post',
+          builder: (context, state) => CreatePostPage(),
         ),
         GoRoute(
           path: '/login',
@@ -87,9 +92,15 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            FilledButton(
+                onPressed: () {
+                  context.go("/post");
+                },
+                child: const Text("Post")),
             Consumer<OAuthRepository>(builder: (context, oauth, child) {
               if (oauth.atProtoSession != null) {
-                return Text("Your session: ${oauth.atProtoSession?.identity}");
+                return Text(
+                    "Your session: ${oauth.atProtoSession!.oAuthSession!.expiresAt}");
               } else {
                 oauth.refreshSession();
                 return Text("Please sign in.");

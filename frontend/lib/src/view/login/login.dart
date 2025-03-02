@@ -19,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text('Boshi')),
       body: Center(
           child: ShadCard(
               width: 350,
@@ -76,8 +76,8 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed: () async {
                                     if (formKey.currentState!
                                         .saveAndValidate()) {
-                                      oauth.service = formKey
-                                          .currentState!.value["auth_provider"];
+                                      oauth.setService(formKey.currentState!
+                                          .value["auth_provider"]);
                                       Uri authUri = await oauth
                                           .getAuthorizationURI(formKey
                                               .currentState!.value["identity"]);
