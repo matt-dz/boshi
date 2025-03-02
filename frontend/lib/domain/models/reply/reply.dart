@@ -1,22 +1,21 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/domain/models/content_item/content_item.dart';
-import 'package:frontend/domain/models/reply/reply.dart';
 
-part 'post.freezed.dart';
-part 'post.g.dart';
+part 'reply.freezed.dart';
+part 'reply.g.dart';
 
 @freezed
-abstract class Post with _$Post implements ContentItem {
-  const factory Post({
+abstract class Reply with _$Reply implements ContentItem {
+  const factory Reply({
     required String id,
     required User author,
     required String content,
     required DateTime timestamp,
     required Set<String> reactions,
     required List<Reply> comments,
-    required String title,
-  }) = _Post;
+    required String replyToId,
+  }) = _Reply;
 
-  factory Post.fromJson(Map<String, Object?> json) => _$PostFromJson(json);
+  factory Reply.fromJson(Map<String, Object?> json) => _$ReplyFromJson(json);
 }

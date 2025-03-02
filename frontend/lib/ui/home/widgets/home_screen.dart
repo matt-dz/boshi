@@ -4,6 +4,9 @@ import 'package:frontend/ui/core/ui/header.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
 
 import '../view_model/home_viewmodel.dart';
+import 'feed.dart';
+
+import 'package:frontend/utils/logger.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title, required this.viewModel});
@@ -18,29 +21,40 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    logger.d('Feed: ${widget.viewModel.posts}');
     return SafeArea(
       child: Scaffold(
-        body: Column(
-          children: [
-            Header(title: widget.title),
-            // Expanded(
-            //   child: Center(
-            //     child: Consumer<OAuthRepository>(
-            //       builder: (context, oauth, child) {
-            //         if (oauth.atProtoSession != null) {
-            //           return Text(
-            //             'Your session: ${oauth.atProtoSession?.identity}',
-            //           );
-            //         } else {
-            //           oauth.refreshSession();
-            //           return Text('Please sign in.');
-            //         }
-            //       },
-            //     ),
-            //   ),
-            // ),
-            Footer(),
-          ],
+        body: ListenableBuilder(
+          listenable: widget.viewModel,
+          builder: (context, _) {
+            return Column(
+              children: [
+                Header(title: widget.title),
+                Expanded(
+                  child: FeedWidget(
+                    posts: widget.viewModel.posts,
+                  ),
+                ),
+                // Expanded(
+                //   child: Center(
+                //     child: Consumer<OAuthRepository>(
+                //       builder: (context, oauth, child) {
+                //         if (oauth.atProtoSession != null) {
+                //           return Text(
+                //             'Your session: ${oauth.atProtoSession?.identity}',
+                //           );
+                //         } else {
+                //           oauth.refreshSession();
+                //           return Text('Please sign in.');
+                //         }
+                //       },
+                //     ),
+                //   ),
+                // ),
+                Footer(),
+              ],
+            );
+          },
         ),
       ),
     );

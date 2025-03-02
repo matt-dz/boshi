@@ -19,6 +19,9 @@ all:
 staging:
 	flutter run -d ${DEVICE_ID} --target ${MAIN_STAGING}
 
+types:
+	dart run build_runner watch -d
+
 docker:
 	@echo "Building $(BUILD_NAME)"
 	host=$$(../scripts/generate-subdomain.sh).deguzman.cloud && \

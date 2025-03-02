@@ -39,6 +39,7 @@ class HomeViewModel extends ChangeNotifier {
       switch (feedResult) {
         case Ok<List<Post>>():
           _posts = feedResult.value;
+          logger.d('Retrieved feed');
         case Error<List<Post>>():
           logger.e('Error loading feed: ${feedResult.error}');
           return feedResult;

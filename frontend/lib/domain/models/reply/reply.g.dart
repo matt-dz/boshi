@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'post.dart';
+part of 'reply.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PostImpl _$$PostImplFromJson(Map<String, dynamic> json) => _$PostImpl(
+_$ReplyImpl _$$ReplyImplFromJson(Map<String, dynamic> json) => _$ReplyImpl(
       id: json['id'] as String,
       author: User.fromJson(json['author'] as Map<String, dynamic>),
       content: json['content'] as String,
@@ -16,10 +16,10 @@ _$PostImpl _$$PostImplFromJson(Map<String, dynamic> json) => _$PostImpl(
       comments: (json['comments'] as List<dynamic>)
           .map((e) => Reply.fromJson(e as Map<String, dynamic>))
           .toList(),
-      title: json['title'] as String,
+      replyToId: json['replyToId'] as String,
     );
 
-Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
+Map<String, dynamic> _$$ReplyImplToJson(_$ReplyImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'author': instance.author,
@@ -27,5 +27,5 @@ Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
       'timestamp': instance.timestamp.toIso8601String(),
       'reactions': instance.reactions.toList(),
       'comments': instance.comments,
-      'title': instance.title,
+      'replyToId': instance.replyToId,
     };

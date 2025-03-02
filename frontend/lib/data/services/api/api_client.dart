@@ -28,8 +28,10 @@ class ApiClient {
         ),
         content: 'Hello, world!',
         timestamp: DateTime.now(),
-        reactions: [],
+        reactions: {},
         comments: [],
+        id: '1',
+        title: 'Post 1',
       ),
       Post(
         author: User(
@@ -43,8 +45,10 @@ class ApiClient {
               dolore magna aliqua.
               ''',
         timestamp: DateTime.now(),
-        reactions: [],
+        reactions: {},
         comments: [],
+        title: 'Post 2',
+        id: '2',
       ),
       Post(
         author: User(
@@ -61,8 +65,10 @@ class ApiClient {
               consequat.
               ''',
         timestamp: DateTime.now(),
-        reactions: [],
+        reactions: {},
         comments: [],
+        title: 'Post 3',
+        id: '3',
       ),
       Post(
         author: User(
@@ -74,8 +80,10 @@ class ApiClient {
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
               ''',
         timestamp: DateTime.now(),
-        reactions: [],
+        reactions: {},
         comments: [],
+        title: 'Post 4',
+        id: '4',
       ),
       Post(
         author: User(
@@ -89,8 +97,10 @@ class ApiClient {
               dolore magna aliqua.
               ''',
         timestamp: DateTime.now(),
-        reactions: [],
+        reactions: {},
         comments: [],
+        title: 'Post 5',
+        id: '5',
       ),
       Post(
         author: User(
@@ -104,8 +114,10 @@ class ApiClient {
               dolore magna aliqua.
               ''',
         timestamp: DateTime.now(),
-        reactions: [],
+        reactions: {},
         comments: [],
+        title: 'Post 6',
+        id: '6',
       ),
       Post(
         author: User(
@@ -119,8 +131,10 @@ class ApiClient {
               dolore magna aliqua.
               ''',
         timestamp: DateTime.now(),
-        reactions: [],
+        reactions: {},
         comments: [],
+        title: 'Post 7',
+        id: '7',
       ),
       Post(
         author: User(
@@ -134,8 +148,10 @@ class ApiClient {
               dolore magna aliqua.
               ''',
         timestamp: DateTime.now(),
-        reactions: [],
+        reactions: {},
         comments: [],
+        title: 'Post 8',
+        id: '8',
       ),
       Post(
         author: User(
@@ -149,8 +165,10 @@ class ApiClient {
               dolore magna aliqua.
               ''',
         timestamp: DateTime.now(),
-        reactions: [],
+        reactions: {},
         comments: [],
+        title: 'Post 9',
+        id: '9',
       ),
       Post(
         author: User(
@@ -164,8 +182,10 @@ class ApiClient {
               dolore magna aliqua.
               ''',
         timestamp: DateTime.now(),
-        reactions: [],
+        reactions: {},
         comments: [],
+        title: 'Post 10',
+        id: '10',
       ),
     ]);
   }

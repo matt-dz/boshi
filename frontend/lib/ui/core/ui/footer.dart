@@ -13,77 +13,73 @@ class Footer extends StatelessWidget {
       children: [
         ShadDivider.horizontal(),
         ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: 450,
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: Icon(PhosphorIconsRegular.house, size: _iconSize),
-                        onPressed: () {
-                          print('pencil pressed!');
-                        },
+          constraints: BoxConstraints(
+            maxWidth: 450,
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(PhosphorIconsRegular.house, size: _iconSize),
+                      onPressed: () {
+                        print('pencil pressed!');
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        PhosphorIconsRegular.graduationCap,
+                        size: _iconSize,
                       ),
-                      IconButton(
-                        icon: Icon(PhosphorIconsRegular.graduationCap,
-                            size: _iconSize,),
-                        onPressed: () {
-                          print('school pressed!');
-                        },
-                      ),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              shape: BoxShape.circle,
-                            ),
+                      onPressed: () {
+                        print('school pressed!');
+                      },
+                    ),
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
                           ),
-                          IconButton(
-                            icon: Icon(
-                              PhosphorIconsRegular.plus,
-                              color: Colors.white,
-                              size: _iconSize,
-                            ),
-                            onPressed: () {
-                              print('plus pressed!');
-                            },
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            PhosphorIconsRegular.plus,
+                            color: Colors.white,
+                            size: _iconSize,
                           ),
-                        ],
-                      ),
-                      IconButton(
-                        icon: Icon(PhosphorIconsRegular.bell, size: _iconSize),
-                        onPressed: () {
-                          print('bell pressed!');
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(PhosphorIconsRegular.user, size: _iconSize),
-                        onPressed: () {
-                          print('person pressed!');
-                        },
-                      ),
-                    ],
-                  ),
+                          onPressed: () {
+                            print('plus pressed!');
+                          },
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: Icon(PhosphorIconsRegular.bell, size: _iconSize),
+                      onPressed: () {
+                        print('bell pressed!');
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(PhosphorIconsRegular.user, size: _iconSize),
+                      onPressed: () {
+                        print('person pressed!');
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),),
+              ),
+            ],
+          ),
+        ),
       ],
     );
-    // return AppBar(
-    //   backgroundColor: Colors.white,
-    //   shape: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-    //   actions: [
-    //     IconButton(onPressed: () {}, icon: Icon(Icons.verified_user)),
-    //   ],
-    // );
   }
 }
