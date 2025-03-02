@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/bluesky-social/indigo/api/atproto"
@@ -14,7 +14,9 @@ import (
 )
 
 func main() {
-	uri := "wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos"
+	uri := os.Getenv("SOCKET_URI"); if uri == "" {
+		panic("Please define a websocket uri in your .env file")
+	}
 	con, _, err := websocket.DefaultDialer.Dial(uri, http.Header{}); if err != nil {
     panic(err)
   }
@@ -23,8 +25,7 @@ func main() {
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
       for _, op := range evt.Ops {
         if strings.HasPrefix(op.Path, "app.boshi.feed") {
-          fmt.Println("Event from ", evt.Repo)
-          fmt.Printf(" - %s record %s\n", op.Action, op.Path)
+					slog.Debug("Event from", "repo", evt.Repo, "action", op.Action, "path", op.Path)
         }
 			}
 			return nil
