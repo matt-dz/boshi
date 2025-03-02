@@ -22,7 +22,7 @@ func main() {
 	rsc := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
       for _, op := range evt.Ops {
-        if strings.HasPrefix(op.Path, "feed.boshi.app") {
+        if strings.HasPrefix(op.Path, "app.boshi.feed") {
           fmt.Println("Event from ", evt.Repo)
           fmt.Printf(" - %s record %s\n", op.Action, op.Path)
         }
