@@ -3,16 +3,11 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'package:frontend/utils/logger.dart';
 
-class Header extends StatefulWidget {
+class Header extends StatelessWidget {
   const Header({super.key, required this.title});
 
   final String title;
 
-  @override
-  State<Header> createState() => _HeaderState();
-}
-
-class _HeaderState extends State<Header> {
   @override
   Widget build(BuildContext context) {
     return Column(

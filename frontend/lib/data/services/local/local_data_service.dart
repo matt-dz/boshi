@@ -4,8 +4,8 @@ import 'package:frontend/domain/models/reply/reply.dart';
 import 'package:frontend/domain/models/user/user.dart';
 
 class LocalDataService {
-  List<Post> getFeed() {
-    return [
+  Result<List<Post>> getFeed() {
+    return Result.ok([
       Post(
         author: User(
           id: '1',
@@ -33,9 +33,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
           Reply(
             id: '100',
             author: User(
-                id: '1',
-                username: 'anonymous1',
-                school: 'University of Florida',),
+              id: '1',
+              username: 'anonymous1',
+              school: 'University of Florida',
+            ),
             content: 'This is a reply',
             timestamp: DateTime.now(),
             reactions: {},
@@ -213,7 +214,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
         title: 'Post 10',
         id: '10',
       ),
-    ];
+    ]);
   }
 
   Future<Result<User>> getUser() async {

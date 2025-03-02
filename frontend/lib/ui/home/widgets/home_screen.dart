@@ -8,31 +8,26 @@ import 'feed.dart';
 
 import 'package:frontend/utils/logger.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, required this.title, required this.viewModel});
 
   final HomeViewModel viewModel;
   final String title;
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
   Widget build(BuildContext context) {
-    logger.d('Feed: ${widget.viewModel.posts}');
+    logger.d('Feed: ${viewModel.posts}');
     return SafeArea(
       child: Scaffold(
         body: ListenableBuilder(
-          listenable: widget.viewModel,
+          listenable: viewModel,
           builder: (context, _) {
             return Column(
               children: [
-                Header(title: widget.title),
+                Header(title: title),
                 Expanded(
                   child: FeedWidget(
-                    posts: widget.viewModel.posts,
+                    posts: viewModel.posts,
                   ),
                 ),
                 Footer(),

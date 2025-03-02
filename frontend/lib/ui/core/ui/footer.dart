@@ -1,3 +1,4 @@
+import 'package:atproto/atproto.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -40,28 +41,23 @@ class Footer extends StatelessWidget {
                         logger.d('school pressed!');
                       },
                     ),
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            shape: BoxShape.circle,
-                          ),
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          PhosphorIconsRegular.plus,
+                          color: Colors.white,
+                          size: _iconSize,
                         ),
-                        IconButton(
-                          icon: Icon(
-                            PhosphorIconsRegular.plus,
-                            color: Colors.white,
-                            size: _iconSize,
-                          ),
-                          onPressed: () {
-                            logger.d('plus pressed!');
-                          },
-                        ),
-                      ],
+                        onPressed: () {
+                          logger.d('plus pressed!');
+                        },
+                      ),
                     ),
                     IconButton(
                       icon: Icon(PhosphorIconsRegular.bell, size: _iconSize),

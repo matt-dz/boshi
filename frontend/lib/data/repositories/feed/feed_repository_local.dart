@@ -12,6 +12,6 @@ class FeedRepositoryLocal implements FeedRepository {
 
   @override
   Future<Result<List<Post>>> getFeed() async {
-    return Result.ok(_localDataService.getFeed());
+    return _localDataService.getFeed();
   }
 }
