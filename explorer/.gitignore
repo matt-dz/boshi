@@ -2,6 +2,3 @@
 !.env.example
 
 **.DS_Store
-
-**/bin/*
-**/bin/.keep
