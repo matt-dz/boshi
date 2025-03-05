@@ -4,6 +4,7 @@ import 'package:frontend/utils/result.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/reply/reply.dart';
 import 'package:frontend/domain/models/user/user.dart';
+import 'package:frontend/domain/models/reaction/reaction.dart';
 
 import 'package:frontend/utils/logger.dart';
 
@@ -29,7 +30,11 @@ class ApiClient {
         ),
         content: 'Hello, world!',
         timestamp: DateTime.now(),
-        reactions: {'🔥', '❤️', '👍'},
+        reactions: [
+          Reaction(emote: '🔥', count: 5),
+          Reaction(emote: '❤️', count: 10),
+          Reaction(emote: '👍', count: 178),
+        ],
         comments: [],
         id: '1',
         title: 'Post 1',
@@ -41,9 +46,9 @@ class ApiClient {
           school: 'Stanford University',
         ),
         content: '''
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [
           Reply(
             id: '100',
@@ -54,7 +59,7 @@ class ApiClient {
             ),
             content: 'This is a reply',
             timestamp: DateTime.now(),
-            reactions: {},
+            reactions: [],
             replyToId: '1',
             comments: [
               Reply(
@@ -66,7 +71,7 @@ class ApiClient {
                 ),
                 content: 'This is a reply to a reply',
                 timestamp: DateTime.now(),
-                reactions: {},
+                reactions: [],
                 replyToId: '100',
                 comments: [
                   Reply(
@@ -78,7 +83,7 @@ class ApiClient {
                     ),
                     content: 'This is a reply to a reply to a reply',
                     timestamp: DateTime.now(),
-                    reactions: {},
+                    reactions: [],
                     replyToId: '101',
                     comments: [],
                   ),
@@ -93,7 +98,7 @@ class ApiClient {
                 ),
                 content: 'This is a reply to a reply',
                 timestamp: DateTime.now(),
-                reactions: {},
+                reactions: [],
                 replyToId: '100',
                 comments: [
                   Reply(
@@ -105,7 +110,7 @@ class ApiClient {
                     ),
                     content: 'This is a reply to a reply to a reply',
                     timestamp: DateTime.now(),
-                    reactions: {},
+                    reactions: [],
                     replyToId: '103',
                     comments: [],
                   ),
@@ -124,9 +129,9 @@ class ApiClient {
           school: 'University of Washington',
         ),
         content: '''
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.''',
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 3',
         id: '3',
@@ -138,9 +143,9 @@ class ApiClient {
           school: 'Princeton University',
         ),
         content: '''
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit , sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
+Lorem ipsum dolor sit amet, consectetur adipiscing elit , sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 4',
         id: '4',
@@ -152,9 +157,9 @@ class ApiClient {
           school: 'Harvard University',
         ),
         content: '''
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 5',
         id: '5',
@@ -166,9 +171,9 @@ class ApiClient {
           school: 'University of California, Berkely',
         ),
         content: '''
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 6',
         id: '6',
@@ -180,9 +185,9 @@ class ApiClient {
           school: 'University of Southern California',
         ),
         content: '''
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 7',
         id: '7',
@@ -194,9 +199,9 @@ class ApiClient {
           school: 'University of California, Los Angeles',
         ),
         content: '''
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 8',
         id: '8',
@@ -208,9 +213,9 @@ class ApiClient {
           school: 'University of Pennsylvania',
         ),
         content: '''
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 9',
         id: '9',
@@ -222,9 +227,9 @@ class ApiClient {
           school: 'Massachusetts Institute of Technology',
         ),
         content: '''
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 10',
         id: '10',

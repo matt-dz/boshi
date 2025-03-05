@@ -2,6 +2,7 @@ import 'package:frontend/utils/result.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/reply/reply.dart';
 import 'package:frontend/domain/models/user/user.dart';
+import 'package:frontend/domain/models/reaction/reaction.dart';
 
 class LocalDataService {
   Result<List<Post>> getFeed() {
@@ -14,7 +15,11 @@ class LocalDataService {
         ),
         content: 'Hello, world!',
         timestamp: DateTime.now(),
-        reactions: {'🔥', '❤️', '👍'},
+        reactions: [
+          Reaction(emote: '🔥', count: 5),
+          Reaction(emote: '❤️', count: 10),
+          Reaction(emote: '👍', count: 178),
+        ],
         comments: [],
         id: '1',
         title: 'Post 1',
@@ -28,7 +33,13 @@ class LocalDataService {
         content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [
+          Reaction(emote: '🥂', count: 999),
+          Reaction(emote: '⚡️', count: 84),
+          Reaction(emote: '🔥', count: 47),
+          Reaction(emote: '❤️', count: 78),
+          Reaction(emote: '👍', count: 7),
+        ],
         comments: [
           Reply(
             id: '100',
@@ -39,7 +50,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
             ),
             content: 'This is a reply',
             timestamp: DateTime.now(),
-            reactions: {},
+            reactions: [
+              Reaction(emote: '🔥', count: 4),
+              Reaction(emote: '❤️', count: 79),
+              Reaction(emote: '👍', count: 17),
+            ],
             replyToId: '1',
             comments: [
               Reply(
@@ -51,7 +66,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
                 ),
                 content: 'This is a reply to a reply',
                 timestamp: DateTime.now(),
-                reactions: {},
+                reactions: [],
                 replyToId: '100',
                 comments: [
                   Reply(
@@ -63,7 +78,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
                     ),
                     content: 'This is a reply to a reply to a reply',
                     timestamp: DateTime.now(),
-                    reactions: {},
+                    reactions: [],
                     replyToId: '101',
                     comments: [],
                   ),
@@ -78,7 +93,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
                 ),
                 content: 'This is a reply to a reply',
                 timestamp: DateTime.now(),
-                reactions: {},
+                reactions: [],
                 replyToId: '100',
                 comments: [
                   Reply(
@@ -90,7 +105,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
                     ),
                     content: 'This is a reply to a reply to a reply',
                     timestamp: DateTime.now(),
-                    reactions: {},
+                    reactions: [],
                     replyToId: '103',
                     comments: [],
                   ),
@@ -111,7 +126,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
         content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 3',
         id: '3',
@@ -125,7 +140,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
         content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit , sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 4',
         id: '4',
@@ -139,7 +154,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit , sed do eiusmod tempor 
         content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 5',
         id: '5',
@@ -153,7 +168,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
         content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 6',
         id: '6',
@@ -167,7 +182,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
         content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 7',
         id: '7',
@@ -181,7 +196,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
         content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 8',
         id: '8',
@@ -195,7 +210,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
         content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 9',
         id: '9',
@@ -209,7 +224,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
         content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
         timestamp: DateTime.now(),
-        reactions: {},
+        reactions: [],
         comments: [],
         title: 'Post 10',
         id: '10',
