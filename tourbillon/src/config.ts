@@ -11,9 +11,17 @@ export type Config = {
   port: number
   listenhost: string
   hostname: string
-  sqliteLocation: string
+  postgres: PostgresConfig
   subscriptionEndpoint: string
   serviceDid: string
   publisherDid: string
   subscriptionReconnectDelay: number
+}
+
+export type PostgresConfig = {
+  database: string
+  username: string
+  password: string
+  host: string
+  port: string
 }
