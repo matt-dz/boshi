@@ -14,7 +14,7 @@ const run = async () => {
       username: maybeStr(process.env.FEEDGEN_POSTGRES_USERNAME) ?? 'admin',
       password: maybeStr(process.env.FEEDGEN_POSTGRES_PASSWORD) ?? '',
       host: maybeStr(process.env.FEEDGEN_POSTGRES_HOST) ?? 'localhost',
-      port: maybeStr(process.env.FEEDGEN_POSTGRES_PORT) ?? '321230',
+      port: maybeStr(process.env.FEEDGEN_POSTGRES_PORT) ?? '31230',
     },
     subscriptionEndpoint:
       maybeStr(process.env.FEEDGEN_SUBSCRIPTION_ENDPOINT) ??
