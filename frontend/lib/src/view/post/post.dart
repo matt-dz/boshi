@@ -57,7 +57,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                         "title": formKey
                                             .currentState!.value["title"],
                                         "content": formKey
-                                            .currentState!.value["content"]
+                                            .currentState!.value["content"],
+                                        "timestamp": DateTime.now().toString()
                                       });
                                   if (ref.status == HttpStatus.ok) {
                                     if (context.mounted) context.go("/");
