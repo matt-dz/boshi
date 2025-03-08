@@ -6,7 +6,6 @@ import (
 	"boshi-explorer/sql/dbutil"
 	"context"
 	"fmt"
-	"log/slog"
 
 	"net/http"
 	"os"
@@ -27,7 +26,7 @@ func main() {
 		panic("Expected SOCKET_URI to be set")
 	}
 
-	con, _, err := websocket.DefaultDialer.Dial(uri, http.Header{})
+	firehoseConnection, _, err := websocket.DefaultDialer.Dial(uri, http.Header{})
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +35,7 @@ func main() {
 	defer pool.Close()
 	queries := dbutil.New(pool)
 
-	rsc := &events.RepoStreamCallbacks{
+	repoCallbacks := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
 			for _, op := range evt.Ops {
 				if strings.HasPrefix(op.Path, "app.boshi.feed") {
@@ -50,6 +49,9 @@ func main() {
 		},
 	}
 
-	sched := sequential.NewScheduler("myfirehose", rsc.EventHandler)
-	events.HandleRepoStream(context.Background(), con, sched, &slog.Logger{})
+	workScheduler := sequential.NewScheduler("myfirehose", repoCallbacks.EventHandler)
+	err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
+	if err != nil {
+		panic(err)
+	}
 }
