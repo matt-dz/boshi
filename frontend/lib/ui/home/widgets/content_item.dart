@@ -217,7 +217,7 @@ class ContentItemWidget extends StatelessWidget {
             Radius.circular(10),
           ),
           border: Border.all(
-            color: Colors.grey,
+            color: Colors.grey.shade400,
           ),
           boxShadow: [
             BoxShadow(
