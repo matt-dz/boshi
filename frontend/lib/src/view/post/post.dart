@@ -52,7 +52,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   final ref = await oauth.atProtoSession!.repo
                                       .createRecord(
                                           collection: NSID.create(
-                                              'feed.boshi.app', 'post'),
+                                              'app.boshi.feed', 'post'),
                                           record: {
                                         "title": formKey
                                             .currentState!.value["title"],
