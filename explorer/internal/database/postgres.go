@@ -1,20 +1,20 @@
 package database
 
 import (
+	"boshi-explorer/internal/logger"
 	"context"
-	"log"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+var log = logger.GetLogger()
 
 func Connect(ctx context.Context) *pgxpool.Pool {
 	pool, err := pgxpool.New(ctx, os.Getenv("POSTGRES_URL"))
 	if err != nil {
 		panic(err)
 	}
-
-	log.Println("Successfully connected to DB")
-
+	log.Debug("Successfully connected to DB")
 	return pool
 }

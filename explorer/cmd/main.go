@@ -17,17 +17,11 @@ import (
 	"github.com/bluesky-social/indigo/events"
 	"github.com/bluesky-social/indigo/events/schedulers/sequential"
 	"github.com/gorilla/websocket"
-	"github.com/joho/godotenv"
 )
 
 var log = logger.GetLogger()
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic("Failed to load env")
-	}
-
 	uri := os.Getenv("SOCKET_URI")
 	if uri == "" {
 		panic("Expected SOCKET_URI to be set")
