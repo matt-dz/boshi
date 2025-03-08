@@ -1,5 +1,5 @@
 import { Pool } from 'pg'
-import { Kysely, Migrator, PostgresDialect, SqliteDialect } from 'kysely'
+import { Kysely, Migrator, PostgresDialect } from 'kysely'
 import { DatabaseSchema } from './schema'
 import { migrationProvider } from './migrations'
 import { PostgresConfig } from '../config'
