@@ -3,36 +3,36 @@
 //   sqlc v1.28.0
 // source: query.sql
 
-package database
+package dbutil
 
 import (
 	"context"
 )
 
 const createPost = `-- name: CreatePost :one
-INSERT INTO posts (
-  uri, cid, indexedAt
+INSERT INTO post (
+  uri, cid, "indexedAt"
 ) VALUES (
   $1, $2, $3
 )
-RETURNING uri, cid, indexedat
+RETURNING uri, cid, "indexedAt"
 `
 
 type CreatePostParams struct {
 	Uri       string
 	Cid       string
-	Indexedat string
+	IndexedAt string
 }
 
 func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
-	row := q.db.QueryRow(ctx, createPost, arg.Uri, arg.Cid, arg.Indexedat)
+	row := q.db.QueryRow(ctx, createPost, arg.Uri, arg.Cid, arg.IndexedAt)
 	var i Post
-	err := row.Scan(&i.Uri, &i.Cid, &i.Indexedat)
+	err := row.Scan(&i.Uri, &i.Cid, &i.IndexedAt)
 	return i, err
 }
 
 const deletePost = `-- name: DeletePost :exec
-DELETE FROM posts
+DELETE FROM post
 WHERE uri = $1
 `
 
@@ -42,20 +42,20 @@ func (q *Queries) DeletePost(ctx context.Context, uri string) error {
 }
 
 const getPost = `-- name: GetPost :one
-SELECT uri, cid, indexedat FROM posts
+SELECT uri, cid, "indexedAt" FROM post
 WHERE uri = $1 LIMIT 1
 `
 
 func (q *Queries) GetPost(ctx context.Context, uri string) (Post, error) {
 	row := q.db.QueryRow(ctx, getPost, uri)
 	var i Post
-	err := row.Scan(&i.Uri, &i.Cid, &i.Indexedat)
+	err := row.Scan(&i.Uri, &i.Cid, &i.IndexedAt)
 	return i, err
 }
 
 const listPosts = `-- name: ListPosts :many
-SELECT uri, cid, indexedat FROM posts
-ORDER BY indexedAt
+SELECT uri, cid, "indexedAt" FROM post
+ORDER BY "indexedAt"
 `
 
 func (q *Queries) ListPosts(ctx context.Context) ([]Post, error) {
@@ -67,7 +67,7 @@ func (q *Queries) ListPosts(ctx context.Context) ([]Post, error) {
 	var items []Post
 	for rows.Next() {
 		var i Post
-		if err := rows.Scan(&i.Uri, &i.Cid, &i.Indexedat); err != nil {
+		if err := rows.Scan(&i.Uri, &i.Cid, &i.IndexedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

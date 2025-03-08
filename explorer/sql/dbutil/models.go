@@ -2,10 +2,10 @@
 // versions:
 //   sqlc v1.28.0
 
-package database
+package dbutil
 
 type Post struct {
 	Uri       string
 	Cid       string
-	Indexedat string
+	IndexedAt string
 }

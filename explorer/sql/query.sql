@@ -1,19 +1,19 @@
 -- name: GetPost :one
-SELECT * FROM posts
+SELECT * FROM post
 WHERE uri = $1 LIMIT 1;
 
 -- name: ListPosts :many
-SELECT * FROM posts
-ORDER BY indexedAt;
+SELECT * FROM post
+ORDER BY "indexedAt";
 
 -- name: CreatePost :one
-INSERT INTO posts (
-  uri, cid, indexedAt
+INSERT INTO post (
+  uri, cid, "indexedAt"
 ) VALUES (
   $1, $2, $3
 )
 RETURNING *;
 
 -- name: DeletePost :exec
-DELETE FROM posts
+DELETE FROM post
 WHERE uri = $1;
