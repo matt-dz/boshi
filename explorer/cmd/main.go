@@ -2,11 +2,15 @@ package main
 
 import (
 	"boshi-explorer/internal/database"
+	"boshi-explorer/sql/dbutil"
 	"context"
+	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/events"
@@ -29,14 +33,15 @@ func main() {
 
 	pool := database.Connect(context.Background())
 	defer pool.Close()
-	// queries := dbutil.New(pool)
+	queries := dbutil.New(pool)
 
 	rsc := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
       for _, op := range evt.Ops {
         if strings.HasPrefix(op.Path, "app.boshi.feed") {
-					// queries.CreatePost(context.Background(), dbutil.CreatePostParams{Uri: op.Path, Cid: op.Cid.String(), IndexedAt: time.Now().String()})
-					slog.Debug("Event from", "repo", evt.Repo, "action", op.Action, "path", op.Path)
+					uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
+					queries.CreatePost(context.Background(), dbutil.CreatePostParams{Uri: uri, Cid: op.Cid.String(), IndexedAt: time.Now().String()})
+					log.Println("New Activity @", "uri", uri)
         }
 			}
 			return nil
