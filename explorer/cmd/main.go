@@ -26,14 +26,19 @@ func main() {
 		panic("Expected SOCKET_URI to be set")
 	}
 
+	log.Debug("Connecting to firehose", "uri", uri)
 	firehoseConnection, _, err := websocket.DefaultDialer.Dial(uri, http.Header{})
 	if err != nil {
 		panic(err)
 	}
 
+	log.Debug("Connecting to postgres")
 	pool := database.Connect(context.Background())
 	defer pool.Close()
 	queries := dbutil.New(pool)
+
+	/* Create event processor and connect it to the firehose */
+	log.Debug("Starting repo stream")
 
 	repoCallbacks := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
@@ -49,7 +54,11 @@ func main() {
 		},
 	}
 
-	workScheduler := sequential.NewScheduler("myfirehose", repoCallbacks.EventHandler)
+	firehoseIdentifier := os.Getenv("FIREHOSE_IDENTIFIER")
+	if firehoseIdentifier == "" {
+		panic("Expected FIREHOSE_IDENTIFIER to be set")
+	}
+	workScheduler := sequential.NewScheduler(firehoseIdentifier, repoCallbacks.EventHandler)
 	err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
 	if err != nil {
 		panic(err)
