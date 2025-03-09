@@ -25,6 +25,9 @@ jobs:
             frontend:
               - 'frontend/**'
               - '!frontend/README.md'
+            explorer:
+              - 'explorer/**'
+              - '!explorer/README.md'
 
   get-build-info:
     needs: changes
@@ -41,8 +44,9 @@ jobs:
           BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
         shell: bash
         run: |
-          output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
-          echo "name=$output" >> $GITHUB_OUTPUT
+          filtered-branch-name=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
+          echo "name=$filtered-branch-name" >> $GITHUB_OUTPUT
+          echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
           git rev-parse --short HEAD | xargs -I {} echo "commit-id={}" >> $GITHUB_OUTPUT
 
   build-backend:
@@ -135,8 +139,73 @@ jobs:
             make docker-push TAG=$BRANCH_NAME-latest
           fi
 
+  build-explorer:
+    needs: [changes, get-build-info]
+    name: Build Frontend
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
+      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build Frontend
+        shell: bash
+        run: |
+          echo "Building Explorer"
+          cd explorer && make docker
+
+          echo "Push images"
+          if [[ $BRANCH_NAME == "main" ]]; then
+            make docker-push TAG=$COMMIT_ID
+            make docker-push TAG=latest
+          else
+            make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
+            make docker-push TAG=$BRANCH_NAME-latest
+          fi
+
+  clone-repo:
+    name: Clone Repo
+    needs:
+      [
+        get-build-info,
+        build-frontend,
+        build-backend,
+        build-landing,
+        build-explorer,
+      ]
+    if: contains(fromJson('["success"]'), needs.build-frontend.result) ||
+      contains(fromJson('["success"]'), needs.build-backend.result) ||
+      contains(fromJson('["success"]'), needs.build-landing.result) ||
+      contains(fromJson('["success"]'), needs.build-explorer.result) # run if one of the builds succeeded
+    runs-on: ubuntu-latest
+    env:
+      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
+      BRANCH_NAME: ${{needs.get-build-info.outputs.branch-name}}
+    steps:
+      - name: Clone Repo
+        uses: appleboy/ssh-action@v.1.2.0
+        env:
+          REPO: matt-dz/boshi
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          envs: REPO
+          script: |
+            echo "Cloning repo..."
+            export DESTINATION=$HOME/$COMMIT_ID
+            mkdir -p $DESTINATION
+            git clone --depth 1 -b $BRANCH_NAME https://github.com/$REPO $DESTINATION
+
   deploy-backend:
-    needs: [changes, build-backend, get-build-info]
+    needs: [changes, build-backend, get-build-info, clone-repo]
     name: Deploy Backend
     runs-on: ubuntu-latest
     env:
@@ -172,13 +241,12 @@ jobs:
               kubectl set image deployments boshi-backend boshi-backend=$REGISTRY/boshi-backend:$TAG -n $NAMESPACE
             else
               kubectl create namespace $NAMESPACE
-              kubectl create deployment boshi-backend --image=$REGISTRY/boshi-backend:$TAG --port=80 -n $NAMESPACE
-              kubectl expose deployment boshi-backend --name=boshi-backend-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
-              kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$SUBDOMAIN.deguzman.cloud/api/*=boshi-backend-svc:80,tls=boshi-tls" --rule="$SUBDOMAIN.deguzman.cloud/oauth/*=boshi-backend-svc:80,tls=boshi-tls" -n $NAMESPACE
+              envsubst < $COMMIT_ID/kubernetes/backend.yaml \
+                | kubectl apply -f - -n $NAMESPACE
             fi
 
   deploy-landing:
-    needs: [changes, build-landing, get-build-info]
+    needs: [changes, build-landing, get-build-info, clone-repo]
     name: Deploy Landing
     runs-on: ubuntu-latest
     env:
@@ -214,13 +282,12 @@ jobs:
               kubectl set image deployments boshi-landing boshi-landing=$REGISTRY/boshi-landing:$TAG -n $NAMESPACE
             else
               kubectl create namespace $NAMESPACE
-              kubectl create deployment boshi-landing --image=$REGISTRY/boshi-landing:$TAG --port=3000 -n $NAMESPACE
-              kubectl expose deployment boshi-landing --name=boshi-landing-svc --port=80 --target-port=3000 --type=ClusterIP -n $NAMESPACE
-              kubectl create ingress landing-ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$SUBDOMAIN.deguzman.cloud/*=boshi-landing-svc:80,tls=boshi-landing-tls" -n $NAMESPACE
+              envsubst < $COMMIT_ID/kubernetes/landing.yaml \
+                | kubectl apply -f - -n $NAMESPACE
             fi
 
   deploy-frontend:
-    needs: [changes, build-frontend, get-build-info]
+    needs: [changes, build-frontend, get-build-info, clone-repo]
     name: Deploy Frontend
     runs-on: ubuntu-latest
     env:
@@ -256,7 +323,74 @@ jobs:
               kubectl set image deployments boshi-frontend boshi-frontend=$REGISTRY/boshi-frontend:$TAG -n $NAMESPACE
             else
               kubectl create namespace $NAMESPACE
-              kubectl create deployment boshi-frontend --image=$REGISTRY/boshi-frontend:$TAG --port=80 -n $NAMESPACE
-              kubectl expose deployment boshi-frontend --name=boshi-frontend-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
-              kubectl create ingress frontend-ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$SUBDOMAIN.deguzman.cloud/*=boshi-frontend-svc:80,tls=boshi-frontend-tls" -n $NAMESPACE
+              envsubst < $COMMIT_ID/kubernetes/frontend.yaml \
+                | kubectl apply -f - -n $NAMESPACE
             fi
+
+  deploy-explorer:
+    needs: [changes, build-explorer, get-build-info, clone-repo]
+    name: Deploy Explorer
+    runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
+      REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
+    steps:
+      - name: Create/Update Explorer Deployment
+        if: ${{ needs.changes.outputs.explorer == 'true' }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          envs: BRANCH_NAME,REGISTRY,COMMIT_ID
+          script: |
+            if [[ $BRANCH_NAME == "main" ]]; then
+              export NAMESPACE="boshi";
+              export SUBDOMAIN="boshi";
+              export TAG="$COMMIT_ID";
+            else
+              export NAMESPACE="boshi-$BRANCH_NAME";
+              export SUBDOMAIN="$BRANCH_NAME-boshi";
+              export TAG="$BRANCH_NAME-$COMMIT_ID";
+            fi
+
+            echo "Namespace: $NAMESPACE"
+            echo "Subdomain: $SUBDOMAIN"
+            echo "Tag: $TAG"
+
+            if kubectl get deployment boshi-explorer -n $NAMESPACE $1 >/dev/null 2>&1; then
+              kubectl set image deployments boshi-explorer boshi-explorer=$REGISTRY/boshi-explorer:$TAG -n $NAMESPACE
+            else
+              kubectl create namespace $NAMESPACE
+              envsubst < $COMMIT_ID/kubernetes/explorer.yaml \
+                | kubectl apply -f - -n $NAMESPACE
+            fi
+
+  cleanup:
+    needs:
+      [
+        get-build-info,
+        deploy-backend,
+        deploy-landing,
+        deploy-frontend,
+        deploy-explorer,
+      ]
+    runs-on: ubuntu-latest
+    if:
+      contains(fromJson('["success", "failure"]'), needs.deploy-frontend.result) ||
+      contains(fromJson('["success", "failure"]'), needs.deploy-backend.result) ||
+      contains(fromJson('["success", "failure"]'), needs.deploy-landing.result) ||
+      contains(fromJson('["success", "failure"]'), needs.deploy-explorer.result)
+    steps:
+      - name: Cleanup Worker
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            rm -rf $HOME/$COMMIT_ID

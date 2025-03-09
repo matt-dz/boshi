@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: boshi-landing
+  labels:
+    app: boshi-landing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: boshi-landing
+  template:
+    metadata:
+      labels:
+        app: boshi-landing
+    spec:
+      containers:
+        - name: boshi-landing
+          image: ${LANDING_IMAGE}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: boshi-landing
+  labels:
+    app: boshi-landing
+spec:
+  selector:
+    app: boshi-landing
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: landing-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: ${CLUSTER_ISSUER}
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ${LANDING_SUBDOMAIN}.${DOMAIN}
+      secretName: boshi-landing-tls
+  rules:
+    - host: ${LANDING_SUBDOMAIN}.${DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            landing:
+              service:
+                name: boshi-landing
+                port:
+                  number: 80

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: boshi-explorer
+  labels:
+    app: boshi-explorer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: boshi-explorer
+  template:
+    metadata:
+      labels:
+        app: boshi-explorer
+    spec:
+      containers:
+        - name: boshi-explorer
+          image: ${EXPLORER_IMAGE}
+          imagePullPolicy: Always
+          env:
+            - name: POSTGRES_URL
+              value: ${POSTGRES_URL}
+            - name: SOCKET_URI
+              value: ${EXPLORER_SOCKET_URI}
+            - name: FIREHOSE_IDENTIFIER
+              value: ${EXPLORER_FIREHOSE_IDENTIFIER}
+          ports:
+            - containerPort: 80
