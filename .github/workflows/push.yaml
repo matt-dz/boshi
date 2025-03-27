@@ -50,7 +50,7 @@ jobs:
     needs: [get-build-info]
     runs-on: ubuntu-latest
     outputs:
-      repo-destination: ${{ steps.clone.outputs.destination }}
+      repo-destination: ${{ steps.clone.outputs.repo-destination }}
     steps:
       - uses: actions/checkout@v4
       - shell: bash
