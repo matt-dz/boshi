@@ -69,7 +69,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME,DESTINATION
+          envs: BRANCH_NAME,DESTINATION,REPO_URL
           script: |
             echo "Cloning repo..."
             mkdir -p $DESTINATION
