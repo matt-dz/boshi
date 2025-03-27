@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: boshi-landing
-          image: ${LANDING_IMAGE}
+          image: matthew10125/boshi-landing
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -46,10 +46,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - ${LANDING_SUBDOMAIN}.${DOMAIN}
+        - ${DOMAIN}
       secretName: boshi-landing-tls
   rules:
-    - host: ${LANDING_SUBDOMAIN}.${DOMAIN}
+    - host: ${DOMAIN}
       http:
         paths:
           - path: /

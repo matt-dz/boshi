@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: boshi-frontend
-          image: ${FRONTEND_IMAGE}
+          image: ${IMAGE}
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -46,10 +46,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - ${FRONTEND_SUBDOMAIN}.${DOMAIN}
+        - ${DOMAIN}
       secretName: boshi-frontend-tls
   rules:
-    - host: ${FRONTEND_SUBDOMAIN}.${DOMAIN}
+    - host: ${DOMAIN}
       http:
         paths:
           - path: /

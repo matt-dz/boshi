@@ -1,29 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: boshi-explorer
+  name: explorer
   labels:
-    app: boshi-explorer
+    app: explorer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: boshi-explorer
+      app: explorer
   template:
     metadata:
       labels:
-        app: boshi-explorer
+        app: explorer
     spec:
       containers:
-        - name: boshi-explorer
-          image: ${EXPLORER_IMAGE}
+        - name: explorer
+          image: ${IMAGE}
           imagePullPolicy: Always
           env:
             - name: POSTGRES_URL
               value: ${POSTGRES_URL}
             - name: SOCKET_URI
-              value: ${EXPLORER_SOCKET_URI}
+              value: ${SOCKET_URI}
             - name: FIREHOSE_IDENTIFIER
-              value: ${EXPLORER_FIREHOSE_IDENTIFIER}
+              value: ${FIREHOSE_IDENTIFIER}
           ports:
             - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: explorer
+  labels:
+    app: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: ClusterIP

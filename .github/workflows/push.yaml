@@ -10,6 +10,7 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       landing: ${{ steps.filter.outputs.landing }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      explorer: ${{ steps.filter.outputs.explorer }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -18,25 +19,27 @@ jobs:
           filters: |
             landing:
               - 'landing/**'
-              - '!landing/README.md'
             backend:
               - 'backend/**'
-              - '!backend/env.example'
             frontend:
               - 'frontend/**'
-              - '!frontend/README.md'
             explorer:
               - 'explorer/**'
-              - '!explorer/README.md'
 
   get-build-info:
     needs: changes
     name: Get Build Info
     runs-on: ubuntu-latest
-    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' }}
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' }}
     outputs:
       name: ${{ steps.convert.outputs.name }}
+      namespace: ${{ steps.convert.outputs.namespace }}
+      docker-tag: ${{ steps.convert.outputs.docker-tag }}
       commit-id: ${{ steps.convert.outputs.commit-id }}
+      backend-exists: ${{ steps.check.outputs.backend-exists }}
+      frontend-exists: ${{ steps.check.outputs.frontend-exists }}
+      landing-exists: ${{ steps.check.outputs.landing-exists }}
+      explorer-exists: ${{ steps.check.outputs.explorer-exists }}
     steps:
       - uses: actions/checkout@v4
       - id: convert
@@ -44,329 +47,214 @@ jobs:
           BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
         shell: bash
         run: |
-          filtered-branch-name=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
-          echo "name=$filtered-branch-name" >> $GITHUB_OUTPUT
-          echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
-          git rev-parse --short HEAD | xargs -I {} echo "commit-id={}" >> $GITHUB_OUTPUT
+          commit-id=$(git rev-parse --short HEAD)
 
-  build-backend:
-    needs: [changes, get-build-info]
-    name: Build Backend
-    if: ${{ needs.changes.outputs.backend == 'true' }}
-    runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
-      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+          echo "name=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')" >> $GITHUB_OUTPUT
+          echo "namespace=$([[ "$branch-name" == "main" ]] && echo "boshi" || echo "boshi-${branch-name}")" >> $GITHUB_OUTPUT
+          echo "docker-tag=$([[ "$branch-name" == "main" ]] && echo "${commit-id}" || echo "${branch-name}-${commit-id}")) >> $GITHUB_OUTPUT
+
+      - name: Check Resources
+        id: check
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          NAMESPACE: ${{ steps.convert.outputs.namespace }}
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build Backend
-        shell: bash
-        run: |
-          echo "Building backend..."
-          cd backend && make docker
-
-          echo "Pushing images..."
-          if [[ $BRANCH_NAME == "main" ]]; then
-            make docker-push TAG=$COMMIT_ID
-            make docker-push TAG=latest
-          else
-            make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
-            make docker-push TAG=$BRANCH_NAME-latest
-          fi
-
-  build-landing:
-    needs: [changes, get-build-info]
-    name: Build Landing
-    if: ${{ needs.changes.outputs.landing == 'true' }}
-    runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
-      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build Landing
-        shell: bash
-        run: |
-          echo "Building Landing"
-          cd landing && make docker
-
-          echo "Push images"
-          if [[ $BRANCH_NAME == "main" ]]; then
-            make docker-push TAG=$COMMIT_ID
-            make docker-push TAG=latest
-          else
-            make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
-            make docker-push TAG=$BRANCH_NAME-latest
-          fi
-
-  build-frontend:
-    needs: [changes, get-build-info]
-    name: Build Frontend
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
-    runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
-      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build Frontend
-        shell: bash
-        run: |
-          echo "Building Frontend"
-          cd frontend && make docker
-
-          echo "Push images"
-          if [[ $BRANCH_NAME == "main" ]]; then
-            make docker-push TAG=$COMMIT_ID
-            make docker-push TAG=latest
-          else
-            make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
-            make docker-push TAG=$BRANCH_NAME-latest
-          fi
-
-  build-explorer:
-    needs: [changes, get-build-info]
-    name: Build Frontend
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
-    runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
-      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build Frontend
-        shell: bash
-        run: |
-          echo "Building Explorer"
-          cd explorer && make docker
-
-          echo "Push images"
-          if [[ $BRANCH_NAME == "main" ]]; then
-            make docker-push TAG=$COMMIT_ID
-            make docker-push TAG=latest
-          else
-            make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
-            make docker-push TAG=$BRANCH_NAME-latest
-          fi
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          envs: NAMESPACE
+          script: |
+            echo $(kubectl get deployment boshi-backend -n "$NAMESPACE" > /dev/null 2>&1 && echo "backend-exists=true" || echo "backend-exists=false") >> $GITHUB_OUTPUT
+            echo $(kubectl get deployment boshi-frontend -n "$NAMESPACE" > /dev/null 2>&1 && echo "frontend-exists=true" || echo "frontend-exists=false") >> $GITHUB_OUTPUT
+            echo $(kubectl get deployment boshi-landing -n "$NAMESPACE" > /dev/null 2>&1 && echo "landing-exists=true" || echo "landing-exists=false") >> $GITHUB_OUTPUT
+            echo $(kubectl get deployment explorer -n "$NAMESPACE" > /dev/null 2>&1 && echo "explorer-exists=true" || echo "explorer-exists=false") >> $GITHUB_OUTPUT
 
   clone-repo:
     name: Clone Repo
-    needs:
-      [
-        get-build-info,
-        build-frontend,
-        build-backend,
-        build-landing,
-        build-explorer,
-      ]
-    if: contains(fromJson('["success"]'), needs.build-frontend.result) ||
-      contains(fromJson('["success"]'), needs.build-backend.result) ||
-      contains(fromJson('["success"]'), needs.build-landing.result) ||
-      contains(fromJson('["success"]'), needs.build-explorer.result) # run if one of the builds succeeded
+    needs: [get-build-info]
     runs-on: ubuntu-latest
     env:
-      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
       BRANCH_NAME: ${{needs.get-build-info.outputs.branch-name}}
+    outputs:
+      repo-destination: ${{ steps.clone.outputs.destination }}
     steps:
-      - name: Clone Repo
-        uses: appleboy/ssh-action@v.1.2.0
+      - uses: actions/checkout@v4
+      - shell: bash
+        id: destination
+        run: |
+          echo "repo-destination=$(mktemp -d)" >> $GITHUB_OUTPUT
+      - uses: appleboy/ssh-action@v.1.2.0
+        name: Clone Repo
+        id: clone
         env:
-          REPO: matt-dz/boshi
+          DESTINATION: ${{ steps.destination.outputs.destination }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: REPO
+          envs: BRANCH_NAME,DESTINATION
           script: |
             echo "Cloning repo..."
-            export DESTINATION=$HOME/$COMMIT_ID
             mkdir -p $DESTINATION
-            git clone --depth 1 -b $BRANCH_NAME https://github.com/$REPO $DESTINATION
+            git clone --depth 1 -b ${BRANCH_NAME} https://github.com/matt-dz/boshi.git $DESTINATION
 
-  deploy-backend:
-    needs: [changes, build-backend, get-build-info, clone-repo]
-    name: Deploy Backend
+  build-and-deploy-backend:
+    needs: [changes, get-build-info, clone-repo]
+    name: Build and Deploy Backend
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.get-build-info.outputs.backend-exists == 'false' }}
     runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
-      REGISTRY: ${{ vars.DOCKER_REGISTRY }}
-      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
     steps:
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: ./.github/actions/docker
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          tag: ${{needs.get-build-info.outputs.docker-tag}}
+          path: backend
+      - uses: ./.github/actions/domain
+        id: domain
+        with:
+          prod: boshi
+          branch: ${{needs.get-build-info.outputs.name}}
       - name: Create/Update Backend Deployment
-        if: ${{ needs.changes.outputs.backend == 'true' }}
-        uses: appleboy/ssh-action@v1.2.0
+        uses: ./.github/actions/k8s
+        env:
+          CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME,REGISTRY,COMMIT_ID
-          script: |
-            if [[ $BRANCH_NAME == "main" ]]; then
-              export NAMESPACE="boshi";
-              export SUBDOMAIN="boshi"
-              export TAG="$COMMIT_ID";
-            else
-              export NAMESPACE="boshi-$BRANCH_NAME";
-              export SUBDOMAIN="$BRANCH_NAME-boshi";
-              export TAG="$BRANCH_NAME-$COMMIT_ID";
-            fi
+          deployment: boshi-backend
+          domain: ${{ steps.domain.outputs.domain }}
+          config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/backend.yaml
+          docker-registry: ${{vars.DOCKER_REGISTRY}}
+          docker-tag: ${{needs.get-build-info.outputs.docker-tag}}
+          namespace: ${{ needs.get-build-info.outputs.namespace }}
+          config-envs: CLUSTER_ISSUER
+          # envs: BRANCH_NAME,REGISTRY,CLUSTER_ISSUER,REPO_DESTINATION,DOCKER_TAG
+          # script: |
+          #   export DOMAIN="$([[ "$branch-name" == "main" ]] && echo "boshi" || echo "${BRANCH_NAME}-boshi").deguzman.cloud"
+          #   export IMAGE=$REGISTRY/boshi-backend:$DOCKER_TAG
 
-            echo "Namespace: $NAMESPACE"
-            echo "Subdomain: $SUBDOMAIN"
-            echo "Tag: $TAG"
+          #   if kubectl get deployment boshi-backend -n $NAMESPACE >/dev/null 2>&1; then
+          #     kubectl set image deployments boshi-backend boshi-backend=$IMAGE -n $NAMESPACE
+          #   else
+          #     kubectl create namespace $NAMESPACE
+          #     envsubst < $REPO_DESTINATION/kubernetes/backend.yaml \
+          #       | kubectl apply -f - -n $NAMESPACE
+          #   fi
 
-            if kubectl get deployment boshi-backend -n $NAMESPACE >/dev/null 2>&1; then
-              kubectl set image deployments boshi-backend boshi-backend=$REGISTRY/boshi-backend:$TAG -n $NAMESPACE
-            else
-              kubectl create namespace $NAMESPACE
-              envsubst < $COMMIT_ID/kubernetes/backend.yaml \
-                | kubectl apply -f - -n $NAMESPACE
-            fi
-
-  deploy-landing:
-    needs: [changes, build-landing, get-build-info, clone-repo]
-    name: Deploy Landing
+  build-and-deploy-landing:
+    needs: [changes, get-build-info, clone-repo]
+    name: Build and Deploy Landing
+    if: ${{ needs.changes.outputs.landing == 'true' || needs.get-build-info.outputs.landing-exists == 'false' }}
     runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
-      REGISTRY: ${{ vars.DOCKER_REGISTRY }}
-      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
     steps:
-      - name: Create/Update Landing Deployment
-        if: ${{ needs.changes.outputs.landing == 'true' }}
-        uses: appleboy/ssh-action@v1.2.0
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/docker
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          tag: ${{needs.get-build-info.outputs.docker-tag}}
+          path: landing
+      - uses: ./.github/actions/domain
+        id: domain
+        with:
+          prod: boshi
+          branch: ${{needs.get-build-info.outputs.name}}
+      - name: Create/Update Backend Deployment
+        uses: ./.github/actions/k8s
+        env:
+          CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME,REGISTRY,COMMIT_ID
-          script: |
-            if [[ $BRANCH_NAME == "main" ]]; then
-              export NAMESPACE="boshi";
-              export SUBDOMAIN="boshi-app";
-              export TAG="$COMMIT_ID";
-            else
-              export NAMESPACE="boshi-$BRANCH_NAME";
-              export SUBDOMAIN="$BRANCH_NAME-boshi-app";
-              export TAG="$BRANCH_NAME-$COMMIT_ID";
-            fi
+          deployment: boshi-landing
+          domain: ${{ steps.domain.outputs.domain }}
+          config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/landing.yaml
+          docker-registry: ${{vars.DOCKER_REGISTRY}}
+          docker-tag: ${{needs.get-build-info.outputs.docker-tag}}
+          namespace: ${{ needs.get-build-info.outputs.namespace }}
+          config-envs: CLUSTER_ISSUER
 
-            echo "Namespace: $NAMESPACE"
-            echo "Subdomain: $SUBDOMAIN"
-            echo "Tag: $TAG"
-
-            if kubectl get deployment boshi-landing -n $NAMESPACE $1 >/dev/null 2>&1; then
-              kubectl set image deployments boshi-landing boshi-landing=$REGISTRY/boshi-landing:$TAG -n $NAMESPACE
-            else
-              kubectl create namespace $NAMESPACE
-              envsubst < $COMMIT_ID/kubernetes/landing.yaml \
-                | kubectl apply -f - -n $NAMESPACE
-            fi
-
-  deploy-frontend:
-    needs: [changes, build-frontend, get-build-info, clone-repo]
-    name: Deploy Frontend
+  build-and-deploy-frontend:
+    needs: [changes, get-build-info, clone-repo]
+    name: Build and Deploy Frontend
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.get-build-info.outputs.frontend-exists == 'false' }}
     runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
-      REGISTRY: ${{ vars.DOCKER_REGISTRY }}
-      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
     steps:
-      - name: Create/Update Landing Deployment
-        if: ${{ needs.changes.outputs.frontend == 'true' }}
-        uses: appleboy/ssh-action@v1.2.0
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/docker
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          tag: ${{needs.get-build-info.outputs.docker-tag}}
+          path: frontend
+      - uses: ./.github/actions/domain
+        id: domain
+        with:
+          prod: boshi
+          branch: ${{needs.get-build-info.outputs.name}}
+      - name: Create/Update Backend Deployment
+        uses: ./.github/actions/k8s
+        env:
+          CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME,REGISTRY,COMMIT_ID
-          script: |
-            if [[ $BRANCH_NAME == "main" ]]; then
-              export NAMESPACE="boshi";
-              export SUBDOMAIN="boshi";
-              export TAG="$COMMIT_ID";
-            else
-              export NAMESPACE="boshi-$BRANCH_NAME";
-              export SUBDOMAIN="$BRANCH_NAME-boshi";
-              export TAG="$BRANCH_NAME-$COMMIT_ID";
-            fi
+          deployment: boshi-frontend
+          domain: ${{ steps.domain.outputs.domain }}
+          config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/frontend.yaml
+          docker-registry: ${{vars.DOCKER_REGISTRY}}
+          docker-tag: ${{needs.get-build-info.outputs.docker-tag}}
+          namespace: ${{ needs.get-build-info.outputs.namespace }}
+          config-envs: CLUSTER_ISSUER
 
-            echo "Namespace: $NAMESPACE"
-            echo "Subdomain: $SUBDOMAIN"
-            echo "Tag: $TAG"
-
-            if kubectl get deployment boshi-frontend -n $NAMESPACE $1 >/dev/null 2>&1; then
-              kubectl set image deployments boshi-frontend boshi-frontend=$REGISTRY/boshi-frontend:$TAG -n $NAMESPACE
-            else
-              kubectl create namespace $NAMESPACE
-              envsubst < $COMMIT_ID/kubernetes/frontend.yaml \
-                | kubectl apply -f - -n $NAMESPACE
-            fi
-
-  deploy-explorer:
-    needs: [changes, build-explorer, get-build-info, clone-repo]
-    name: Deploy Explorer
+  build-explorer:
+    needs: [changes, get-build-info, clone-repo]
+    name: Build and Deploy Explorer
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
-      REGISTRY: ${{ vars.DOCKER_REGISTRY }}
-      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     steps:
-      - name: Create/Update Explorer Deployment
-        if: ${{ needs.changes.outputs.explorer == 'true' }}
-        uses: appleboy/ssh-action@v1.2.0
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/docker
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          tag: ${{needs.get-build-info.outputs.docker-tag}}
+          path: explorer
+      - uses: ./.github/actions/domain
+        id: domain
+        with:
+          prod: boshi
+          branch: ${{needs.get-build-info.outputs.name}}
+      - name: Create/Update Backend Deployment
+        uses: ./.github/actions/k8s
+        env:
+          POSTGRES_URL: ${{secrets.POSTGRES_URL}}
+          SOCKET_URI: ${{secrets.SOCKET_URI}}
+          FIREHOSE_IDENTIFIER: ${{secrets.FIREHOSE_IDENTIFIER}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME,REGISTRY,COMMIT_ID
-          script: |
-            if [[ $BRANCH_NAME == "main" ]]; then
-              export NAMESPACE="boshi";
-              export SUBDOMAIN="boshi";
-              export TAG="$COMMIT_ID";
-            else
-              export NAMESPACE="boshi-$BRANCH_NAME";
-              export SUBDOMAIN="$BRANCH_NAME-boshi";
-              export TAG="$BRANCH_NAME-$COMMIT_ID";
-            fi
-
-            echo "Namespace: $NAMESPACE"
-            echo "Subdomain: $SUBDOMAIN"
-            echo "Tag: $TAG"
-
-            if kubectl get deployment boshi-explorer -n $NAMESPACE $1 >/dev/null 2>&1; then
-              kubectl set image deployments boshi-explorer boshi-explorer=$REGISTRY/boshi-explorer:$TAG -n $NAMESPACE
-            else
-              kubectl create namespace $NAMESPACE
-              envsubst < $COMMIT_ID/kubernetes/explorer.yaml \
-                | kubectl apply -f - -n $NAMESPACE
-            fi
+          deployment: boshi-frontend
+          domain: ${{ steps.domain.outputs.domain }}
+          config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/explorer.yaml
+          docker-registry: ${{vars.DOCKER_REGISTRY}}
+          docker-tag: ${{needs.get-build-info.outputs.docker-tag}}
+          namespace: ${{ needs.get-build-info.outputs.namespace }}
+          config-envs: POSTGRES_URL,SOCKET_URI,FIREHOSE_IDENTIFIER
 
   cleanup:
     needs:
@@ -387,10 +275,12 @@ jobs:
       - name: Cleanup Worker
         uses: appleboy/ssh-action@v1.0.3
         env:
-          COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
+          REPO_DESTINATION: ${{needs.clone-repo.outputs.repo-destination}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          envs: REPO_DESTINATION
           script: |
-            rm -rf $HOME/$COMMIT_ID
+            rm -rf $REPO_DESTINATION

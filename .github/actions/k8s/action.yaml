@@ -1,0 +1,63 @@
+name: "Create/Update K8s Deployment"
+description: "Creates or Updates a K8s Deployment on the SSH host"
+inputs:
+  host:
+    description: "SSH Host"
+    required: true
+  username:
+    description: "SSH Username"
+    required: true
+  key:
+    description: "SSH Key"
+    required: true
+  port:
+    description: "SSH Port"
+    required: true
+  deployment:
+    description: "Kubernetes deployment name"
+    required: true
+  domain:
+    description: "Domain of the deployment"
+    required: true
+  config-path:
+    description: "Path to the config"
+    required: true
+  docker-registry:
+    description: "Docker Image"
+    required: true
+  docker-tag:
+    description: "Docker Tag"
+    required: true
+  namespace:
+    description: "Kubernetes namespace"
+    required: false
+  config-envs:
+    description: "Additional environment variables for the K8s config"
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+    - name: Create Deployment
+      uses: appleboy/ssh-action@v1.2.0
+      env:
+        DEPLOYMENT: ${{ inputs.deployment }}
+        DOMAIN: ${{ inputs.domain }}
+        CONFIG_PATH: ${{ inputs.config-path }}
+        REGISTRY: ${{ inputs.docker-registry }}
+        IMAGE: ${{ inputs.docker-registry }}:${{ inputs.docker-tag }}
+        NAMESPACE: ${{ inputs.namespace }}
+      with:
+        host: ${{ inputs.host }}
+        username: ${{ inputs.username }}
+        key: ${{ inputs.key }}
+        port: ${{ inputs.port }}
+        envs: REGISTRY,DEPLOYMENT,NAMESPACE,CONFIG_PATH,IMAGE,${{inputs.config-envs}}
+        script: |
+          if kubectl get deployment $DEPLOYMENT -n $NAMESPACE >/dev/null 2>&1; then
+            kubectl set image deployments $DEPLOYMENT $DEPLOYMENT=$IMAGE -n $NAMESPACE
+          else
+            kubectl create namespace $NAMESPACE
+            envsubst < ${CONFIG_PATH} \
+              | kubectl apply -f - -n $NAMESPACE
+          fi
