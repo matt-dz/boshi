@@ -73,6 +73,9 @@ jobs:
           script: |
             echo "Cloning repo..."
             mkdir -p $DESTINATION
+            echo ${BRANCH_NAME}
+            echo ${REPO_URL}
+            echo $DESTINATION
             git clone --depth 1 -b ${BRANCH_NAME} ${REPO_URL} $DESTINATION
 
   build-and-deploy-backend:
