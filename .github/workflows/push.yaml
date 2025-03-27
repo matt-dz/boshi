@@ -218,7 +218,7 @@ jobs:
           namespace: ${{ needs.get-build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
-  build-explorer:
+  build-and-deploy-explorer:
     needs: [changes, get-build-info, clone-repo]
     name: Build and Deploy Explorer
     if: ${{ needs.changes.outputs.frontend == 'true' }}
