@@ -35,7 +35,6 @@ jobs:
       branch-name: ${{ steps.convert.outputs.branch-name }}
       namespace: ${{ steps.convert.outputs.branch-namespace }}
       docker-tag: ${{ steps.convert.outputs.docker-tag }}
-      commit-id: ${{ steps.convert.outputs.commit-id }}
     steps:
       - uses: actions/checkout@v4
       - id: convert
@@ -44,8 +43,8 @@ jobs:
           commit_id=$(git rev-parse --short HEAD)
 
           echo "branch-name=$(echo "${{ github.head_ref || github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')" >> $GITHUB_OUTPUT
-          echo "namespace=$([[ "$branch-name" == "main" ]] && echo "boshi" || echo "boshi-${branch-name}") >> $GITHUB_OUTPUT
-          echo "docker-tag=$([[ "$branch-name" == "main" ]] && echo "${commit_id}" || echo "${branch-name}-${commit_id}") >> $GITHUB_OUTPUT
+          echo "namespace=$([[ "$branch-name" == "main" ]] && echo "boshi" || echo "boshi-${branch-name}")" >> $GITHUB_OUTPUT
+          echo "docker-tag=$([[ "$branch-name" == "main" ]] && echo "${commit_id}" || echo "${branch-name}-${commit_id}")" >> $GITHUB_OUTPUT
   clone-repo:
     name: Clone Repo
     needs: [get-build-info]
