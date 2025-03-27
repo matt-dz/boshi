@@ -67,6 +67,7 @@ jobs:
         id: clone
         env:
           DESTINATION: ${{ steps.destination.outputs.repo-destination }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -76,7 +77,7 @@ jobs:
           script: |
             echo "Cloning repo..."
             mkdir -p $DESTINATION
-            git clone --depth 1 -b ${BRANCH_NAME} https://github.com/matt-dz/boshi.git $DESTINATION
+            git clone --depth 1 -b ${BRANCH_NAME} ${REPO_URL} $DESTINATION
 
   build-and-deploy-backend:
     needs: [changes, get-build-info, clone-repo]
