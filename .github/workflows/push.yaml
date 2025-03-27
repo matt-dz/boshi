@@ -39,21 +39,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: convert
-        env:
-          BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
         shell: bash
         run: |
           commit_id=$(git rev-parse --short HEAD)
 
-          echo "branch-name=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')" >> $GITHUB_OUTPUT
+          echo "branch-name=$(echo "${{ github.head_ref || github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')" >> $GITHUB_OUTPUT
           echo "namespace=$([[ "$branch-name" == "main" ]] && echo "boshi" || echo "boshi-${branch-name}") >> $GITHUB_OUTPUT
           echo "docker-tag=$([[ "$branch-name" == "main" ]] && echo "${commit_id}" || echo "${branch-name}-${commit_id}") >> $GITHUB_OUTPUT
   clone-repo:
     name: Clone Repo
     needs: [get-build-info]
     runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.get-build-info.outputs.branch-name}}
     outputs:
       repo-destination: ${{ steps.clone.outputs.destination }}
     steps:
@@ -68,6 +64,7 @@ jobs:
         env:
           DESTINATION: ${{ steps.destination.outputs.repo-destination }}
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          BRANCH_NAME: ${{needs.get-build-info.outputs.branch-name}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
