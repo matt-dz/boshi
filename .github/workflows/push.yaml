@@ -66,7 +66,7 @@ jobs:
         name: Clone Repo
         id: clone
         env:
-          DESTINATION: ${{ steps.destination.outputs.destination }}
+          DESTINATION: ${{ steps.destination.outputs.repo-destination }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
