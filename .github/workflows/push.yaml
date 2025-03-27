@@ -36,10 +36,6 @@ jobs:
       namespace: ${{ steps.convert.outputs.namespace }}
       docker-tag: ${{ steps.convert.outputs.docker-tag }}
       commit-id: ${{ steps.convert.outputs.commit-id }}
-      backend-exists: ${{ steps.check.outputs.backend-exists }}
-      frontend-exists: ${{ steps.check.outputs.frontend-exists }}
-      landing-exists: ${{ steps.check.outputs.landing-exists }}
-      explorer-exists: ${{ steps.check.outputs.explorer-exists }}
     steps:
       - uses: actions/checkout@v4
       - id: convert
@@ -52,24 +48,6 @@ jobs:
           echo "name=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')" >> $GITHUB_OUTPUT
           echo "namespace=$([[ "$branch-name" == "main" ]] && echo "boshi" || echo "boshi-${branch-name}") >> $GITHUB_OUTPUT
           echo "docker-tag=$([[ "$branch-name" == "main" ]] && echo "${commit_id}" || echo "${branch-name}-${commit_id}") >> $GITHUB_OUTPUT
-
-      - name: Check Resources
-        id: check
-        uses: appleboy/ssh-action@v1.2.0
-        env:
-          NAMESPACE: ${{ steps.convert.outputs.namespace }}
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          envs: NAMESPACE
-          script: |
-            echo $(kubectl get deployment boshi-backend -n "$NAMESPACE" > /dev/null 2>&1 && echo "backend-exists=true" || echo "backend-exists=false") >> $GITHUB_OUTPUT
-            echo $(kubectl get deployment boshi-frontend -n "$NAMESPACE" > /dev/null 2>&1 && echo "frontend-exists=true" || echo "frontend-exists=false") >> $GITHUB_OUTPUT
-            echo $(kubectl get deployment boshi-landing -n "$NAMESPACE" > /dev/null 2>&1 && echo "landing-exists=true" || echo "landing-exists=false") >> $GITHUB_OUTPUT
-            echo $(kubectl get deployment explorer -n "$NAMESPACE" > /dev/null 2>&1 && echo "explorer-exists=true" || echo "explorer-exists=false") >> $GITHUB_OUTPUT
-
   clone-repo:
     name: Clone Repo
     needs: [get-build-info]
@@ -103,11 +81,11 @@ jobs:
   build-and-deploy-backend:
     needs: [changes, get-build-info, clone-repo]
     name: Build and Deploy Backend
-    if: ${{ needs.changes.outputs.backend == 'true' || needs.get-build-info.outputs.backend-exists == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
+        if: ${{ needs.changes.outputs.backend == 'true' }}
         uses: ./.github/actions/docker
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
@@ -120,7 +98,7 @@ jobs:
           prod: boshi
           branch: ${{needs.get-build-info.outputs.name}}
       - name: Create/Update Backend Deployment
-        uses: ./.github/actions/k8s
+        uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
         with:
@@ -151,11 +129,11 @@ jobs:
   build-and-deploy-landing:
     needs: [changes, get-build-info, clone-repo]
     name: Build and Deploy Landing
-    if: ${{ needs.changes.outputs.landing == 'true' || needs.get-build-info.outputs.landing-exists == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/docker
+        if: ${{ needs.changes.outputs.landing == 'true' }}
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -167,7 +145,7 @@ jobs:
           prod: boshi
           branch: ${{needs.get-build-info.outputs.name}}
       - name: Create/Update Backend Deployment
-        uses: ./.github/actions/k8s
+        uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
         with:
@@ -186,11 +164,11 @@ jobs:
   build-and-deploy-frontend:
     needs: [changes, get-build-info, clone-repo]
     name: Build and Deploy Frontend
-    if: ${{ needs.changes.outputs.frontend == 'true' || needs.get-build-info.outputs.frontend-exists == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/docker
+        if: ${{ needs.changes.outputs.frontend == 'true' }}
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -202,7 +180,7 @@ jobs:
           prod: boshi
           branch: ${{needs.get-build-info.outputs.name}}
       - name: Create/Update Backend Deployment
-        uses: ./.github/actions/k8s
+        uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
         with:
@@ -221,12 +199,12 @@ jobs:
   build-and-deploy-explorer:
     needs: [changes, get-build-info, clone-repo]
     name: Build and Deploy Explorer
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/docker
+        if: ${{ needs.changes.outputs.explorer == 'true' }}
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -238,7 +216,7 @@ jobs:
           prod: boshi
           branch: ${{needs.get-build-info.outputs.name}}
       - name: Create/Update Backend Deployment
-        uses: ./.github/actions/k8s
+        uses: ./.github/actions/k8s/deploy/deploy
         env:
           POSTGRES_URL: ${{secrets.POSTGRES_URL}}
           SOCKET_URI: ${{secrets.SOCKET_URI}}
