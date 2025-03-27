@@ -63,7 +63,7 @@ jobs:
         env:
           DESTINATION: ${{ steps.destination.outputs.repo-destination }}
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
-          BRANCH_NAME: ${{needs.get-build-info.outputs.branch-name}}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
