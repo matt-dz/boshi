@@ -50,8 +50,8 @@ jobs:
           commit_id=$(git rev-parse --short HEAD)
 
           echo "name=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')" >> $GITHUB_OUTPUT
-          echo "namespace=$([[ "$branch-name" == "main" ]] && echo "boshi" || echo "boshi-${branch-name}")" >> $GITHUB_OUTPUT
-          echo "docker-tag=$([[ "$branch-name" == "main" ]] && echo "${commit_id}" || echo "${branch-name}-${commit_id}")) >> $GITHUB_OUTPUT
+          echo "namespace=$([[ "$branch-name" == "main" ]] && echo "boshi" || echo "boshi-${branch-name}") >> $GITHUB_OUTPUT
+          echo "docker-tag=$([[ "$branch-name" == "main" ]] && echo "${commit_id}" || echo "${branch-name}-${commit_id}") >> $GITHUB_OUTPUT
 
       - name: Check Resources
         id: check
