@@ -1,4 +1,4 @@
-FROM golang:alpine AS builder
+FROM --platform=$BUILDPLATFOR golang:alpine AS builder
 
 WORKDIR /app
 COPY . .

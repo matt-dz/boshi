@@ -5,6 +5,10 @@ IMAGE_NAME ?= boshi-explorer
 TAG ?= latest
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 
+PLATFORM ?= linux/arm64
+TARGETOS ?= linux
+TARGETARCH ?= arm64
+
 ifneq (,$(wildcard ./.env))
     include .env
     export
@@ -16,11 +20,11 @@ all:
 
 build:
 	@echo "Building the application..."
-	go build -o bin/boshi-explorer cmd/main.go
+	CGO_ENABLED=0 GOOS=$(TARGETOS) GOARCH=$(TARGETARCH) go build -o bin/boshi-explorer cmd/main.go
 
 docker:
 	@echo "Building $(BUILD_NAME)..."
-	docker build -t $(BUILD_NAME) .
+	docker build --platform $(PLATFORM) -t $(BUILD_NAME) .
 
 docker-push:
 	@echo "Tagging $(BUILD_NAME):$(TAG)..."
