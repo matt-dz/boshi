@@ -212,10 +212,10 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          deployment: boshi-frontend
+          deployment: explorer
           domain: ${{ steps.domain.outputs.domain }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/explorer.yaml
-          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-frontend:${{needs.get-build-info.outputs.docker-tag}}
+          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-explorer:${{needs.get-build-info.outputs.docker-tag}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
           config-envs: POSTGRES_URL,SOCKET_URI,FIREHOSE_IDENTIFIER
 
