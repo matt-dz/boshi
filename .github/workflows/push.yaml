@@ -94,7 +94,7 @@ jobs:
         id: domain
         with:
           prod: boshi
-          branch: ${{needs.get-build-info.outputs.branch-name}}
+          dev: ${{needs.get-build-info.outputs.branch-name}}
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
@@ -128,7 +128,7 @@ jobs:
         id: domain
         with:
           prod: boshi
-          branch: ${{needs.get-build-info.outputs.branch-name}}
+          dev: ${{needs.get-build-info.outputs.branch-name}}-app
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
@@ -162,7 +162,7 @@ jobs:
         id: domain
         with:
           prod: boshi
-          branch: ${{needs.get-build-info.outputs.branch-name}}
+          dev: ${{needs.get-build-info.outputs.branch-name}}
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
@@ -193,11 +193,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           tag: ${{ github.sha }}
           path: explorer
-      - uses: ./.github/actions/domain
-        id: domain
-        with:
-          prod: boshi
-          branch: ${{needs.get-build-info.outputs.branch-name}}
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
@@ -210,7 +205,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           deployment: explorer
-          domain: ${{ steps.domain.outputs.domain }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/explorer.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-explorer:${{github.sha}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}

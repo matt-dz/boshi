@@ -4,7 +4,7 @@ inputs:
   prod:
     description: "Production subdomain"
     required: true
-  branch:
+  dev:
     description: "branch subdomain"
     required: true
 outputs:
@@ -18,8 +18,8 @@ runs:
       id: determine
       shell: bash
       run: |
-        if [ "${{ inputs.branch }}" == "main" ]; then
+        if [ "${{ inputs.dev }}" == "main" ]; then
           echo "domain=${{ inputs.prod }}" >> $GITHUB_OUTPUT
         else
-          echo "domain=${{ inputs.branch }}-boshi" >> $GITHUB_OUTPUT
+          echo "domain=${{ inputs.dev }}-boshi" >> $GITHUB_OUTPUT
         fi

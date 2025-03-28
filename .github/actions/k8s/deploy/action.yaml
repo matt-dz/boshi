@@ -16,9 +16,6 @@ inputs:
   deployment:
     description: "Kubernetes deployment name"
     required: true
-  domain:
-    description: "Domain of the deployment"
-    required: true
   config-path:
     description: "Path to the config"
     required: true
@@ -31,6 +28,10 @@ inputs:
   config-envs:
     description: "Additional environment variables for the K8s config"
     required: false
+  domain:
+    description: "Domain of the deployment"
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
