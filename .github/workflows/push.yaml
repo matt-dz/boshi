@@ -34,17 +34,14 @@ jobs:
     outputs:
       branch-name: ${{ steps.convert.outputs.branch-name }}
       namespace: ${{ steps.convert.outputs.namespace }}
-      docker-tag: ${{ steps.convert.outputs.docker-tag }}
     steps:
       - uses: actions/checkout@v4
       - id: convert
         shell: bash
         run: |
-          commit_id=$(git rev-parse --short HEAD)
           branch_name=$(echo "${{ github.head_ref || github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
 
           echo "namespace=$([[ "$branch_name" == "main" ]] && echo "boshi" || echo "boshi-${branch_name}")" >> $GITHUB_OUTPUT
-          echo "docker-tag=$([[ "$branch_name" == "main" ]] && echo "${commit_id}" || echo "${branch_name}-${commit_id}")" >> $GITHUB_OUTPUT
           echo "branch-name=${branch_name}" >> $GITHUB_OUTPUT
   clone-repo:
     name: Clone Repo
@@ -91,7 +88,7 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          tag: ${{needs.get-build-info.outputs.docker-tag}}
+          tag: ${{ github.sha }}
           path: backend
       - uses: ./.github/actions/domain
         id: domain
@@ -110,7 +107,7 @@ jobs:
           deployment: boshi-backend
           domain: ${{ steps.domain.outputs.domain }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/backend.yaml
-          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-backend:${{needs.get-build-info.outputs.docker-tag}}
+          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-backend:${{github.sha}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -125,7 +122,7 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          tag: ${{needs.get-build-info.outputs.docker-tag}}
+          tag: ${{github.sha}}
           path: landing
       - uses: ./.github/actions/domain
         id: domain
@@ -144,7 +141,7 @@ jobs:
           deployment: boshi-landing
           domain: ${{ steps.domain.outputs.domain }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/landing.yaml
-          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-landing:${{needs.get-build-info.outputs.docker-tag}}
+          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-landing:${{github.sha}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -159,7 +156,7 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          tag: ${{needs.get-build-info.outputs.docker-tag}}
+          tag: ${{ github.sha }}
           path: frontend
       - uses: ./.github/actions/domain
         id: domain
@@ -178,7 +175,7 @@ jobs:
           deployment: boshi-frontend
           domain: ${{ steps.domain.outputs.domain }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/frontend.yaml
-          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-frontend:${{needs.get-build-info.outputs.docker-tag}}
+          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-frontend:${{github.sha}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -194,7 +191,7 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          tag: ${{needs.get-build-info.outputs.docker-tag}}
+          tag: ${{ github.sha }}
           path: explorer
       - uses: ./.github/actions/domain
         id: domain
@@ -215,7 +212,7 @@ jobs:
           deployment: explorer
           domain: ${{ steps.domain.outputs.domain }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/explorer.yaml
-          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-explorer:${{needs.get-build-info.outputs.docker-tag}}
+          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-explorer:${{github.sha}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
           config-envs: POSTGRES_URL,SOCKET_URI,FIREHOSE_IDENTIFIER
 
