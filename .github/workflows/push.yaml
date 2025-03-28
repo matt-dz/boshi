@@ -106,7 +106,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           deployment: boshi-backend
-          domain: ${{ steps.domain.outputs.domain }}
+          domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/backend.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-backend:${{github.sha}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
@@ -129,7 +129,7 @@ jobs:
       - uses: ./.github/actions/domain
         id: domain
         with:
-          prod: boshi
+          prod: boshi-app
           dev: ${{needs.get-build-info.outputs.branch-name}}-app
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
@@ -141,7 +141,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           deployment: boshi-landing
-          domain: ${{ steps.domain.outputs.domain }}
+          domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/landing.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-landing:${{github.sha}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
@@ -176,7 +176,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           deployment: boshi-frontend
-          domain: ${{ steps.domain.outputs.domain }}
+          domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/frontend.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-frontend:${{github.sha}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
