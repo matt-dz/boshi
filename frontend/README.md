@@ -1,4 +1,4 @@
-# frontend
+# Boshi Frontend
 
 A new Flutter project.
 
