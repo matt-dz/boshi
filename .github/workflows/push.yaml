@@ -110,22 +110,9 @@ jobs:
           deployment: boshi-backend
           domain: ${{ steps.domain.outputs.domain }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/backend.yaml
-          docker-registry: ${{vars.DOCKER_REGISTRY}}
-          docker-tag: ${{needs.get-build-info.outputs.docker-tag}}
+          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-backend:${{needs.get-build-info.outputs.docker-tag}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
-          # envs: BRANCH_NAME,REGISTRY,CLUSTER_ISSUER,REPO_DESTINATION,DOCKER_TAG
-          # script: |
-          #   export DOMAIN="$([[ "$branch-name" == "main" ]] && echo "boshi" || echo "${BRANCH_NAME}-boshi").deguzman.cloud"
-          #   export IMAGE=$REGISTRY/boshi-backend:$DOCKER_TAG
-
-          #   if kubectl get deployment boshi-backend -n $NAMESPACE >/dev/null 2>&1; then
-          #     kubectl set image deployments boshi-backend boshi-backend=$IMAGE -n $NAMESPACE
-          #   else
-          #     kubectl create namespace $NAMESPACE
-          #     envsubst < $REPO_DESTINATION/kubernetes/backend.yaml \
-          #       | kubectl apply -f - -n $NAMESPACE
-          #   fi
 
   build-and-deploy-landing:
     needs: [changes, get-build-info, clone-repo]
@@ -157,8 +144,7 @@ jobs:
           deployment: boshi-landing
           domain: ${{ steps.domain.outputs.domain }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/landing.yaml
-          docker-registry: ${{vars.DOCKER_REGISTRY}}
-          docker-tag: ${{needs.get-build-info.outputs.docker-tag}}
+          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-landing:${{needs.get-build-info.outputs.docker-tag}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -192,8 +178,7 @@ jobs:
           deployment: boshi-frontend
           domain: ${{ steps.domain.outputs.domain }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/frontend.yaml
-          docker-registry: ${{vars.DOCKER_REGISTRY}}
-          docker-tag: ${{needs.get-build-info.outputs.docker-tag}}
+          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-frontend:${{needs.get-build-info.outputs.docker-tag}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -230,8 +215,7 @@ jobs:
           deployment: boshi-frontend
           domain: ${{ steps.domain.outputs.domain }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/explorer.yaml
-          docker-registry: ${{vars.DOCKER_REGISTRY}}
-          docker-tag: ${{needs.get-build-info.outputs.docker-tag}}
+          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-frontend:${{needs.get-build-info.outputs.docker-tag}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
           config-envs: POSTGRES_URL,SOCKET_URI,FIREHOSE_IDENTIFIER
 

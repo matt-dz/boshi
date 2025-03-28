@@ -54,7 +54,7 @@ spec:
         paths:
           - path: /
             pathType: Prefix
-            landing:
+            backend:
               service:
                 name: boshi-landing
                 port:
