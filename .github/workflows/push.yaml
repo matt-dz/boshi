@@ -41,10 +41,11 @@ jobs:
         shell: bash
         run: |
           commit_id=$(git rev-parse --short HEAD)
+          branch_name=$(echo "${{ github.head_ref || github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
 
-          echo "branch-name=$(echo "${{ github.head_ref || github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')" >> $GITHUB_OUTPUT
-          echo "namespace=$([[ "$branch-name" == "main" ]] && echo "boshi" || echo "boshi-${branch-name}")" >> $GITHUB_OUTPUT
-          echo "docker-tag=$([[ "$branch-name" == "main" ]] && echo "${commit_id}" || echo "${branch-name}-${commit_id}")" >> $GITHUB_OUTPUT
+          echo "namespace=$([[ "$branch_name" == "main" ]] && echo "boshi" || echo "boshi-${branch_name}")" >> $GITHUB_OUTPUT
+          echo "docker-tag=$([[ "$branch_name" == "main" ]] && echo "${commit_id}" || echo "${branch_name}-${commit_id}")" >> $GITHUB_OUTPUT
+          echo "branch-name=${branch_name}" >> $GITHUB_OUTPUT
   clone-repo:
     name: Clone Repo
     needs: [get-build-info]
@@ -252,7 +253,7 @@ jobs:
           REPO_DESTINATION: ${{needs.clone-repo.outputs.repo-destination}}
         with:
           host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
+          username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           envs: REPO_DESTINATION
