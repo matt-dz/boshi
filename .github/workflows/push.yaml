@@ -95,7 +95,7 @@ jobs:
         id: domain
         with:
           prod: boshi
-          dev: ${{needs.get-build-info.outputs.branch-name}}
+          dev: ${{needs.get-build-info.outputs.branch-name}}-boshi
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
@@ -130,7 +130,7 @@ jobs:
         id: domain
         with:
           prod: boshi-app
-          dev: ${{needs.get-build-info.outputs.branch-name}}-app
+          dev: ${{needs.get-build-info.outputs.branch-name}}-boshi-app
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
@@ -165,7 +165,7 @@ jobs:
         id: domain
         with:
           prod: boshi
-          dev: ${{needs.get-build-info.outputs.branch-name}}
+          dev: ${{needs.get-build-info.outputs.branch-name}}-boshi
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
