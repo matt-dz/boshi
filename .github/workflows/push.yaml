@@ -80,6 +80,7 @@ jobs:
     needs: [changes, get-build-info, clone-repo]
     name: Build and Deploy Backend
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     steps:
       - uses: actions/checkout@v4
       - name: Build Docker Image
@@ -115,6 +116,7 @@ jobs:
     needs: [changes, get-build-info, clone-repo]
     name: Build and Deploy Landing
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/docker
@@ -149,6 +151,7 @@ jobs:
     needs: [changes, get-build-info, clone-repo]
     name: Build and Deploy Frontend
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/docker
