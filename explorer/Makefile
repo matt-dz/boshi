@@ -1,7 +1,5 @@
 .PHONY: all build docker docker-push generate clean
 
-SHELL := /bin/bash
-
 DOCKER_REGISTRY ?= matthew10125
 IMAGE_NAME ?= boshi-explorer
 TAG ?= latest
