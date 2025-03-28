@@ -97,7 +97,7 @@ jobs:
         with:
           prod: boshi
           branch: ${{needs.get-build-info.outputs.branch-name}}
-      - name: Create/Update Backend Deployment
+      - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
@@ -144,7 +144,7 @@ jobs:
         with:
           prod: boshi
           branch: ${{needs.get-build-info.outputs.branch-name}}
-      - name: Create/Update Backend Deployment
+      - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
@@ -179,7 +179,7 @@ jobs:
         with:
           prod: boshi
           branch: ${{needs.get-build-info.outputs.branch-name}}
-      - name: Create/Update Backend Deployment
+      - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
@@ -215,8 +215,8 @@ jobs:
         with:
           prod: boshi
           branch: ${{needs.get-build-info.outputs.branch-name}}
-      - name: Create/Update Backend Deployment
-        uses: ./.github/actions/k8s/deploy/deploy
+      - name: Create/Update Deployment
+        uses: ./.github/actions/k8s/deploy
         env:
           POSTGRES_URL: ${{secrets.POSTGRES_URL}}
           SOCKET_URI: ${{secrets.SOCKET_URI}}
