@@ -244,11 +244,7 @@ jobs:
         build-and-deploy-explorer,
       ]
     runs-on: ubuntu-latest
-    if:
-      contains(fromJson('["success", "failure"]'), needs.build-and-deploy-frontend.result) ||
-      contains(fromJson('["success", "failure"]'), needs.build-and-deploy-backend.result) ||
-      contains(fromJson('["success", "failure"]'), needs.build-and-deploy-landing.result) ||
-      contains(fromJson('["success", "failure"]'), needs.build-and-deploy-explorer.result)
+    if: always()
     steps:
       - name: Cleanup Worker
         uses: appleboy/ssh-action@v1.2.0
