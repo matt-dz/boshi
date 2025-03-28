@@ -52,7 +52,7 @@ runs:
         username: ${{ inputs.username }}
         key: ${{ inputs.key }}
         port: ${{ inputs.port }}
-        envs: REGISTRY,DEPLOYMENT,NAMESPACE,CONFIG_PATH,IMAGE,${{inputs.config-envs}}
+        envs: REGISTRY,DEPLOYMENT,NAMESPACE,CONFIG_PATH,IMAGE,DOMAIN,${{inputs.config-envs}}
         script: |
           if kubectl get deployment $DEPLOYMENT -n $NAMESPACE >/dev/null 2>&1; then
             kubectl set image deployments $DEPLOYMENT $DEPLOYMENT=$IMAGE -n $NAMESPACE
