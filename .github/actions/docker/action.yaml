@@ -1,0 +1,35 @@
+name: "Docker Push and Build"
+description: "Builds and Pushes a Docker image via Make commands"
+inputs:
+  username:
+    description: "Docker Hub username"
+    required: true
+  password:
+    description: "Docker Hub password"
+    required: true
+  tag:
+    description: "Tag for the docker image"
+    required: true
+  path:
+    description: "Path to the Makefile"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ inputs.username }}
+        password: ${{ inputs.password }}
+    - name: Build and Push Images
+      working-directory: ${{ inputs.path }}
+      shell: bash
+      run: |
+        echo "Building image..."
+        make docker
+
+        echo "Pushing image with tag ${{ inputs.tag }}..."
+        make docker-push TAG=${{ inputs.tag }}
+
+        echo "Pushing image with latest tag ..."
+        make docker-push TAG=latest
