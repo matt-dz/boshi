@@ -8,6 +8,37 @@ import 'package:frontend/utils/content_item.dart';
 
 import 'package:frontend/utils/logger.dart';
 
+class Sidebar extends StatelessWidget {
+  const Sidebar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: Icon(
+            PhosphorIconsRegular.flag,
+            size: 16,
+          ),
+          onPressed: () {
+            logger.d('flag pressed!');
+          },
+        ),
+        IconButton(
+          icon: Icon(
+            PhosphorIconsRegular.chatCircle,
+            size: 16,
+          ),
+          onPressed: () {
+            logger.d('comment pressed!');
+          },
+        ),
+      ],
+    );
+  }
+}
+
 // TODO: Figure out padding issue
 class ReactionWrapper extends StatelessWidget {
   const ReactionWrapper({
@@ -85,9 +116,11 @@ class ContentItemHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisSize: MainAxisSize.max,
           children: [
             Text.rich(
               TextSpan(
@@ -118,16 +151,16 @@ class ContentItemHeader extends StatelessWidget {
                 ],
               ),
             ),
-            Spacer(),
-            IconButton(
-              icon: Icon(
-                PhosphorIconsRegular.dotsThreeVertical,
-                size: 20,
-              ),
-              onPressed: () {
-                logger.d('dots pressed!');
-              },
-            ),
+            // Spacer(),
+            // IconButton(
+            //   icon: Icon(
+            //     PhosphorIconsRegular.dotsThreeVertical,
+            //     size: 20,
+            //   ),
+            //   onPressed: () {
+            //     logger.d('dots pressed!');
+            //   },
+            // ),
           ],
         ),
         if (post is Post)
@@ -208,9 +241,7 @@ class ContentItemWidget extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(8),
         width: 450,
-        constraints: BoxConstraints(
-          minWidth: 350,
-        ),
+        constraints: BoxConstraints(minWidth: 350, maxHeight: 250),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(
@@ -227,15 +258,22 @@ class ContentItemWidget extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
+        child: Row(
+          spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 4,
           children: [
-            ContentItemHeader(post: post),
-            Text(
-              post.content,
+            Flexible(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ContentItemHeader(post: post),
+                  Text(post.content),
+                  ContentItemFooter(post: post),
+                ],
+              ),
             ),
-            ContentItemFooter(post: post),
+            Sidebar(),
           ],
         ),
       ),

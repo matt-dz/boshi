@@ -14,7 +14,7 @@ DEV_STAGING = lib/main_development.dart
 
 all:
 	scripts/start.sh &
-	flutter run -d ${DEVICE_ID} --target ${DEV_STAGING} --pid-file /tmp/flutter.pid
+	flutter run -d ${DEVICE_ID} --target ${DEV_STAGING} --pid-file /tmp/flutter.pid --web-hostname 0.0.0.0 --web-port 3000
 
 staging:
 	flutter run -d ${DEVICE_ID} --target ${MAIN_STAGING}
