@@ -21,16 +21,12 @@ jobs:
           filters: |
             landing:
               - 'landing/**'
-              - '!**/*.md'
             backend:
               - 'backend/**'
-              - '!**/*.md'
             frontend:
               - 'frontend/**'
-              - '!**/*.md'
             explorer:
               - 'explorer/**'
-              - '!**/*.md'
 
   build-info:
     needs: changes
