@@ -9,6 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-info
+        with:
+          branch-name: ${{ github.event.ref }}
   delete:
     needs: [build-info]
     name: Delete Deployment Resources
