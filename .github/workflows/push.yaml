@@ -31,9 +31,13 @@ jobs:
     name: Get Build Info
     runs-on: ubuntu-latest
     if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' }}
+    outputs:
+      branch-name: ${{ steps.build-info.outputs.branch-name }}
+      namespace: ${{ steps.build-info.outputs.namespace }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-info
+        id: build-info
 
   clone-repo:
     name: Clone Repo

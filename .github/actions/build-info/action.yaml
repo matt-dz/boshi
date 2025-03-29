@@ -14,7 +14,8 @@ runs:
       name: Generate Build Info
       shell: bash
       run: |
-        branch_name=$(echo "${{ github.head_ref || github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
+        branch_name=${{ github.head_ref || github.ref_name }}
+        filtered_branch_name=$(echo "${branch_name}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
 
-        echo "namespace=$([[ "$branch_name" == "main" ]] && echo "boshi" || echo "boshi-${branch_name}")" >> $GITHUB_OUTPUT
-        echo "branch-name=${branch_name}" >> $GITHUB_OUTPUT
+        echo "namespace=$([[ "${branch_name}" == "main" ]] && echo "boshi" || echo "boshi-${filtered_branch_name}")" >> $GITHUB_OUTPUT
+        echo "branch-name=${filtered_branch_name}" >> $GITHUB_OUTPUT
