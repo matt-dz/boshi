@@ -209,6 +209,7 @@ jobs:
     needs:
       [
         build-info,
+        clone-repo,
         build-and-deploy-backend,
         build-and-deploy-landing,
         build-and-deploy-frontend,
@@ -228,4 +229,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           envs: REPO_DESTINATION
           script: |
-            rm -rf $REPO_DESTINATION
+            rm -rf ${REPO_DESTINATION}
