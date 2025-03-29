@@ -22,16 +22,12 @@ jobs:
           filters: |
             landing:
               - 'landing/**'
-              - '!landing/**/*.md'
             backend:
               - 'backend/**'
-              - '!backend/**/*.md'
             frontend:
               - 'frontend/**'
-              - '!frontend/**/*.md'
             explorer:
               - 'explorer/**'
-              - '!explorer/**/*.md'
             kubernetes:
               - 'kubernetes/**'
 
