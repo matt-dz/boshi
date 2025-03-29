@@ -16,15 +16,21 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: filter
         with:
+          base: ${{ github.head_ref || github.ref_name }}
+          list-files: "json"
           filters: |
             landing:
               - 'landing/**'
+              - '!**/*.md'
             backend:
               - 'backend/**'
+              - '!**/*.md'
             frontend:
               - 'frontend/**'
+              - '!**/*.md'
             explorer:
               - 'explorer/**'
+              - '!**/*.md'
 
   build-info:
     needs: changes
