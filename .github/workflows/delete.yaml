@@ -4,6 +4,8 @@ jobs:
   build-info:
     if: github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
+    outputs:
+      namespace: ${{ steps.build-info.outputs.namespace }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-info
