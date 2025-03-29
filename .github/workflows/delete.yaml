@@ -9,6 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-info
+        id: build-info
         with:
           branch-name: ${{ github.event.ref }}
   delete:
