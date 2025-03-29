@@ -21,7 +21,7 @@ inputs:
     required: true
   namespace:
     description: "Kubernetes namespace"
-    required: false
+    required: true
   config-envs:
     description: "Additional environment variables for the K8s config"
     required: false
