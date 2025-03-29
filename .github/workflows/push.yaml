@@ -26,26 +26,17 @@ jobs:
             explorer:
               - 'explorer/**'
 
-  get-build-info:
+  build-info:
     needs: changes
     name: Get Build Info
     runs-on: ubuntu-latest
     if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' }}
-    outputs:
-      branch-name: ${{ steps.convert.outputs.branch-name }}
-      namespace: ${{ steps.convert.outputs.namespace }}
     steps:
-      - uses: actions/checkout@v4
-      - id: convert
-        shell: bash
-        run: |
-          branch_name=$(echo "${{ github.head_ref || github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
+      - uses: ./.github/actions/build-info
 
-          echo "namespace=$([[ "$branch_name" == "main" ]] && echo "boshi" || echo "boshi-${branch_name}")" >> $GITHUB_OUTPUT
-          echo "branch-name=${branch_name}" >> $GITHUB_OUTPUT
   clone-repo:
     name: Clone Repo
-    needs: [get-build-info]
+    needs: [build-info]
     runs-on: ubuntu-latest
     outputs:
       repo-destination: ${{ steps.destination.outputs.repo-destination }}
@@ -77,7 +68,7 @@ jobs:
             git clone --depth 1 -b ${BRANCH_NAME} ${REPO_URL} $DESTINATION
 
   build-and-deploy-backend:
-    needs: [changes, get-build-info, clone-repo]
+    needs: [changes, build-info, clone-repo]
     name: Build and Deploy Backend
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -95,7 +86,7 @@ jobs:
         id: domain
         with:
           prod: boshi
-          dev: ${{needs.get-build-info.outputs.branch-name}}-boshi
+          dev: ${{needs.build-info.outputs.branch-name}}-boshi
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
@@ -108,11 +99,11 @@ jobs:
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/backend.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-backend:${{github.sha}}
-          namespace: ${{ needs.get-build-info.outputs.namespace }}
+          namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
   build-and-deploy-landing:
-    needs: [changes, get-build-info, clone-repo]
+    needs: [changes, build-info, clone-repo]
     name: Build and Deploy Landing
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -129,7 +120,7 @@ jobs:
         id: domain
         with:
           prod: boshi-app
-          dev: ${{needs.get-build-info.outputs.branch-name}}-boshi-app
+          dev: ${{needs.build-info.outputs.branch-name}}-boshi-app
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
@@ -142,11 +133,11 @@ jobs:
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/landing.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-landing:${{github.sha}}
-          namespace: ${{ needs.get-build-info.outputs.namespace }}
+          namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
   build-and-deploy-frontend:
-    needs: [changes, get-build-info, clone-repo]
+    needs: [changes, build-info, clone-repo]
     name: Build and Deploy Frontend
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -163,7 +154,7 @@ jobs:
         id: domain
         with:
           prod: boshi
-          dev: ${{needs.get-build-info.outputs.branch-name}}-boshi
+          dev: ${{needs.build-info.outputs.branch-name}}-boshi
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
@@ -176,11 +167,11 @@ jobs:
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/frontend.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-frontend:${{github.sha}}
-          namespace: ${{ needs.get-build-info.outputs.namespace }}
+          namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
   build-and-deploy-explorer:
-    needs: [changes, get-build-info, clone-repo]
+    needs: [changes, build-info, clone-repo]
     name: Build and Deploy Explorer
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -206,13 +197,13 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/explorer.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-explorer:${{github.sha}}
-          namespace: ${{ needs.get-build-info.outputs.namespace }}
+          namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: POSTGRES_URL,SOCKET_URI,FIREHOSE_IDENTIFIER
 
   cleanup:
     needs:
       [
-        get-build-info,
+        build-info,
         build-and-deploy-backend,
         build-and-deploy-landing,
         build-and-deploy-frontend,
