@@ -11,6 +11,7 @@ jobs:
       landing: ${{ steps.filter.outputs.landing }}
       frontend: ${{ steps.filter.outputs.frontend }}
       explorer: ${{ steps.filter.outputs.explorer }}
+      kubernetes: ${{ steps.filter.outputs.kubernetes }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -21,18 +22,24 @@ jobs:
           filters: |
             landing:
               - 'landing/**'
+              - '!landing/**/*.md'
             backend:
               - 'backend/**'
+              - '!backend/**/*.md'
             frontend:
               - 'frontend/**'
+              - '!frontend/**/*.md'
             explorer:
               - 'explorer/**'
+              - '!explorer/**/*.md'
+            kubernetes:
+              - 'kubernetes/**'
 
   build-info:
     needs: changes
     name: Get Build Info
     runs-on: ubuntu-latest
-    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' }}
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' || needs.changes.outputs.kubernetes == 'true' }}
     outputs:
       branch-name: ${{ steps.build-info.outputs.branch-name }}
       namespace: ${{ steps.build-info.outputs.namespace }}
