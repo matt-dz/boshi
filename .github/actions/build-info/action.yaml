@@ -10,7 +10,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v4
     - id: build
       name: Generate Build Info
       shell: bash

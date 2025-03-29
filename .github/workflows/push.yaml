@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' }}
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/build-info
 
   clone-repo:
