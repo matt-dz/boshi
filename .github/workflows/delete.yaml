@@ -1,35 +1,33 @@
 name: Branch Deleted
 on: delete
 jobs:
-  convert-branch-name:
+  build-info:
     if: github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
     outputs:
-      name: ${{ steps.convert.outputs.name }}
+      namespace: ${{ steps.build-info.outputs.namespace }}
     steps:
-      - id: convert
-        env:
-            BRANCH_NAME: "${{ github.event.ref }}"
-        run: |
-          output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
-          echo "name=$output" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-info
+        id: build-info
+        with:
+          branch-name: ${{ github.event.ref }}
   delete:
-    needs: [convert-branch-name]
+    needs: [build-info]
     name: Delete Deployment Resources
     runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
     steps:
       - name: Delete Deployment
         uses: appleboy/ssh-action@v1.2.0
+        env:
+          NAMESPACE: ${{needs.build-info.outputs.namespace}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME
+          envs: NAMESPACE
           script: |
-            export NAMESPACE="boshi-$BRANCH_NAME"
             if kubectl get namespace $NAMESPACE >/dev/null 2>&1; then
               kubectl delete namespace $NAMESPACE
             else

@@ -1,0 +1,25 @@
+name: "Generate Build Info"
+description: "Generates build info for the deployment"
+inputs:
+  branch-name:
+    description: "Branch name"
+    required: false
+    default: "${{ github.head_ref || github.ref_name }}"
+outputs:
+  branch-name:
+    description: "URL friendly branch name"
+    value: ${{ steps.build.outputs.branch-name }}
+  namespace:
+    description: "Kubernetes namespace"
+    value: ${{ steps.build.outputs.namespace }}
+runs:
+  using: "composite"
+  steps:
+    - id: build
+      name: Generate Build Info
+      shell: bash
+      run: |
+        filtered_branch_name=$(echo "${{inputs.branch-name}}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
+
+        echo "namespace=$([[ "${{inputs.branch-name}}" == "main" ]] && echo "boshi" || echo "boshi-${filtered_branch_name}")" >> $GITHUB_OUTPUT
+        echo "branch-name=${filtered_branch_name}" >> $GITHUB_OUTPUT

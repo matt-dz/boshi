@@ -1,0 +1,52 @@
+name: "Create/Update K8s Deployment"
+description: "Creates or Updates a K8s Deployment on the SSH host"
+inputs:
+  host:
+    description: "SSH Host"
+    required: true
+  username:
+    description: "SSH Username"
+    required: true
+  key:
+    description: "SSH Key"
+    required: true
+  port:
+    description: "SSH Port"
+    required: true
+  config-path:
+    description: "Path to the config"
+    required: true
+  docker-image:
+    description: "Docker image"
+    required: true
+  namespace:
+    description: "Kubernetes namespace"
+    required: true
+  config-envs:
+    description: "Additional environment variables for the K8s config"
+    required: false
+  domain:
+    description: "Domain of the deployment"
+    required: false
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+    - name: Create Deployment
+      uses: appleboy/ssh-action@v1.2.0
+      env:
+        DOMAIN: ${{ inputs.domain }}
+        CONFIG_PATH: ${{ inputs.config-path }}
+        IMAGE: ${{ inputs.docker-image }}
+        NAMESPACE: ${{ inputs.namespace }}
+      with:
+        host: ${{ inputs.host }}
+        username: ${{ inputs.username }}
+        key: ${{ inputs.key }}
+        port: ${{ inputs.port }}
+        envs: NAMESPACE,CONFIG_PATH,IMAGE,DOMAIN,${{inputs.config-envs}}
+        script: |
+          kubectl create namespace $NAMESPACE
+          envsubst < ${CONFIG_PATH} \
+            | kubectl apply -f - -n $NAMESPACE
