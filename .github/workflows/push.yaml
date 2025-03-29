@@ -105,7 +105,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          deployment: boshi-backend
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/backend.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-backend:${{github.sha}}
@@ -140,7 +139,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          deployment: boshi-landing
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/landing.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-landing:${{github.sha}}
@@ -175,7 +173,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          deployment: boshi-frontend
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/frontend.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-frontend:${{github.sha}}
@@ -207,7 +204,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          deployment: explorer
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/explorer.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-explorer:${{github.sha}}
           namespace: ${{ needs.get-build-info.outputs.namespace }}
