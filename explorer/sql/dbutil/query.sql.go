@@ -7,27 +7,37 @@ package dbutil
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createPost = `-- name: CreatePost :one
 INSERT INTO post (
-  uri, cid, "indexedAt"
+  uri, cid, indexed_at
 ) VALUES (
   $1, $2, $3
 )
-RETURNING uri, cid, "indexedAt"
+RETURNING uri, cid, author_did, indexed_at, title, content, reply_to_post_cid
 `
 
 type CreatePostParams struct {
 	Uri       string
 	Cid       string
-	IndexedAt string
+	IndexedAt pgtype.Timestamptz
 }
 
 func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
 	row := q.db.QueryRow(ctx, createPost, arg.Uri, arg.Cid, arg.IndexedAt)
 	var i Post
-	err := row.Scan(&i.Uri, &i.Cid, &i.IndexedAt)
+	err := row.Scan(
+		&i.Uri,
+		&i.Cid,
+		&i.AuthorDid,
+		&i.IndexedAt,
+		&i.Title,
+		&i.Content,
+		&i.ReplyToPostCid,
+	)
 	return i, err
 }
 
@@ -42,20 +52,28 @@ func (q *Queries) DeletePost(ctx context.Context, uri string) error {
 }
 
 const getPost = `-- name: GetPost :one
-SELECT uri, cid, "indexedAt" FROM post
+SELECT uri, cid, author_did, indexed_at, title, content, reply_to_post_cid FROM post
 WHERE uri = $1 LIMIT 1
 `
 
 func (q *Queries) GetPost(ctx context.Context, uri string) (Post, error) {
 	row := q.db.QueryRow(ctx, getPost, uri)
 	var i Post
-	err := row.Scan(&i.Uri, &i.Cid, &i.IndexedAt)
+	err := row.Scan(
+		&i.Uri,
+		&i.Cid,
+		&i.AuthorDid,
+		&i.IndexedAt,
+		&i.Title,
+		&i.Content,
+		&i.ReplyToPostCid,
+	)
 	return i, err
 }
 
 const listPosts = `-- name: ListPosts :many
-SELECT uri, cid, "indexedAt" FROM post
-ORDER BY "indexedAt"
+SELECT uri, cid, author_did, indexed_at, title, content, reply_to_post_cid FROM post
+ORDER BY indexed_at
 `
 
 func (q *Queries) ListPosts(ctx context.Context) ([]Post, error) {
@@ -67,7 +85,15 @@ func (q *Queries) ListPosts(ctx context.Context) ([]Post, error) {
 	var items []Post
 	for rows.Next() {
 		var i Post
-		if err := rows.Scan(&i.Uri, &i.Cid, &i.IndexedAt); err != nil {
+		if err := rows.Scan(
+			&i.Uri,
+			&i.Cid,
+			&i.AuthorDid,
+			&i.IndexedAt,
+			&i.Title,
+			&i.Content,
+			&i.ReplyToPostCid,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

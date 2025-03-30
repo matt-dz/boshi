@@ -16,6 +16,7 @@ import (
 	"github.com/bluesky-social/indigo/events"
 	"github.com/bluesky-social/indigo/events/schedulers/sequential"
 	"github.com/gorilla/websocket"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 var log = logger.GetLogger()
@@ -46,7 +47,10 @@ func main() {
 				if strings.HasPrefix(op.Path, "app.boshi.feed") {
 					uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
 					log.Info("New Activity @", "uri", uri)
-					queries.CreatePost(context.Background(), dbutil.CreatePostParams{Uri: uri, Cid: op.Cid.String(), IndexedAt: time.Now().String()})
+					queries.CreatePost(context.Background(), dbutil.CreatePostParams{Uri: uri, Cid: op.Cid.String(), IndexedAt: pgtype.Timestamptz{
+						Time:  time.Now(),
+						Valid: true,
+					}})
 					log.Info("Post created", "uri", uri)
 				}
 			}

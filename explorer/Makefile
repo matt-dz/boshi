@@ -1,4 +1,4 @@
-.PHONY: all build docker docker-push generate clean
+.PHONY: all build sqlc docker docker-push generate clean
 
 DOCKER_REGISTRY ?= matthew10125
 IMAGE_NAME ?= boshi-explorer
@@ -21,6 +21,10 @@ all:
 build:
 	@echo "Building the application..."
 	CGO_ENABLED=0 GOOS=$(TARGETOS) GOARCH=$(TARGETARCH) go build -o bin/boshi-explorer cmd/main.go
+
+sqlc:
+	@echo "Generating SQLC..."
+	cd sql && sqlc generate
 
 docker:
 	@echo "Building $(BUILD_NAME)..."

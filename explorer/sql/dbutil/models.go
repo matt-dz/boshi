@@ -4,8 +4,24 @@
 
 package dbutil
 
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
 type Post struct {
+	Uri            string
+	Cid            string
+	AuthorDid      string
+	IndexedAt      pgtype.Timestamptz
+	Title          string
+	Content        string
+	ReplyToPostCid pgtype.Text
+}
+
+type Reaction struct {
 	Uri       string
-	Cid       string
-	IndexedAt string
+	PostUri   pgtype.Text
+	AuthorDid string
+	IndexedAt pgtype.Timestamptz
+	Emote     string
 }
