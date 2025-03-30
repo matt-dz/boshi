@@ -38,7 +38,8 @@ class FeedRepositoryRemote implements FeedRepository {
 
   @override
   Future<Result<post_domain_model.Post>> addReply(
-      reply_request.Reply reply) async {
+    reply_request.Reply reply,
+  ) async {
     return _apiClient.addReply(reply);
   }
 

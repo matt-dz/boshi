@@ -1,4 +1,4 @@
-.PHONY: docker docker-push
+.PHONY: docker docker-push staging types all format
 
 
 DOCKER_REGISTRY ?= matthew10125
@@ -37,3 +37,10 @@ docker-push:
 	@echo "Pushing $(BUILD_NAME):$(tag)"
 	docker tag $(BUILD_NAME) $(BUILD_NAME):$(TAG)
 	docker push $(BUILD_NAME):$(TAG)
+
+format:
+	@echo "Running dart format"
+	dart format .
+
+	@cho "Running dart fix"
+	dart fix --apply

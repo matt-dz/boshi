@@ -47,7 +47,9 @@ Future<(Uri, OAuthContext)> getOAuthAuthorizationURI(
 
 /// Generate OAuth2 session and store it in shared preferences
 Future<OAuthSession> generateSession(
-    OAuthClient client, String callback) async {
+  OAuthClient client,
+  String callback,
+) async {
   logger.d('Retrieving shared preferences instance');
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 

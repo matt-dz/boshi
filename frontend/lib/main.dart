@@ -15,8 +15,6 @@ import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
 
-import 'package:frontend/utils/logger.dart';
-
 import 'main_development.dart' as dev;
 
 void main() {

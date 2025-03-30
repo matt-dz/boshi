@@ -59,7 +59,9 @@ class LocalDataService {
   }
 
   Future<OAuthSession> generateSession(
-      OAuthClient client, String callback) async {
+    OAuthClient client,
+    String callback,
+  ) async {
     return oauth_shared.generateSession(client, callback);
   }
 
