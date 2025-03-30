@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
+import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
@@ -20,9 +21,13 @@ class HomeViewModel extends ChangeNotifier {
   })  : _feedRepository = feedRepository,
         _userRepository = userRepository {
     load = Command0(_load)..execute();
+    updateReactionCount = Command1<Post, ReactionPayload>(
+      _updateReactionCount,
+    );
   }
 
   late Command0 load;
+  late Command1 updateReactionCount;
   final FeedRepository _feedRepository;
   final UserRepository _userRepository;
 
@@ -54,6 +59,22 @@ class HomeViewModel extends ChangeNotifier {
           logger.e('Error retrieving user: ${userResult.error}');
       }
       return userResult;
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<Result<Post>> _updateReactionCount(
+    ReactionPayload reactionPayload,
+  ) async {
+    try {
+      logger.d('Updating reaction count');
+      final post = await _feedRepository.updateReactionCount(reactionPayload);
+
+      if (post is Error<Post>) {
+        logger.e('Error updating reaction count: ${post.error}');
+      }
+      return post;
     } finally {
       notifyListeners();
     }

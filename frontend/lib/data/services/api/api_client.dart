@@ -1,10 +1,15 @@
 import 'dart:io';
 
+import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 import 'package:frontend/utils/result.dart';
+import 'package:frontend/shared/models/report/report.dart';
 import 'package:frontend/domain/models/post/post.dart';
-import 'package:frontend/domain/models/reply/reply.dart';
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/domain/models/reaction/reaction.dart';
+import 'package:frontend/data/models/requests/reply/reply.dart'
+    as reply_request;
+import 'package:frontend/data/models/requests/post/post.dart' as post_request;
+
+import 'package:frontend/shared/models/mock_data/feed/feed.dart';
 
 import 'package:frontend/utils/logger.dart';
 
@@ -21,220 +26,7 @@ class ApiClient {
   // TODO: Implement the getFeed method
   Future<Result<List<Post>>> getFeed() async {
     logger.w('Function not implemented. Returning default list.');
-    return Result.ok([
-      Post(
-        author: User(
-          id: '1',
-          username: 'anonymous1',
-          school: 'University of Florida',
-        ),
-        content: 'Hello, world!',
-        timestamp: DateTime.now(),
-        reactions: [
-          Reaction(emote: '🔥', count: 5),
-          Reaction(emote: '❤️', count: 10),
-          Reaction(emote: '👍', count: 178),
-        ],
-        comments: [],
-        id: '1',
-        title: 'Post 1',
-      ),
-      Post(
-        author: User(
-          id: '2',
-          username: 'anonymous2',
-          school: 'Stanford University',
-        ),
-        content: '''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
-        timestamp: DateTime.now(),
-        reactions: [],
-        comments: [
-          Reply(
-            id: '100',
-            author: User(
-              id: '1',
-              username: 'anonymous1',
-              school: 'University of Florida',
-            ),
-            content: 'This is a reply',
-            timestamp: DateTime.now(),
-            reactions: [],
-            replyToId: '1',
-            comments: [
-              Reply(
-                id: '101',
-                author: User(
-                  id: '2',
-                  username: 'anonymous2',
-                  school: 'Stanford University',
-                ),
-                content: 'This is a reply to a reply',
-                timestamp: DateTime.now(),
-                reactions: [],
-                replyToId: '100',
-                comments: [
-                  Reply(
-                    id: '102',
-                    author: User(
-                      id: '3',
-                      username: 'anonymous3',
-                      school: 'University of Washington',
-                    ),
-                    content: 'This is a reply to a reply to a reply',
-                    timestamp: DateTime.now(),
-                    reactions: [],
-                    replyToId: '101',
-                    comments: [],
-                  ),
-                ],
-              ),
-              Reply(
-                id: '103',
-                author: User(
-                  id: '4',
-                  username: 'anonymous4',
-                  school: 'Princeton University',
-                ),
-                content: 'This is a reply to a reply',
-                timestamp: DateTime.now(),
-                reactions: [],
-                replyToId: '100',
-                comments: [
-                  Reply(
-                    id: '104',
-                    author: User(
-                      id: '3',
-                      username: 'anonymous3',
-                      school: 'University of Washington',
-                    ),
-                    content: 'This is a reply to a reply to a reply',
-                    timestamp: DateTime.now(),
-                    reactions: [],
-                    replyToId: '103',
-                    comments: [],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-        title: 'Post 2',
-        id: '2',
-      ),
-      Post(
-        author: User(
-          id: '3',
-          username: 'anonymous3',
-          school: 'University of Washington',
-        ),
-        content: '''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.''',
-        timestamp: DateTime.now(),
-        reactions: [],
-        comments: [],
-        title: 'Post 3',
-        id: '3',
-      ),
-      Post(
-        author: User(
-          id: '4',
-          username: 'anonymous4',
-          school: 'Princeton University',
-        ),
-        content: '''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit , sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
-        timestamp: DateTime.now(),
-        reactions: [],
-        comments: [],
-        title: 'Post 4',
-        id: '4',
-      ),
-      Post(
-        author: User(
-          id: '5',
-          username: 'anonymous5',
-          school: 'Harvard University',
-        ),
-        content: '''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
-        timestamp: DateTime.now(),
-        reactions: [],
-        comments: [],
-        title: 'Post 5',
-        id: '5',
-      ),
-      Post(
-        author: User(
-          id: '6',
-          username: 'anonymous6',
-          school: 'University of California, Berkely',
-        ),
-        content: '''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
-        timestamp: DateTime.now(),
-        reactions: [],
-        comments: [],
-        title: 'Post 6',
-        id: '6',
-      ),
-      Post(
-        author: User(
-          id: '7',
-          username: 'anonymous7',
-          school: 'University of Southern California',
-        ),
-        content: '''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
-        timestamp: DateTime.now(),
-        reactions: [],
-        comments: [],
-        title: 'Post 7',
-        id: '7',
-      ),
-      Post(
-        author: User(
-          id: '8',
-          username: 'anonymous8',
-          school: 'University of California, Los Angeles',
-        ),
-        content: '''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
-        timestamp: DateTime.now(),
-        reactions: [],
-        comments: [],
-        title: 'Post 8',
-        id: '8',
-      ),
-      Post(
-        author: User(
-          id: '9',
-          username: 'anonymous9',
-          school: 'University of Pennsylvania',
-        ),
-        content: '''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
-        timestamp: DateTime.now(),
-        reactions: [],
-        comments: [],
-        title: 'Post 9',
-        id: '9',
-      ),
-      Post(
-        author: User(
-          id: '10',
-          username: 'anonymous10',
-          school: 'Massachusetts Institute of Technology',
-        ),
-        content: '''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
-        timestamp: DateTime.now(),
-        reactions: [],
-        comments: [],
-        title: 'Post 10',
-        id: '10',
-      ),
-    ]);
+    return Result.ok(mockFeed);
   }
 
   // TODO: Implement the getUser method
@@ -243,5 +35,32 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
     return Result.ok(
       User(id: '1', username: 'anonymous1', school: 'University of Florida'),
     );
+  }
+
+  Future<Result<Post>> getPost(String id) async {
+    logger.d('Retrieving post');
+    return Result.ok(mockFeed[0]);
+  }
+
+  Future<Result<Post>> updateReactionCount(
+    ReactionPayload reactionPayload,
+  ) async {
+    logger.d('Updating reaction count');
+    return Result.ok(mockFeed[0]);
+  }
+
+  Future<Result<Post>> addReply(reply_request.Reply reply) async {
+    logger.d('Adding reply');
+    return Result.ok(mockFeed[0]);
+  }
+
+  Future<Result<void>> reportPost(Report report) async {
+    logger.d('Reporting post');
+    return Result.ok(null);
+  }
+
+  Future<Result<Post>> addPost(post_request.Post post) async {
+    logger.d('Adding post');
+    return Result.ok(mockFeed[0]);
   }
 }
