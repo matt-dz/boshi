@@ -253,6 +253,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/tourbillon.yaml
+          domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-tourbillon:${{github.sha}}
           namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: FEEDGEN_PORT,FEEDGEN_LISTENHOST, FEEDGEN_POSTGRES_LOCATION,FEEDGEN_POSTGRES_DATABASE,FEEDGEN_POSTGRES_USERNAME,FEEDGEN_POSTGRES_PASSWORD,FEEDGEN_POSTGRES_HOST,FEEDGEN_POSTGRES_PORT,FEEDGEN_SUBSCRIPTION_ENDPOINT,FEEDGEN_HOSTNAME,FEEDGEN_PUBLISHER_DID,FEEDGEN_SUBSCRIPTION_RECONNECT_DELAY
