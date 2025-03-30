@@ -20,27 +20,27 @@ spec:
           imagePullPolicy: Always
           env:
             - name: FEEDGEN_PORT
-              value: ${FEEDGEN_PORT}
+              value: "${FEEDGEN_PORT}"
             - name: FEEDGEN_LISTENHOST
-              value: ${FEEDGEN_LISTENHOST}
+              value: "${FEEDGEN_LISTENHOST}"
             - name: FEEDGEN_POSTGRES_DATABASE
-              value: ${FEEDGEN_POSTGRES_DATABASE}
+              value: "${FEEDGEN_POSTGRES_DATABASE}"
             - name: FEEDGEN_POSTGRES_USERNAME
-              value: ${FEEDGEN_POSTGRES_USERNAME}
+              value: "${FEEDGEN_POSTGRES_USERNAME}"
             - name: FEEDGEN_POSTGRES_PASSWORD
-              value: ${FEEDGEN_POSTGRES_PASSWORD}
+              value: "${FEEDGEN_POSTGRES_PASSWORD}"
             - name: FEEDGEN_POSTGRES_HOST
-              value: ${FEEDGEN_POSTGRES_HOST}
+              value: "${FEEDGEN_POSTGRES_HOST}"
             - name: FEEDGEN_POSTGRES_PORT
-              value: ${FEEDGEN_POSTGRES_PORT}
+              value: "${FEEDGEN_POSTGRES_PORT}"
             - name: FEEDGEN_SUBSCRIPTION_ENDPOINT
-              value: ${FEEDGEN_SUBSCRIPTION_ENDPOINT}
+              value: "${FEEDGEN_SUBSCRIPTION_ENDPOINT}"
             - name: FEEDGEN_HOSTNAME
-              value: ${FEEDGEN_HOSTNAME}
+              value: "${FEEDGEN_HOSTNAME}"
             - name: FEEDGEN_PUBLISHER_DID
-              value: ${FEEDGEN_PUBLISHER_DID}
+              value: "${FEEDGEN_PUBLISHER_DID}"
             - name: FEEDGEN_SUBSCRIPTION_RECONNECT_DELAY
-              value: ${FEEDGEN_SUBSCRIPTION_RECONNECT_DELAY}
+              value: "${FEEDGEN_SUBSCRIPTION_RECONNECT_DELAY}"
           ports:
             - containerPort: 80
 ---
