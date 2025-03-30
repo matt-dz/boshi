@@ -13,12 +13,11 @@ abstract class OAuthRepository {
   String service;
   final Uri _clientId;
   late OAuthContext oAuthContext;
-  atp.ATProto? _atProto;
+  atp.ATProto? atProto;
 
   late OAuthClientMetadata? clientMetadata;
   late OAuthClient? oAuthClient;
 
-  atp.ATProto? get atProtoSession => _atProto;
   Uri get clientId => _clientId;
 
   Future<Result<Uri>> getAuthorizationURI(String identity, String service);

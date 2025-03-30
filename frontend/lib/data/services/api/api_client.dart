@@ -94,7 +94,10 @@ class ApiClient {
     return oauth_shared.getOAuthAuthorizationURI(client, identity);
   }
 
-  Future<void> generateSession(OAuthClient client, String callback) async {
+  Future<OAuthSession> generateSession(
+    OAuthClient client,
+    String callback,
+  ) async {
     return oauth_shared.generateSession(client, callback);
   }
 

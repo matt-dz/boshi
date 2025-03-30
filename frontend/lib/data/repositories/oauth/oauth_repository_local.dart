@@ -2,6 +2,7 @@ import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
 import 'package:frontend/utils/result.dart';
 import 'oauth_repository.dart';
+import 'package:atproto/atproto.dart' as atp;
 
 import 'package:frontend/utils/logger.dart';
 
@@ -18,7 +19,7 @@ class OAuthRepositoryLocal extends OAuthRepository {
       clientId: '${clientId.scheme}://${clientId.host}',
       clientName: 'Boshi',
       clientUri: clientId.toString(),
-      redirectUris: ['http://127.0.0.1:${clientId.port}/'],
+      redirectUris: ['http://127.0.0.1:${clientId.port}'],
       grantTypes: [
         'authorization_code',
         'refresh_token',
@@ -56,7 +57,9 @@ class OAuthRepositoryLocal extends OAuthRepository {
   Future<Result<void>> generateSession(String callback) async {
     try {
       _initializeOAuthClient();
-      await _localDataService.generateSession(oAuthClient!, callback);
+      final session =
+          await _localDataService.generateSession(oAuthClient!, callback);
+      atProto = atp.ATProto.fromOAuthSession(session);
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
@@ -69,7 +72,9 @@ class OAuthRepositoryLocal extends OAuthRepository {
   Future<Result<void>> refreshSession() async {
     try {
       _initializeOAuthClient();
-      await _localDataService.refreshSession(oAuthClient!);
+      final (_, newAtproto) =
+          await _localDataService.refreshSession(oAuthClient!);
+      atProto = newAtproto;
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);

@@ -57,7 +57,6 @@ List<SingleChildWidget> get providersRemote {
 }
 
 List<SingleChildWidget> get providersLocal {
-  // TODO: Add logging
   const frontendPort = String.fromEnvironment(
     'FRONTEND_PORT',
     defaultValue: '3000',

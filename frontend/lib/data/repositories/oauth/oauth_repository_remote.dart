@@ -42,7 +42,8 @@ class OAuthRepositoryRemote extends OAuthRepository {
   Future<Result<void>> generateSession(String callback) async {
     try {
       await _initializeOAuthClient();
-      await _apiClient.generateSession(oAuthClient!, callback);
+      final session = await _apiClient.generateSession(oAuthClient!, callback);
+      atProto = atp.ATProto.fromOAuthSession(session);
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
@@ -55,7 +56,8 @@ class OAuthRepositoryRemote extends OAuthRepository {
   Future<Result<void>> refreshSession() async {
     try {
       await _initializeOAuthClient();
-      await _apiClient.refreshSession(oAuthClient!);
+      final (_, newAtproto) = await _apiClient.refreshSession(oAuthClient!);
+      atProto = newAtproto;
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);

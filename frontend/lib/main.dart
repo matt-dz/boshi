@@ -15,34 +15,39 @@ import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
 
+import 'package:frontend/utils/logger.dart';
+
 import 'main_development.dart' as dev;
 
 void main() {
   dev.main();
-  // runApp(
-  //   MultiProvider(
-  //     providers: [
-  //       ChangeNotifierProvider(
-  //         create: (context) => OAuthRepository(
-  //           clientId: Uri.base.isScheme('http')
-  //               ? Uri.base
-  //               : Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),
-  //         ),
-  //       ),
-  //     ],
-  //     child: const MainApp(),
-  //   ),
-  // );
 }
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
-  // This widget is the root of your application.
-
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
+      redirect: (context, state) {
+        final oauth = context.read<OAuthRepository>();
+        final isLoggedIn = oauth.atProto != null;
+        final isLoggingIn = state.matchedLocation.startsWith('/login');
+
+        // Redirect to login if trying to access protected pages
+        // without being logged in
+        if (!isLoggedIn && !isLoggingIn) {
+          return '/login';
+        }
+
+        // Prevent logged-in users from visiting the login page again
+        if (isLoggedIn && isLoggingIn) {
+          return '/';
+        }
+
+        // No redirection needed
+        return null;
+      },
       routes: [
         GoRoute(
           path: '/',
@@ -66,10 +71,10 @@ class MainApp extends StatelessWidget {
               path: '/redirect',
               builder: (context, state) => Consumer<OAuthRepository>(
                 builder: (context, oauth, child) {
-                  if (oauth.atProtoSession == null) {
+                  if (oauth.atProto == null) {
                     oauth.generateSession(Uri.base.toString());
                   }
-                  return RedirectScreen(atpSession: oauth.atProtoSession);
+                  return RedirectScreen(atpSession: oauth.atProto);
                 },
               ),
             ),

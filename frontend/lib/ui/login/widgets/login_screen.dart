@@ -24,11 +24,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
       body: Center(
         child: ShadCard(
           width: 350,
-          title: const Text('Sign In'),
+          title: const Text('Boshi Log In'),
           description: const Text('Use your identity to sign in with OAuth'),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
