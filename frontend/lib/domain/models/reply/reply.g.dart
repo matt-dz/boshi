@@ -17,7 +17,7 @@ _$ReplyImpl _$$ReplyImplFromJson(Map<String, dynamic> json) => _$ReplyImpl(
       comments: (json['comments'] as List<dynamic>)
           .map((e) => Reply.fromJson(e as Map<String, dynamic>))
           .toList(),
-      replyToId: json['replyToId'] as String,
+      replyToId: json['reply_to_id'] as String,
     );
 
 Map<String, dynamic> _$$ReplyImplToJson(_$ReplyImpl instance) =>
@@ -28,5 +28,5 @@ Map<String, dynamic> _$$ReplyImplToJson(_$ReplyImpl instance) =>
       'timestamp': instance.timestamp.toIso8601String(),
       'reactions': instance.reactions,
       'comments': instance.comments,
-      'replyToId': instance.replyToId,
+      'reply_to_id': instance.replyToId,
     };

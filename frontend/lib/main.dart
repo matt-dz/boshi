@@ -4,15 +4,16 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/ui/login/view_model/login.dart';
-import 'package:frontend/ui/login/view_model/login_redirect.dart';
+import 'package:frontend/ui/login/widgets/login_screen.dart';
+import 'package:frontend/ui/login/widgets/redirect_screen.dart';
+import 'package:frontend/ui/login/view_model/login_viewmodel.dart';
+
 import 'package:frontend/ui/home/view_model/home_viewmodel.dart';
 import 'package:frontend/ui/home/widgets/home_screen.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
-
-import 'package:frontend/data/repositories/oauth.dart';
+import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
 
 import 'main_development.dart' as dev;
 
@@ -55,7 +56,11 @@ class MainApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/login',
-          builder: (context, state) => LoginPage(),
+          builder: (context, state) => LoginScreen(
+            viewModel: LoginViewModel(
+              oAuthRepository: context.read<OAuthRepository>(),
+            ),
+          ),
           routes: [
             GoRoute(
               path: '/redirect',
@@ -64,7 +69,7 @@ class MainApp extends StatelessWidget {
                   if (oauth.atProtoSession == null) {
                     oauth.generateSession(Uri.base.toString());
                   }
-                  return RedirectPage(atpSession: oauth.atProtoSession);
+                  return RedirectScreen(atpSession: oauth.atProtoSession);
                 },
               ),
             ),

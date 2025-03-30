@@ -1,6 +1,5 @@
 .PHONY: docker docker-push
 
-SHELL := /bin/bash
 
 DOCKER_REGISTRY ?= matthew10125
 IMAGE_NAME ?= boshi-frontend
@@ -11,10 +10,16 @@ PLATFORM ?= linux/arm64
 DEVICE_ID ?= chrome
 MAIN_STAGING = lib/main_staging.dart
 DEV_STAGING = lib/main_development.dart
+FRONTEND_PORT=3000
+
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
 
 all:
 	scripts/start.sh &
-	flutter run -d ${DEVICE_ID} --target ${DEV_STAGING} --pid-file /tmp/flutter.pid --web-hostname 0.0.0.0 --web-port 3000
+	flutter run -d ${DEVICE_ID} --target ${DEV_STAGING} --pid-file /tmp/flutter.pid --web-hostname 127.0.0.1 --web-port ${FRONTEND_PORT}
 
 staging:
 	flutter run -d ${DEVICE_ID} --target ${MAIN_STAGING}

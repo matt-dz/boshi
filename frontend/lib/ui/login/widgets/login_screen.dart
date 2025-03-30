@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:frontend/data/repositories/oauth.dart';
+import '../view_model/login_viewmodel.dart';
+import 'package:frontend/ui/models/login/login.dart';
+import 'package:frontend/utils/result.dart';
+import 'package:frontend/utils/logger.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key, required this.viewModel});
+
+  final LoginViewModel viewModel;
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<ShadFormState>();
 
   @override
@@ -73,25 +78,32 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  Consumer<OAuthRepository>(
-                    builder: (context, oauth, child) {
-                      return ShadButton(
-                        child: const Text('Sign in'),
-                        onPressed: () async {
-                          if (formKey.currentState!.saveAndValidate()) {
-                            oauth.service =
-                                formKey.currentState!.value['auth_provider'];
-                            final Uri authUri = await oauth.getAuthorizationURI(
-                              formKey.currentState!.value['identity'],
-                            );
-                            if (!await launchUrl(authUri)) {
-                              throw Exception(
-                                'Could not launch $authUri',
-                              );
+                  ShadButton(
+                    child: const Text('Log in'),
+                    onPressed: () async {
+                      if (formKey.currentState!.saveAndValidate()) {
+                        final result = await widget.viewModel.login.execute(
+                          Login(
+                            oAuthService:
+                                formKey.currentState!.value['auth_provider'],
+                            identity: formKey.currentState!.value['identity'],
+                          ),
+                        );
+
+                        switch (result) {
+                          case Ok<Uri>():
+                            try {
+                              if (!await launchUrl(result.value)) {
+                                logger.e('Unable to launch url');
+                              }
+                            } on PlatformException catch (e) {
+                              logger.e('Error launching URL: $e');
                             }
-                          }
-                        },
-                      );
+                          case Error():
+                            logger.e('Error signing in: $result');
+                            return;
+                        }
+                      }
                     },
                   ),
                 ],

@@ -11,7 +11,7 @@ _$ReactionPayloadImpl _$$ReactionPayloadImplFromJson(
     _$ReactionPayloadImpl(
       emote: json['emote'] as String,
       delta: (json['delta'] as num).toInt(),
-      postId: json['postId'] as String,
+      postId: json['post_id'] as String,
     );
 
 Map<String, dynamic> _$$ReactionPayloadImplToJson(
@@ -19,5 +19,5 @@ Map<String, dynamic> _$$ReactionPayloadImplToJson(
     <String, dynamic>{
       'emote': instance.emote,
       'delta': instance.delta,
-      'postId': instance.postId,
+      'post_id': instance.postId,
     };
