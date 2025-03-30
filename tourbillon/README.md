@@ -1,5 +1,6 @@
 # ATProto Feed Generator
 
+
 This is a starter kit for creating ATProto Feed Generators. It's not feature complete, but should give you a good starting ground off of which to build and deploy a feed.
 
 ## Overview
@@ -28,13 +29,13 @@ We've set up this simple server with SQLite to store and query data. Feel free t
 
 Next, you will need to do two things:
 
-1. Implement indexing logic in `src/subscription.ts`. 
-   
+1. Implement indexing logic in `src/subscription.ts`.
+
    This will subscribe to the repo subscription stream on startup, parse events and index them according to your provided logic.
 
 2. Implement feed generation logic in `src/algos`
 
-   For inspiration, we've provided a very simple feed algorithm (`whats-alf`) that returns all posts related to the titular character of the TV show ALF. 
+   For inspiration, we've provided a very simple feed algorithm (`whats-alf`) that returns all posts related to the titular character of the TV show ALF.
 
    You can either edit it or add another algorithm alongside it. The types are in place, and you will just need to return something that satisfies the `SkeletonFeedPost[]` type.
 
