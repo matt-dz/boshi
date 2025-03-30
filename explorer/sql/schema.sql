@@ -15,8 +15,9 @@ CREATE TABLE reply (
     indexed_at TIMESTAMPTZ NOT NULL,
     title VARCHAR(511) NOT NULL,
     content VARCHAR(8191) NOT NULL,
-    reply_to_uri VARCHAR,
-    PRIMARY KEY (uri)
+    reply_to_uri VARCHAR NOT NULL,
+    PRIMARY KEY (uri),
+    FOREIGN KEY (reply_to_uri) REFERENCES post (uri)
 );
 
 CREATE TABLE reaction (

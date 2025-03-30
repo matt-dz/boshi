@@ -32,5 +32,5 @@ type Reply struct {
 	IndexedAt  pgtype.Timestamptz
 	Title      string
 	Content    string
-	ReplyToUri pgtype.Text
+	ReplyToUri string
 }
