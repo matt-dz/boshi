@@ -231,7 +231,7 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           tag: ${{ github.sha }}
-          path: explorer
+          path: tourbillon
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:
