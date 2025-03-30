@@ -17,7 +17,7 @@ INSERT INTO post (
 ) VALUES (
   $1, $2, $3
 )
-RETURNING uri, cid, author_did, indexed_at, title, content, reply_to_post_cid
+RETURNING uri, cid, author_did, indexed_at, title, content
 `
 
 type CreatePostParams struct {
@@ -36,7 +36,6 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 		&i.IndexedAt,
 		&i.Title,
 		&i.Content,
-		&i.ReplyToPostCid,
 	)
 	return i, err
 }
@@ -52,7 +51,7 @@ func (q *Queries) DeletePost(ctx context.Context, uri string) error {
 }
 
 const getPost = `-- name: GetPost :one
-SELECT uri, cid, author_did, indexed_at, title, content, reply_to_post_cid FROM post
+SELECT uri, cid, author_did, indexed_at, title, content FROM post
 WHERE uri = $1 LIMIT 1
 `
 
@@ -66,13 +65,12 @@ func (q *Queries) GetPost(ctx context.Context, uri string) (Post, error) {
 		&i.IndexedAt,
 		&i.Title,
 		&i.Content,
-		&i.ReplyToPostCid,
 	)
 	return i, err
 }
 
 const listPosts = `-- name: ListPosts :many
-SELECT uri, cid, author_did, indexed_at, title, content, reply_to_post_cid FROM post
+SELECT uri, cid, author_did, indexed_at, title, content FROM post
 ORDER BY indexed_at
 `
 
@@ -92,7 +90,6 @@ func (q *Queries) ListPosts(ctx context.Context) ([]Post, error) {
 			&i.IndexedAt,
 			&i.Title,
 			&i.Content,
-			&i.ReplyToPostCid,
 		); err != nil {
 			return nil, err
 		}

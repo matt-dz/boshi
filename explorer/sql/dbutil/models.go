@@ -9,13 +9,12 @@ import (
 )
 
 type Post struct {
-	Uri            string
-	Cid            string
-	AuthorDid      string
-	IndexedAt      pgtype.Timestamptz
-	Title          string
-	Content        string
-	ReplyToPostCid pgtype.Text
+	Uri       string
+	Cid       string
+	AuthorDid string
+	IndexedAt pgtype.Timestamptz
+	Title     string
+	Content   string
 }
 
 type Reaction struct {
@@ -24,4 +23,14 @@ type Reaction struct {
 	AuthorDid string
 	IndexedAt pgtype.Timestamptz
 	Emote     string
+}
+
+type Reply struct {
+	Uri        string
+	Cid        string
+	AuthorDid  string
+	IndexedAt  pgtype.Timestamptz
+	Title      string
+	Content    string
+	ReplyToUri pgtype.Text
 }

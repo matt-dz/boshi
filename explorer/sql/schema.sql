@@ -5,7 +5,17 @@ CREATE TABLE post (
     indexed_at TIMESTAMPTZ NOT NULL,
     title VARCHAR(511) NOT NULL,
     content VARCHAR(8191) NOT NULL,
-    reply_to_post_cid VARCHAR,
+    PRIMARY KEY (uri)
+);
+
+CREATE TABLE reply (
+    uri VARCHAR,
+    cid VARCHAR NOT NULL,
+    author_did VARCHAR NOT NULL,
+    indexed_at TIMESTAMPTZ NOT NULL,
+    title VARCHAR(511) NOT NULL,
+    content VARCHAR(8191) NOT NULL,
+    reply_to_uri VARCHAR,
     PRIMARY KEY (uri)
 );
 
