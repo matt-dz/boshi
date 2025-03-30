@@ -17,7 +17,7 @@ CREATE TABLE reply (
     content VARCHAR(8191) NOT NULL,
     reply_to_uri VARCHAR NOT NULL,
     PRIMARY KEY (uri),
-    FOREIGN KEY (reply_to_uri) REFERENCES post (uri)
+    FOREIGN KEY (reply_to_uri) REFERENCES post (uri) ON DELETE CASCADE
 );
 
 CREATE TABLE reaction (
@@ -27,5 +27,5 @@ CREATE TABLE reaction (
     indexed_at TIMESTAMPTZ NOT NULL,
     emote VARCHAR NOT NULL,
     PRIMARY KEY (uri),
-    FOREIGN KEY (post_uri) REFERENCES post (uri)
+    FOREIGN KEY (post_uri) REFERENCES post (uri) ON DELETE CASCADE
 );
