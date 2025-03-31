@@ -4,44 +4,43 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/ui/login/view_model/login.dart';
-import 'package:frontend/ui/login/view_model/login_redirect.dart';
+import 'package:frontend/ui/login/widgets/login_screen.dart';
+import 'package:frontend/ui/login/widgets/redirect_screen.dart';
+import 'package:frontend/ui/login/view_model/login_viewmodel.dart';
+
 import 'package:frontend/ui/home/view_model/home_viewmodel.dart';
 import 'package:frontend/ui/home/widgets/home_screen.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
-
-import 'package:frontend/data/repositories/oauth.dart';
+import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
 
 import 'main_development.dart' as dev;
 
 void main() {
   dev.main();
-  // runApp(
-  //   MultiProvider(
-  //     providers: [
-  //       ChangeNotifierProvider(
-  //         create: (context) => OAuthRepository(
-  //           clientId: Uri.base.isScheme('http')
-  //               ? Uri.base
-  //               : Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),
-  //         ),
-  //       ),
-  //     ],
-  //     child: const MainApp(),
-  //   ),
-  // );
 }
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
-  // This widget is the root of your application.
-
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
+      initialLocation: '/login',
+      redirect: (BuildContext context, GoRouterState state) {
+        final oauth = context.read<OAuthRepository>();
+        if (!oauth.authorized) {
+          try {
+            oauth.generateSession(Uri.base.toString());
+            return null;
+          } catch (e) {
+            return '/login';
+          }
+        } else {
+          return null;
+        }
+      },
       routes: [
         GoRoute(
           path: '/',
@@ -55,16 +54,20 @@ class MainApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/login',
-          builder: (context, state) => LoginPage(),
+          builder: (context, state) => LoginScreen(
+            viewModel: LoginViewModel(
+              oAuthRepository: context.read<OAuthRepository>(),
+            ),
+          ),
           routes: [
             GoRoute(
               path: '/redirect',
               builder: (context, state) => Consumer<OAuthRepository>(
                 builder: (context, oauth, child) {
-                  if (oauth.atProtoSession == null) {
+                  if (oauth.authorized) {
                     oauth.generateSession(Uri.base.toString());
                   }
-                  return RedirectPage(atpSession: oauth.atProtoSession);
+                  return RedirectScreen(atpSession: oauth.atProto);
                 },
               ),
             ),

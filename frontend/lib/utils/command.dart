@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'result.dart';
 
+import 'package:frontend/shared/exceptions/command_already_running_exception.dart';
+
 typedef CommandAction0<T> = Future<Result<T>> Function();
 typedef CommandAction1<T, A> = Future<Result<T>> Function(A);
 
@@ -35,7 +37,7 @@ abstract class Command<T> extends ChangeNotifier {
   bool get completed => _result is Ok;
 
   /// Get last action result
-  Result? get result => _result;
+  Result<T>? get result => _result;
 
   /// Clear last action result
   void clearResult() {
@@ -44,11 +46,11 @@ abstract class Command<T> extends ChangeNotifier {
   }
 
   /// Internal execute implementation
-  Future<void> _execute(CommandAction0<T> action) async {
+  Future<Result<T>> _execute(CommandAction0<T> action) async {
     // Ensure the action can't launch multiple times.
     // e.g. avoid multiple taps on button
     if (_running) {
-      return;
+      return _result ?? Result.error(CommandAlreadyRunningException());
     }
 
     // Notify listeners.
@@ -59,6 +61,13 @@ abstract class Command<T> extends ChangeNotifier {
 
     try {
       _result = await action();
+      return _result!;
+    } on Exception catch (e) {
+      _result = Result.error(e);
+      return _result!;
+    } catch (e) {
+      _result = Result.error(Exception(e));
+      return _result!;
     } finally {
       _running = false;
       notifyListeners();
@@ -74,8 +83,8 @@ class Command0<T> extends Command<T> {
   final CommandAction0<T> _action;
 
   /// Executes the action.
-  Future<void> execute() async {
-    await _execute(_action);
+  Future<Result<T>> execute() async {
+    return await _execute(_action);
   }
 }
 
@@ -87,7 +96,7 @@ class Command1<T, A> extends Command<T> {
   final CommandAction1<T, A> _action;
 
   /// Executes the action with the argument.
-  Future<void> execute(A argument) async {
-    await _execute(() => _action(argument));
+  Future<Result<T>> execute(A argument) async {
+    return await _execute(() => _action(argument));
   }
 }

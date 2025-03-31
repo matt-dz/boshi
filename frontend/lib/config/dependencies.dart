@@ -11,16 +11,18 @@ import 'package:frontend/data/repositories/feed/feed_repository_local.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository_remote.dart';
 import 'package:frontend/data/repositories/user/user_repository_local.dart';
-import 'package:frontend/data/repositories/oauth.dart';
+import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
+import 'package:frontend/data/repositories/oauth/oauth_repository_remote.dart';
+import 'package:frontend/data/repositories/oauth/oauth_repository_local.dart';
 
 List<SingleChildWidget> _sharedProviders = [
-  ChangeNotifierProvider(
-    create: (context) => OAuthRepository(
-      clientId: Uri.base.isScheme('http')
-          ? Uri.base
-          : Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),
-    ),
-  ),
+  // ChangeNotifierProvider(
+  //   create: (context) => OAuthRepository(
+  //     clientId: Uri.base.isScheme('http')
+  //         ? Uri.base
+  //         : Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),
+  //   ),
+  // ),
 ];
 
 List<SingleChildWidget> get providersRemote {
@@ -45,11 +47,21 @@ List<SingleChildWidget> get providersRemote {
         apiClient: context.read<ApiClient>(),
       ) as FeedRepository,
     ),
+    Provider(
+      create: (context) => OAuthRepositoryRemote(
+        clientId: Uri.base,
+        apiClient: context.read<ApiClient>(),
+      ) as OAuthRepository,
+    ),
   ];
 }
 
 List<SingleChildWidget> get providersLocal {
-  // TODO: Add logging
+  const frontendPort = String.fromEnvironment(
+    'FRONTEND_PORT',
+    defaultValue: '3000',
+  );
+
   return [
     ..._sharedProviders,
     Provider<LocalDataService>(
@@ -64,6 +76,12 @@ List<SingleChildWidget> get providersLocal {
       create: (context) => FeedRepositoryLocal(
         localDataService: context.read<LocalDataService>(),
       ) as FeedRepository,
+    ),
+    Provider(
+      create: (context) => OAuthRepositoryLocal(
+        clientId: Uri.parse('http://localhost:$frontendPort'),
+        localDataService: context.read<LocalDataService>(),
+      ) as OAuthRepository,
     ),
   ];
 }
