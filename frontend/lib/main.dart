@@ -28,9 +28,13 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final router = GoRouter(
       redirect: (context, state) {
+        const env = String.fromEnvironment('ENV');
+        if (env != 'PROD') {
+          return null;
+        }
         final oauth = context.read<OAuthRepository>();
         final isLoggedIn = oauth.atProto != null;
-        final isLoggingIn = state.matchedLocation.startsWith('/login');
+        final isLoggingIn = state.uri.path.startsWith('/login');
 
         // Redirect to login if trying to access protected pages
         // without being logged in
