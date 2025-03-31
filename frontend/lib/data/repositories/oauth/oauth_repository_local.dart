@@ -30,6 +30,7 @@ class OAuthRepositoryLocal extends OAuthRepository {
       tokenEndpointAuthMethod: 'none',
     );
     oAuthClient ??= OAuthClient(clientMetadata!, service: service);
+    initialized = true;
     logger.d(clientMetadata);
   }
 

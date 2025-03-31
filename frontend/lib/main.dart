@@ -27,28 +27,19 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
-      redirect: (context, state) {
-        const env = String.fromEnvironment('ENV');
-        if (env != 'PROD') {
+      initialLocation: '/login',
+      redirect: (BuildContext context, GoRouterState state) {
+        final oauth = context.read<OAuthRepository>();
+        if (!oauth.authorized) {
+          try {
+            oauth.generateSession(Uri.base.toString());
+            return null;
+          } catch (e) {
+            return '/login';
+          }
+        } else {
           return null;
         }
-        final oauth = context.read<OAuthRepository>();
-        final isLoggedIn = oauth.atProto != null;
-        final isLoggingIn = state.uri.path.startsWith('/login');
-
-        // Redirect to login if trying to access protected pages
-        // without being logged in
-        if (!isLoggedIn && !isLoggingIn) {
-          return '/login';
-        }
-
-        // Prevent logged-in users from visiting the login page again
-        if (isLoggedIn && isLoggingIn) {
-          return '/';
-        }
-
-        // No redirection needed
-        return null;
       },
       routes: [
         GoRoute(
@@ -73,7 +64,7 @@ class MainApp extends StatelessWidget {
               path: '/redirect',
               builder: (context, state) => Consumer<OAuthRepository>(
                 builder: (context, oauth, child) {
-                  if (oauth.atProto == null) {
+                  if (oauth.authorized) {
                     oauth.generateSession(Uri.base.toString());
                   }
                   return RedirectScreen(atpSession: oauth.atProto);

@@ -15,6 +15,7 @@ class OAuthRepositoryRemote extends OAuthRepository {
     clientMetadata ??=
         await _apiClient.getOAuthClientMetadata(clientId.toString());
     oAuthClient ??= OAuthClient(clientMetadata!, service: service);
+    initialized = true;
   }
 
   @override

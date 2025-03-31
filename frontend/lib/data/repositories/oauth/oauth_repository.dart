@@ -8,9 +8,11 @@ abstract class OAuthRepository {
   })  : _clientId = clientId,
         clientMetadata = null,
         oAuthClient = null,
-        service = 'bsky.social';
+        service = 'bsky.social',
+        initialized = false;
 
   String service;
+  bool initialized;
   final Uri _clientId;
   late OAuthContext oAuthContext;
   atp.ATProto? atProto;
@@ -19,6 +21,7 @@ abstract class OAuthRepository {
   late OAuthClient? oAuthClient;
 
   Uri get clientId => _clientId;
+  bool get authorized => atProto != null;
 
   Future<Result<Uri>> getAuthorizationURI(String identity, String service);
   Future<Result<void>> generateSession(String callback);
