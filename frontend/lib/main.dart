@@ -28,15 +28,18 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final router = GoRouter(
       initialLocation: '/login',
-      redirect: (BuildContext context, GoRouterState state) {
+      redirect: (BuildContext context, GoRouterState state) async {
         final oauth = context.read<OAuthRepository>();
-        if (!oauth.authorized) {
+        final isLoggingIn = state.uri.path.startsWith('/login');
+        if (!oauth.authorized && !isLoggingIn) {
           try {
-            oauth.generateSession(Uri.base.toString());
+            await oauth.generateSession(Uri.base.toString());
             return null;
           } catch (e) {
             return '/login';
           }
+        } else if (oauth.authorized && isLoggingIn) {
+          return '/';
         } else {
           return null;
         }
