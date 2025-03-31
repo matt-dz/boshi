@@ -15,6 +15,9 @@ import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
 
+import 'package:frontend/utils/logger.dart';
+import 'package:frontend/utils/result.dart';
+
 import 'main_development.dart' as dev;
 
 void main() {
@@ -27,22 +30,18 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
-      initialLocation: '/login',
       redirect: (BuildContext context, GoRouterState state) async {
         final oauth = context.read<OAuthRepository>();
         final isLoggingIn = state.uri.path.startsWith('/login');
         if (!oauth.authorized && !isLoggingIn) {
-          try {
-            await oauth.generateSession(Uri.base.toString());
-            return null;
-          } catch (e) {
+          final result = await oauth.generateSession(Uri.base.toString());
+          if (result is Error<void>) {
             return '/login';
           }
         } else if (oauth.authorized && isLoggingIn) {
           return '/';
-        } else {
-          return null;
         }
+        return null;
       },
       routes: [
         GoRoute(

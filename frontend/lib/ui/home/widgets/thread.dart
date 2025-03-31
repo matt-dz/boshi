@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/reply/reply.dart';
-import 'package:frontend/utils/logger.dart';
 
 import 'content_item.dart';
 
@@ -37,7 +36,6 @@ class Thread extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.d('Thread: ${post.id}, $post');
     return Column(
       children: [
         ContentItemWidget(
