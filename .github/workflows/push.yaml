@@ -90,7 +90,7 @@ jobs:
 
   build-and-deploy-backend:
     needs: [changes, build-info, clone-repo]
-    if: ${{ needs.changes.outputs.backend == 'true' || steps.namespace.outputs.exists == 'false' }}
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.build-info.outputs.namespace-exists == 'false' }}
     name: Build and Deploy Backend
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -140,7 +140,7 @@ jobs:
 
   build-and-deploy-landing:
     needs: [changes, build-info, clone-repo]
-    if: ${{ needs.changes.outputs.landing == 'true' || steps.namespace.outputs.exists == 'false' }}
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.build-info.outputs.namespace-exists == 'false' }}
     name: Build and Deploy Landing
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -190,7 +190,7 @@ jobs:
 
   build-and-deploy-frontend:
     needs: [changes, build-info, clone-repo]
-    if: ${{ needs.changes.outputs.frontend == 'true' || steps.namespace.outputs.exists == 'false' }}
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.build-info.outputs.namespace-exists == 'false' }}
     name: Build and Deploy Frontend
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -240,7 +240,7 @@ jobs:
 
   build-and-deploy-explorer:
     needs: [changes, build-info, clone-repo]
-    if: ${{ needs.changes.outputs.explorer == 'true' || steps.namespace.outputs.exists == 'false' }}
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.build-info.outputs.namespace-exists == 'false' }}
     name: Build and Deploy Explorer
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
