@@ -1,0 +1,41 @@
+name: "Check Namespace Existance"
+description: "Check if a namespace exists in a Kubernetes cluster"
+inputs:
+  host:
+    description: "SSH Host"
+    required: true
+  username:
+    description: "SSH Username"
+    required: true
+  key:
+    description: "SSH Key"
+    required: true
+  port:
+    description: "SSH Port"
+    required: true
+  namespace:
+    description: "Namespace"
+    required: true
+outputs:
+  exists:
+    description: "Whether the namespace exists"
+    value: ${{ steps.check.outputs.exists }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+    - uses: applyboy/ssh-action@v1.2.0
+      id: check
+      name: Check Namespace
+      with:
+        host: ${{ inputs.host }}
+        username: ${{ inputs.username }}
+        key: ${{ inputs.key }}
+        port: ${{ inputs.port }}
+        script: |
+          if kubectl get namespace "${{ inputs.namespace }}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
