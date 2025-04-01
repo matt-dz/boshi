@@ -25,7 +25,7 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
-    - uses: applyboy/ssh-action@v1.2.0
+    - uses: appleboy/ssh-action@v1.2.0
       id: check
       name: Check Namespace
       with:
