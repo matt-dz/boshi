@@ -52,7 +52,7 @@ runs:
         port: ${{ inputs.port }}
         envs: NAMESPACE,CONFIG_PATH,IMAGE,DOMAIN,UPDATE_DEPLOYMENT,${{inputs.config-envs}}
         script: |
-          if [ ! kubectl get namespace $NAMESPACE >/dev/null 2>&1]; then
+          if [ ! kubectl get namespace $NAMESPACE >/dev/null 2>&1 ]; then
             echo "Creating namespace $NAMESPACE and deploying"
             kubectl create namespace $NAMESPACE
             envsubst < ${CONFIG_PATH} \
