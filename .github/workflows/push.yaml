@@ -94,7 +94,6 @@ jobs:
           tag: ${{ github.sha }}
           path: backend
       - uses: ./.github/actions/domain
-        if: ${{ needs.changes.outputs.backend == 'true' || contains(fromJson(needs.changes.outputs.changed_files), 'backend.yaml') }}
         id: domain
         with:
           prod: boshi
@@ -111,6 +110,7 @@ jobs:
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/backend.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-backend:latest
+          update-deployment: ${{ needs.changes.outputs.backend == 'true' || contains(fromJson(needs.changes.outputs.changed_files), 'backend.yaml') }}
           namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -134,7 +134,6 @@ jobs:
           prod: boshi-app
           dev: ${{needs.build-info.outputs.branch-name}}-boshi-app
       - name: Create/Update Deployment
-        if: ${{ needs.changes.outputs.landing == 'true' || contains(fromJson(needs.changes.outputs.changed_files), 'landing.yaml') }}
         uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
@@ -146,6 +145,7 @@ jobs:
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/landing.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-landing:latest
+          update-deployment: ${{ needs.changes.outputs.landing == 'true' || contains(fromJson(needs.changes.outputs.changed_files), 'landing.yaml') }}
           namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -169,7 +169,6 @@ jobs:
           prod: boshi
           dev: ${{needs.build-info.outputs.branch-name}}-boshi
       - name: Create/Update Deployment
-        if: ${{ needs.changes.outputs.frontend == 'true' || contains(fromJson(needs.changes.outputs.changed_files), 'frontend.yaml') }}
         uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
@@ -181,6 +180,7 @@ jobs:
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/frontend.yaml
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-frontend:latest
+          update-deployment: ${{ needs.changes.outputs.frontend == 'true' || contains(fromJson(needs.changes.outputs.changed_files), 'frontend.yaml') }}
           namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -199,7 +199,6 @@ jobs:
           tag: ${{ github.sha }}
           path: explorer
       - name: Create/Update Deployment
-        if: ${{ needs.changes.outputs.explorer == 'true' || contains(fromJson(needs.changes.outputs.changed_files), 'explorer.yaml') }}
         uses: ./.github/actions/k8s/deploy
         env:
           POSTGRES_URL: ${{secrets.POSTGRES_URL}}
@@ -211,6 +210,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/explorer.yaml
+          update-deployment: ${{ needs.changes.outputs.explorer == 'true' || contains(fromJson(needs.changes.outputs.changed_files), 'explorer.yaml') }}
           docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-explorer:latest
           namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: POSTGRES_URL,SOCKET_URI,FIREHOSE_IDENTIFIER
