@@ -33,10 +33,8 @@ jobs:
               - 'kubernetes/**'
 
   build-info:
-    needs: changes
     name: Get Build Info
     runs-on: ubuntu-latest
-    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' || needs.changes.outputs.kubernetes == 'true' }}
     outputs:
       branch-name: ${{ steps.build-info.outputs.branch-name }}
       namespace: ${{ steps.build-info.outputs.namespace }}
@@ -56,8 +54,9 @@ jobs:
           namespace: ${{ steps.build-info.outputs.namespace }}
 
   clone-repo:
+    needs: [changes, build-info]
+    if: ${{ needs.build-info.outputs.namespace-exists == 'false' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' || needs.changes.outputs.kubernetes == 'true' }}
     name: Clone Repo
-    needs: [build-info]
     runs-on: ubuntu-latest
     outputs:
       repo-destination: ${{ steps.destination.outputs.repo-destination }}
