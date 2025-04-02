@@ -49,7 +49,7 @@ List<SingleChildWidget> get providersRemote {
         apiClient: context.read<ApiClient>(),
       ) as FeedRepository,
     ),
-    Provider(
+    ChangeNotifierProvider(
       create: (context) => OAuthRepositoryRemote(
         clientId: Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),
         apiClient: context.read<ApiClient>(),
@@ -79,7 +79,7 @@ List<SingleChildWidget> get providersLocal {
         localDataService: context.read<LocalDataService>(),
       ) as FeedRepository,
     ),
-    Provider(
+    ChangeNotifierProvider(
       create: (context) => OAuthRepositoryLocal(
         clientId: Uri.parse('http://localhost:$frontendPort'),
         localDataService: context.read<LocalDataService>(),
