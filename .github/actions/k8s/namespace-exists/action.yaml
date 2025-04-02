@@ -1,0 +1,47 @@
+name: "Check Namespace Existance"
+description: "Check if a namespace exists in a Kubernetes cluster"
+inputs:
+  host:
+    description: "SSH Host"
+    required: true
+  username:
+    description: "SSH Username"
+    required: true
+  key:
+    description: "SSH Key"
+    required: true
+  port:
+    description: "SSH Port"
+    required: true
+  namespace:
+    description: "Namespace"
+    required: true
+  kube-deploy-key:
+    description: "Kube Deploy Server API Key"
+    required: true
+  kube-deploy-url:
+    description: "Kube Deploy Server URL"
+    required: true
+outputs:
+  exists:
+    description: "Whether the namespace exists"
+    value: ${{ steps.check.outputs.exists }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+    - id: check
+      name: Check Namespace
+      shell: bash
+      run: |
+        STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X GET ${{ inputs.kube-deploy-url }}/namespace/${{ inputs.namespace }} --header "X-Api-Key: ${{ inputs.kube-deploy-key }}")
+
+        if [ "$STATUS_CODE" -eq 200 ]; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        elif [ "$STATUS_CODE" -eq 404 ]; then
+          echo "exists=false" >> $GITHUB_OUTPUT
+        else
+          echo "Unexpected status code: $STATUS_CODE"
+          exit 1
+        fi
