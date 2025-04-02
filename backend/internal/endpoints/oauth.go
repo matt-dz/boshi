@@ -26,7 +26,7 @@ func ServeOauthMetadata(w http.ResponseWriter, r *http.Request) {
 		ApplicationType:         "web",
 		DpopBoundAccessTokens:   true,
 	})
-	r.Header.Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 
 	if err != nil {
 		log.Error("Failed to encode response", "error", err)
