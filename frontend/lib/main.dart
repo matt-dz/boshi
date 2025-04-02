@@ -36,6 +36,7 @@ class MainApp extends StatelessWidget {
           print('naughty naughty');
           final result = await oauth.generateSession(Uri.base.toString());
           if (result is Error<void>) {
+            print(result.error);
             print('naughty naughty - sending you back');
             return '/login';
           }
