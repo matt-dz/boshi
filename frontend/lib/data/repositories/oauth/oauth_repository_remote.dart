@@ -12,7 +12,6 @@ class OAuthRepositoryRemote extends OAuthRepository {
 
   final ApiClient _apiClient;
   Future<void> _initializeOAuthClient() async {
-    print('Retrieving metadata from ${clientId.toString()}');
     clientMetadata ??=
         await _apiClient.getOAuthClientMetadata(clientId.toString());
     oAuthClient ??= OAuthClient(clientMetadata!, service: service);
@@ -27,7 +26,6 @@ class OAuthRepositoryRemote extends OAuthRepository {
     try {
       this.service = service;
       await _initializeOAuthClient();
-      print('retrieved');
       final (uri, context) = await _apiClient.getOAuthAuthorizationURI(
         oAuthClient!,
         identity,

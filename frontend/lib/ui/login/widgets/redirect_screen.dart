@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:atproto/atproto.dart' as atp;
-import 'package:atproto/atproto_oauth.dart';
-import 'package:go_router/go_router.dart';
 
 class RedirectScreen extends StatefulWidget {
   const RedirectScreen({super.key, required this.atpSession});
@@ -16,15 +14,15 @@ class RedirectScreen extends StatefulWidget {
 class _RedirectScreenState extends State<RedirectScreen> {
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        if (widget.atpSession != null) {
-          context.go('/');
-        }
-      } on OAuthException {
-        rethrow;
-      }
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   try {
+    //     if (widget.atpSession != null) {
+    //       context.go('/');
+    //     }
+    //   } on OAuthException {
+    //     rethrow;
+    //   }
+    // });
 
     return Center(
       child: const Text(

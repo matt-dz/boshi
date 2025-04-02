@@ -15,7 +15,6 @@ import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
 
-import 'package:frontend/utils/logger.dart';
 import 'package:frontend/utils/result.dart';
 
 import 'main_development.dart' as dev;
@@ -63,6 +62,13 @@ class MainApp extends StatelessWidget {
           ),
           routes: [
             GoRoute(
+              redirect: (context, state) {
+                final oauth = context.read<OAuthRepository>();
+                if (oauth.authorized) {
+                  return '/';
+                }
+                return '/login';
+              },
               path: '/redirect',
               builder: (context, state) => Consumer<OAuthRepository>(
                 builder: (context, oauth, child) {
