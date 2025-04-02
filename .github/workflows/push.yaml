@@ -60,7 +60,7 @@ jobs:
 
   clone-repo:
     needs: [changes, build-info]
-    if: ${{ needs.build-info.outputs.namespace-exists == 'false' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' || needs.changes.outputs.kubernetes == 'true' }}
+    if: ${{ needs.build-info.outputs.namespace-exists == 'false' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' || needs.changes.outputs.tourbillon == 'true' || needs.changes.outputs.kubernetes == 'true' }}
     name: Clone Repo
     runs-on: ubuntu-latest
     outputs:
