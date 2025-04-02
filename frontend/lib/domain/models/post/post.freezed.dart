@@ -24,7 +24,7 @@ mixin _$Post {
   User get author => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
-  Set<String> get reactions => throw _privateConstructorUsedError;
+  List<Reaction> get reactions => throw _privateConstructorUsedError;
   List<Reply> get comments => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
 
@@ -47,7 +47,7 @@ abstract class $PostCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      Set<String> reactions,
+      List<Reaction> reactions,
       List<Reply> comments,
       String title});
 
@@ -97,7 +97,7 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
       reactions: null == reactions
           ? _value.reactions
           : reactions // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
+              as List<Reaction>,
       comments: null == comments
           ? _value.comments
           : comments // ignore: cast_nullable_to_non_nullable
@@ -132,7 +132,7 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      Set<String> reactions,
+      List<Reaction> reactions,
       List<Reply> comments,
       String title});
 
@@ -180,7 +180,7 @@ class __$$PostImplCopyWithImpl<$Res>
       reactions: null == reactions
           ? _value._reactions
           : reactions // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
+              as List<Reaction>,
       comments: null == comments
           ? _value._comments
           : comments // ignore: cast_nullable_to_non_nullable
@@ -201,7 +201,7 @@ class _$PostImpl implements _Post {
       required this.author,
       required this.content,
       required this.timestamp,
-      required final Set<String> reactions,
+      required final List<Reaction> reactions,
       required final List<Reply> comments,
       required this.title})
       : _reactions = reactions,
@@ -218,12 +218,12 @@ class _$PostImpl implements _Post {
   final String content;
   @override
   final DateTime timestamp;
-  final Set<String> _reactions;
+  final List<Reaction> _reactions;
   @override
-  Set<String> get reactions {
-    if (_reactions is EqualUnmodifiableSetView) return _reactions;
+  List<Reaction> get reactions {
+    if (_reactions is EqualUnmodifiableListView) return _reactions;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableSetView(_reactions);
+    return EqualUnmodifiableListView(_reactions);
   }
 
   final List<Reply> _comments;
@@ -292,7 +292,7 @@ abstract class _Post implements Post {
       required final User author,
       required final String content,
       required final DateTime timestamp,
-      required final Set<String> reactions,
+      required final List<Reaction> reactions,
       required final List<Reply> comments,
       required final String title}) = _$PostImpl;
 
@@ -307,7 +307,7 @@ abstract class _Post implements Post {
   @override
   DateTime get timestamp;
   @override
-  Set<String> get reactions;
+  List<Reaction> get reactions;
   @override
   List<Reply> get comments;
   @override

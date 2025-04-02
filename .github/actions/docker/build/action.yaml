@@ -1,0 +1,17 @@
+name: "Docker Push and Build"
+description: "Builds a Docker image via Make commands"
+inputs:
+  build-name:
+    description: "Name of the docker image"
+    required: true
+  path:
+    description: "Path to the Makefile"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Build Images
+      working-directory: ${{ inputs.path }}
+      shell: bash
+      run: |
+        BUILD_NAME=${{ inputs.build-name }} make docker

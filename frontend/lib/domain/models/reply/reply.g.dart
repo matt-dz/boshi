@@ -11,12 +11,13 @@ _$ReplyImpl _$$ReplyImplFromJson(Map<String, dynamic> json) => _$ReplyImpl(
       author: User.fromJson(json['author'] as Map<String, dynamic>),
       content: json['content'] as String,
       timestamp: DateTime.parse(json['timestamp'] as String),
-      reactions:
-          (json['reactions'] as List<dynamic>).map((e) => e as String).toSet(),
+      reactions: (json['reactions'] as List<dynamic>)
+          .map((e) => Reaction.fromJson(e as Map<String, dynamic>))
+          .toList(),
       comments: (json['comments'] as List<dynamic>)
           .map((e) => Reply.fromJson(e as Map<String, dynamic>))
           .toList(),
-      replyToId: json['replyToId'] as String,
+      replyToId: json['reply_to_id'] as String,
     );
 
 Map<String, dynamic> _$$ReplyImplToJson(_$ReplyImpl instance) =>
@@ -25,7 +26,7 @@ Map<String, dynamic> _$$ReplyImplToJson(_$ReplyImpl instance) =>
       'author': instance.author,
       'content': instance.content,
       'timestamp': instance.timestamp.toIso8601String(),
-      'reactions': instance.reactions.toList(),
+      'reactions': instance.reactions,
       'comments': instance.comments,
-      'replyToId': instance.replyToId,
+      'reply_to_id': instance.replyToId,
     };

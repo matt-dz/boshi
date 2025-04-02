@@ -24,7 +24,7 @@ mixin _$Reply {
   User get author => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
-  Set<String> get reactions => throw _privateConstructorUsedError;
+  List<Reaction> get reactions => throw _privateConstructorUsedError;
   List<Reply> get comments => throw _privateConstructorUsedError;
   String get replyToId => throw _privateConstructorUsedError;
 
@@ -47,7 +47,7 @@ abstract class $ReplyCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      Set<String> reactions,
+      List<Reaction> reactions,
       List<Reply> comments,
       String replyToId});
 
@@ -97,7 +97,7 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
       reactions: null == reactions
           ? _value.reactions
           : reactions // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
+              as List<Reaction>,
       comments: null == comments
           ? _value.comments
           : comments // ignore: cast_nullable_to_non_nullable
@@ -132,7 +132,7 @@ abstract class _$$ReplyImplCopyWith<$Res> implements $ReplyCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      Set<String> reactions,
+      List<Reaction> reactions,
       List<Reply> comments,
       String replyToId});
 
@@ -181,7 +181,7 @@ class __$$ReplyImplCopyWithImpl<$Res>
       reactions: null == reactions
           ? _value._reactions
           : reactions // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
+              as List<Reaction>,
       comments: null == comments
           ? _value._comments
           : comments // ignore: cast_nullable_to_non_nullable
@@ -202,7 +202,7 @@ class _$ReplyImpl implements _Reply {
       required this.author,
       required this.content,
       required this.timestamp,
-      required final Set<String> reactions,
+      required final List<Reaction> reactions,
       required final List<Reply> comments,
       required this.replyToId})
       : _reactions = reactions,
@@ -219,12 +219,12 @@ class _$ReplyImpl implements _Reply {
   final String content;
   @override
   final DateTime timestamp;
-  final Set<String> _reactions;
+  final List<Reaction> _reactions;
   @override
-  Set<String> get reactions {
-    if (_reactions is EqualUnmodifiableSetView) return _reactions;
+  List<Reaction> get reactions {
+    if (_reactions is EqualUnmodifiableListView) return _reactions;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableSetView(_reactions);
+    return EqualUnmodifiableListView(_reactions);
   }
 
   final List<Reply> _comments;
@@ -294,7 +294,7 @@ abstract class _Reply implements Reply {
       required final User author,
       required final String content,
       required final DateTime timestamp,
-      required final Set<String> reactions,
+      required final List<Reaction> reactions,
       required final List<Reply> comments,
       required final String replyToId}) = _$ReplyImpl;
 
@@ -309,7 +309,7 @@ abstract class _Reply implements Reply {
   @override
   DateTime get timestamp;
   @override
-  Set<String> get reactions;
+  List<Reaction> get reactions;
   @override
   List<Reply> get comments;
   @override

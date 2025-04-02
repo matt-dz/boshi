@@ -1,0 +1,20 @@
+name: "Docker Push"
+description: "Pushes a Docker image"
+inputs:
+  tag:
+    description: "Tag for the docker image"
+    required: true
+  build-name:
+    description: "Name of the built docker image"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Push Image
+      shell: bash
+      run: |
+        echo "Tagging image '${{ inputs.build-name }}' with '${{ inputs.tag }}'"
+        docker tag ${{ inputs.build-name }} ${{ inputs.build-name}}:${{ inputs.tag }}
+        echo "Pushing image"
+        docker push ${{ inputs.build-name }}:${{ inputs.tag }}

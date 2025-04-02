@@ -11,8 +11,9 @@ _$PostImpl _$$PostImplFromJson(Map<String, dynamic> json) => _$PostImpl(
       author: User.fromJson(json['author'] as Map<String, dynamic>),
       content: json['content'] as String,
       timestamp: DateTime.parse(json['timestamp'] as String),
-      reactions:
-          (json['reactions'] as List<dynamic>).map((e) => e as String).toSet(),
+      reactions: (json['reactions'] as List<dynamic>)
+          .map((e) => Reaction.fromJson(e as Map<String, dynamic>))
+          .toList(),
       comments: (json['comments'] as List<dynamic>)
           .map((e) => Reply.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -25,7 +26,7 @@ Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
       'author': instance.author,
       'content': instance.content,
       'timestamp': instance.timestamp.toIso8601String(),
-      'reactions': instance.reactions.toList(),
+      'reactions': instance.reactions,
       'comments': instance.comments,
       'title': instance.title,
     };

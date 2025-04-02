@@ -1,4 +1,5 @@
 import 'package:frontend/domain/models/user/user.dart';
+import 'package:frontend/domain/models/reaction/reaction.dart';
 
 abstract class ContentItem {
   const ContentItem({
@@ -13,7 +14,7 @@ abstract class ContentItem {
   final String id;
   final DateTime timestamp;
   final User author;
-  final Set<String> reactions;
+  final List<Reaction> reactions;
   final List<ContentItem> comments;
   final String content;
 }
