@@ -35,7 +35,7 @@ runs:
       name: Check Namespace
       shell: bash
       run: |
-        STATUS_CODE=$(curl -X GET "${{ inputs.kube-deploy-url }}/namespace/${{inputs.namespace}}" --header "X-Api-Key: ${{ inputs.kube-deploy-key }}")
+        STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X GET ${{ inputs.kube-deploy-url }}/namespace/${{ inputs.namespace }} --header "X-Api-Key: ${{ inputs.kube-deploy-key }}")
 
         if [ "$STATUS_CODE" -eq 200 ]; then
           echo "exists=true" >> $GITHUB_OUTPUT
