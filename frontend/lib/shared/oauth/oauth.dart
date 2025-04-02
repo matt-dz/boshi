@@ -54,9 +54,9 @@ Future<OAuthSession> generateSession(
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   logger.d('Retrieving OAuth variables from storage');
-  final codeVerifier = prefs.getString('oauth-code-verifier');
-  final state = prefs.getString('oauth-state');
-  final dpopNonce = prefs.getString('oauth-dpop-nonce');
+  final codeVerifier = prefs.getString('flutter.oauth-code-verifier');
+  final state = prefs.getString('flutter.oauth-state');
+  final dpopNonce = prefs.getString('flutter.oauth-dpop-nonce');
 
   if (codeVerifier == null || state == null || dpopNonce == null) {
     logger.e('OAuth variables not set');
