@@ -38,10 +38,7 @@ jobs:
   build-info:
     name: Get Build Info
     runs-on: ubuntu-latest
-<<<<<<< HEAD
     if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.explorer == 'true' || needs.changes.outputs.tourbillon == 'true' || needs.changes.outputs.kubernetes == 'true' }}
-=======
->>>>>>> d283d83b2001df4898161881a370a466fbe00186
     outputs:
       branch-name: ${{ steps.build-info.outputs.branch-name }}
       namespace: ${{ steps.build-info.outputs.namespace }}
