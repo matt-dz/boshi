@@ -62,22 +62,8 @@ class MainApp extends StatelessWidget {
           ),
           routes: [
             GoRoute(
-              redirect: (context, state) {
-                final oauth = context.read<OAuthRepository>();
-                if (oauth.authorized) {
-                  return '/';
-                }
-                return '/login';
-              },
               path: '/redirect',
-              builder: (context, state) => Consumer<OAuthRepository>(
-                builder: (context, oauth, child) {
-                  if (oauth.authorized) {
-                    oauth.generateSession(Uri.base.toString());
-                  }
-                  return RedirectScreen(atpSession: oauth.atProto);
-                },
-              ),
+              builder: (context, state) => RedirectScreen(),
             ),
           ],
         ),
