@@ -52,6 +52,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           namespace: ${{ steps.build-info.outputs.namespace }}
+          kube-deploy-key: ${{ secrets.KUBE_DEPLOY_KEY }}
+          kube-deploy-url: ${{ vars.KUBE_DEPLOY_URL }}
 
   clone-repo:
     needs: [changes, build-info]
