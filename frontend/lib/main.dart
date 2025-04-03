@@ -1,40 +1,57 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:frontend/src/model/oauth/oauth_repository.dart';
-import 'package:frontend/src/view/login/redirect.dart';
-import 'package:frontend/src/view/post/post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/src/view/login/login.dart';
+import 'package:frontend/ui/login/widgets/login_screen.dart';
+import 'package:frontend/ui/login/widgets/redirect_screen.dart';
+import 'package:frontend/ui/login/view_model/login_viewmodel.dart';
+
+import 'package:frontend/ui/home/view_model/home_viewmodel.dart';
+import 'package:frontend/ui/home/widgets/home_screen.dart';
+
+import 'package:frontend/data/repositories/feed/feed_repository.dart';
+import 'package:frontend/data/repositories/user/user_repository.dart';
+import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
+
+import 'package:frontend/utils/result.dart';
+
+import 'main_development.dart' as dev;
 
 void main() {
-  usePathUrlStrategy();
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(
-          create: (context) => OAuthRepository(
-              clientId: Uri.base.isScheme("http")
-                  ? Uri.base
-                  : Uri.parse("${Uri.base.origin}/oauth/client-metadata.json")))
-    ],
-    child: const MyApp(),
-  ));
+  dev.main();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
+      redirect: (BuildContext context, GoRouterState state) async {
+        final oauth = context.read<OAuthRepository>();
+        final isLoggingIn = state.uri.path.startsWith('/login');
+        if (!oauth.authorized && !isLoggingIn) {
+          final result = await oauth.refreshSession();
+          if (result is Error<void>) {
+            return '/login';
+          }
+        } else if (oauth.authorized && isLoggingIn) {
+          return '/';
+        }
+        return null;
+      },
       routes: [
         GoRoute(
           path: '/',
-          builder: (context, state) => MyHomePage(title: "hello"),
+          builder: (context, state) => HomeScreen(
+            title: 'Boshi',
+            viewModel: HomeViewModel(
+              feedRepository: context.read<FeedRepository>(),
+              userRepository: context.read<UserRepository>(),
+            ),
+          ),
         ),
         GoRoute(
           path: '/post',
@@ -42,17 +59,15 @@ class MyApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/login',
-          builder: (context, state) => LoginPage(),
+          builder: (context, state) => LoginScreen(
+            viewModel: LoginViewModel(
+              oAuthRepository: context.read<OAuthRepository>(),
+            ),
+          ),
           routes: [
             GoRoute(
               path: '/redirect',
-              builder: (context, state) =>
-                  Consumer<OAuthRepository>(builder: (context, oauth, child) {
-                if (oauth.atProtoSession == null) {
-                  oauth.generateSession(Uri.base.toString());
-                }
-                return RedirectPage(atpSession: oauth.atProtoSession);
-              }),
+              builder: (context, state) => RedirectScreen(),
             ),
           ],
         ),
@@ -64,51 +79,6 @@ class MyApp extends StatelessWidget {
         return theme.copyWith();
       },
       routerConfig: router,
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-        actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.verified_user)),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FilledButton(
-                onPressed: () {
-                  context.go("/post");
-                },
-                child: const Text("Post")),
-            Consumer<OAuthRepository>(builder: (context, oauth, child) {
-              if (oauth.atProtoSession != null) {
-                return Text(
-                    "Your session: ${oauth.atProtoSession!.oAuthSession!.expiresAt}");
-              } else {
-                oauth.refreshSession();
-                return Text("Please sign in.");
-              }
-            }),
-          ],
-        ),
-      ),
     );
   }
 }

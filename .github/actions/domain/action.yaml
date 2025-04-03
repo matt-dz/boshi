@@ -1,0 +1,25 @@
+name: "Determine Domain"
+description: "Determines the domain for the deployment based on the current branch"
+inputs:
+  prod:
+    description: "Production domain"
+    required: true
+  dev:
+    description: "Development domain"
+    required: true
+outputs:
+  domain:
+    description: "Domain for the deployment"
+    value: ${{ steps.determine.outputs.domain }}
+runs:
+  using: "composite"
+  steps:
+    - name: Determine Domain
+      id: determine
+      shell: bash
+      run: |
+        if [ "${{ github.head_ref || github.ref_name }}" == "main" ]; then
+          echo "domain=${{ inputs.prod }}" >> $GITHUB_OUTPUT
+        else
+          echo "domain=${{ inputs.dev }}" >> $GITHUB_OUTPUT
+        fi

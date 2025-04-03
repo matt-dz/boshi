@@ -3,16 +3,22 @@ package middleware
 import (
 	"boshi-backend/internal/logger"
 	"context"
+	"log/slog"
 	"net/http"
 	"time"
 )
 
-var bLogger = logger.GetLogger()
+var log = logger.GetLogger()
 var ctx = context.Background()
 
 type logResponseWriter struct {
 	http.ResponseWriter
 	statusCode int
+}
+
+func (lrw *logResponseWriter) WriteHeader(code int) {
+	lrw.statusCode = code
+	lrw.ResponseWriter.WriteHeader(code)
 }
 
 type Middleware func(http.HandlerFunc) http.HandlerFunc
@@ -31,18 +37,35 @@ func Chain(h http.HandlerFunc, m ...Middleware) http.HandlerFunc {
 	return h
 }
 
-func (lrw *logResponseWriter) WriteHeader(code int) {
-	lrw.statusCode = code
-	lrw.ResponseWriter.WriteHeader(code)
-}
-
 func LogRequest() Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
 			lrw := &logResponseWriter{w, http.StatusOK}
 			next.ServeHTTP(lrw, r)
-			bLogger.InfoContext(ctx, "Request received", "method", r.Method, "endpoint", r.URL, "status", lrw.statusCode, "duration", time.Since(start).String())
+			log.InfoContext(ctx, "Request received", "method", r.Method, "endpoint", r.URL, "status", lrw.statusCode, "duration", time.Since(start).String())
+		}
+	}
+}
+
+func LogContext() Middleware {
+	return func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			r = r.WithContext(logger.AppendCtx(r.Context(), slog.String("method", r.Method)))
+			r = r.WithContext(logger.AppendCtx(r.Context(), slog.String("path", r.URL.Path)))
+			next(w, r)
+		}
+	}
+}
+
+func Timer() Middleware {
+	return func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+			lrw := &logResponseWriter{w, http.StatusOK}
+			next(lrw, r)
+			r = r.WithContext(logger.AppendCtx(r.Context(), slog.Int("status", lrw.statusCode)))
+			log.InfoContext(r.Context(), "Request handled", slog.String("duration", time.Since(start).String()))
 		}
 	}
 }

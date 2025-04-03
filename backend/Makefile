@@ -8,6 +8,11 @@ TAG ?= latest
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 PLATFORM ?= linux/arm64
 
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
+
 all: build
 
 build:
@@ -29,7 +34,7 @@ docker:
 	@echo "Building $(BUILD_NAME)..."
 	subdomain=$$(../scripts/generate-subdomain.sh) && \
 	   if [[ subdomain == "main" ]]; then subdomain="boshi"; fi && \
-		docker buildx build --build-arg SUBDOMAIN=$${subdomain} --platform $(PLATFORM) -t $(BUILD_NAME) .
+		docker build --build-arg DOMAIN=$${subdomain}.deguzman.cloud --platform $(PLATFORM) -t $(BUILD_NAME) .
 
 clean:
 	@echo "Cleaning bin directory..."
