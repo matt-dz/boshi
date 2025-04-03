@@ -54,13 +54,9 @@ Future<OAuthSession> generateSession(
   final SharedPreferencesAsync prefs = SharedPreferencesAsync();
 
   logger.d('Retrieving OAuth variables from storage');
-  print('getting variables');
   final codeVerifier = await prefs.getString('oauth-code-verifier');
-  print(codeVerifier);
   final state = await prefs.getString('oauth-state');
-  print(state);
   final dpopNonce = await prefs.getString('oauth-dpop-nonce');
-  print(dpopNonce);
 
   if (codeVerifier == null || state == null || dpopNonce == null) {
     logger.e('OAuth variables not set');

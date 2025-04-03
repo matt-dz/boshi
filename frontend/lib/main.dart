@@ -33,17 +33,13 @@ class MainApp extends StatelessWidget {
         final oauth = context.read<OAuthRepository>();
         final isLoggingIn = state.uri.path.startsWith('/login');
         if (!oauth.authorized && !isLoggingIn) {
-          print('naughty naughty');
           final result = await oauth.refreshSession();
           if (result is Error<void>) {
-            print(result.error);
-            print('naughty naughty - sending you back');
             return '/login';
           }
         } else if (oauth.authorized && isLoggingIn) {
           return '/';
         }
-        print('all good');
         return null;
       },
       routes: [
