@@ -1,6 +1,6 @@
 package endpoints
 
-type ClientMetadata struct {
+type clientMetadata struct {
 	ClientID                string   `json:"client_id"`
 	ClientName              string   `json:"client_name"`
 	ClientURI               string   `json:"client_uri"`
