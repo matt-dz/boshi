@@ -13,9 +13,15 @@ var log = logger.GetLogger()
 
 func main() {
 	log.Info("Starting server...")
-
 	/* Setup routes */
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("OPTIONS /",
+		middleware.Chain(
+			endpoints.AddCors,
+			middleware.LogRequest(),
+		),
+	)
 
 	mux.HandleFunc("GET /api/heartbeat",
 		middleware.Chain(
