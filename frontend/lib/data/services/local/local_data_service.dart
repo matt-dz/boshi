@@ -62,7 +62,7 @@ class LocalDataService {
     OAuthClient client,
     String callback,
   ) async {
-    return oauth_shared.generateSession(client, callback);
+    return oauth_shared.generateSession(client, callback, false);
   }
 
   Future<(OAuthSession, ATProto)> refreshSession(OAuthClient client) async {

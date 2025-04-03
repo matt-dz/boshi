@@ -15,8 +15,6 @@ import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
 import 'package:frontend/data/repositories/oauth/oauth_repository_remote.dart';
 import 'package:frontend/data/repositories/oauth/oauth_repository_local.dart';
 
-import 'package:frontend/utils/logger.dart';
-
 List<SingleChildWidget> _sharedProviders = [
   // ChangeNotifierProvider(
   //   create: (context) => OAuthRepository(

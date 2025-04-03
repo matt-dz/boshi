@@ -5,6 +5,8 @@ import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const securePrefix = 'flutter.';
+
 Future<void> _setSessionVars(
   OAuthSession session,
   SharedPreferences? prefs,
@@ -49,14 +51,17 @@ Future<(Uri, OAuthContext)> getOAuthAuthorizationURI(
 Future<OAuthSession> generateSession(
   OAuthClient client,
   String callback,
+  bool secure,
 ) async {
   logger.d('Retrieving shared preferences instance');
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   logger.d('Retrieving OAuth variables from storage');
-  final codeVerifier = prefs.getString('flutter.oauth-code-verifier');
-  final state = prefs.getString('flutter.oauth-state');
-  final dpopNonce = prefs.getString('flutter.oauth-dpop-nonce');
+  final codeVerifier =
+      prefs.getString('${secure ? securePrefix : ""}oauth-code-verifier');
+  final state = prefs.getString('${secure ? securePrefix : ""}oauth-state');
+  final dpopNonce =
+      prefs.getString('${secure ? securePrefix : ""}oauth-dpop-nonce');
 
   if (codeVerifier == null || state == null || dpopNonce == null) {
     logger.e('OAuth variables not set');
