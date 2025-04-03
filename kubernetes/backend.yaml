@@ -21,6 +21,8 @@ spec:
           env:
             - name: PORT
               value: "80"
+            - name: POSTGRES_URL
+              value: ${POSTGRES_URL}
           ports:
             - containerPort: 80
 ---

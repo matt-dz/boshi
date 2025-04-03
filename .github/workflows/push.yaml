@@ -136,6 +136,7 @@ jobs:
         uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
+          POSTGRES_URL: ${{secrets.POSTGRES_URL}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -145,7 +146,7 @@ jobs:
           config-path: ${{ needs.clone-repo.outputs.repo-destination }}/kubernetes/backend.yaml
           docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || format('{0}-latest', needs.build-info.outputs.branch-name) }}
           namespace: ${{ needs.build-info.outputs.namespace }}
-          config-envs: CLUSTER_ISSUER
+          config-envs: CLUSTER_ISSUER, POSTGRES_URL
 
   build-and-deploy-landing:
     needs: [changes, build-info, clone-repo]
