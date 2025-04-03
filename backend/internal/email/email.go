@@ -7,8 +7,6 @@ import (
 	"os"
 )
 
-var ErrCreateMail = errors.New("Unable to create email body")
-
 const welcomeSubject string = "Welcome to Boshi"
 const welcomeBody string = "Thank you for signing up for the Boshi mail list! We are excited that you've decided to join us on our journey. Updates are coming soon."
 
