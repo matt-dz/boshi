@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
 
-abstract class OAuthRepository extends ChangeNotifier {
-  OAuthRepository({
+abstract class AtProtoRepository extends ChangeNotifier {
+  AtProtoRepository({
     required Uri clientId,
   })  : _clientId = clientId,
         clientMetadata = null,
@@ -27,4 +28,5 @@ abstract class OAuthRepository extends ChangeNotifier {
   Future<Result<Uri>> getAuthorizationURI(String identity, String service);
   Future<Result<void>> generateSession(String callback);
   Future<Result<void>> refreshSession();
+  Future<Result<void>> addPost(Post post);
 }
