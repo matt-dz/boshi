@@ -9,9 +9,9 @@ const securePrefix = 'flutter.';
 
 Future<void> _setSessionVars(
   OAuthSession session,
-  SharedPreferences? prefs,
+  SharedPreferencesAsync? prefs,
 ) async {
-  prefs ??= await SharedPreferences.getInstance();
+  prefs ??= SharedPreferencesAsync();
   await prefs.setString(
     'session-vars',
     json.encode({
@@ -34,7 +34,7 @@ Future<(Uri, OAuthContext)> getOAuthAuthorizationURI(
   String identity,
 ) async {
   logger.d('Retrieving shared preferences instance');
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final SharedPreferencesAsync prefs = SharedPreferencesAsync();
 
   logger.d('Initiating OAuth authorization request');
   final (uri, context) = await client.authorize(identity);
@@ -54,13 +54,12 @@ Future<OAuthSession> generateSession(
   bool secure,
 ) async {
   logger.d('Retrieving shared preferences instance');
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.reload();
+  final SharedPreferencesAsync prefs = SharedPreferencesAsync();
 
   logger.d('Retrieving OAuth variables from storage');
-  final codeVerifier = prefs.getString('oauth-code-verifier');
-  final state = prefs.getString('oauth-state');
-  final dpopNonce = prefs.getString('oauth-dpop-nonce');
+  final codeVerifier = await prefs.getString('oauth-code-verifier');
+  final state = await prefs.getString('oauth-state');
+  final dpopNonce = await prefs.getString('oauth-dpop-nonce');
 
   if (codeVerifier == null || state == null || dpopNonce == null) {
     logger.e('OAuth variables not set');
@@ -99,10 +98,10 @@ Future<OAuthSession> generateSession(
 
 Future<(OAuthSession, ATProto)> refreshSession(OAuthClient client) async {
   logger.d('Retrieving shared preferences instance');
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final SharedPreferencesAsync prefs = SharedPreferencesAsync();
 
   logger.d('Retrieving OAuth session variables from shared preferences');
-  final sessionVars = prefs.getString('session-vars');
+  final sessionVars = await prefs.getString('session-vars');
   if (sessionVars == null) {
     throw ArgumentError('No session stored');
   }
