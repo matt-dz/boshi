@@ -14,6 +14,7 @@ func ServeOauthMetadata(w http.ResponseWriter, r *http.Request) {
 	domain := os.Getenv("DOMAIN")
 
 	log.Debug("Encoding client metadata")
+	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(ClientMetadata{
 		ClientID:                fmt.Sprintf("https://%s/oauth/client-metadata.json", domain),
 		ClientName:              "Boshi",
