@@ -58,6 +58,7 @@ class MainApp extends StatelessWidget {
         GoRoute(
           path: '/post',
           builder: (context, state) => PostScreen(
+            title: 'Boshi',
             viewModel: PostViewModel(
               atprotoRepository: context.read<AtProtoRepository>(),
             ),
