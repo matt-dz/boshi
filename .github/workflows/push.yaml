@@ -31,6 +31,9 @@ jobs:
               - 'explorer/**'
             kubernetes:
               - 'kubernetes/**'
+      - name: Debug
+        run: |
+          echo "${{ steps.filter.changed_files }"
 
   build-info:
     name: Get Build Info
