@@ -34,6 +34,7 @@ class _RedirectScreenState extends State<RedirectScreen> {
     if (result is Ok<void>) {
       context.go('/');
     } else {
+      print(result.toString());
       setState(() {
         _error = 'Failed to generate session.';
         _loading = false;
