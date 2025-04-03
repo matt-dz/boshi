@@ -17,7 +17,7 @@ spec:
       containers:
         - name: tourbillon
           image: ${IMAGE}
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: FEEDGEN_PORT
               value: "${FEEDGEN_PORT}"
