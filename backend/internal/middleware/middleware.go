@@ -41,19 +41,12 @@ func LogRequest() Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
-			lrw := &logResponseWriter{w, http.StatusOK}
-			next.ServeHTTP(lrw, r)
-			log.InfoContext(ctx, "Request received", "method", r.Method, "endpoint", r.URL, "status", lrw.statusCode, "duration", time.Since(start).String())
-		}
-	}
-}
-
-func LogContext() Middleware {
-	return func(next http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
 			r = r.WithContext(logger.AppendCtx(r.Context(), slog.String("method", r.Method)))
 			r = r.WithContext(logger.AppendCtx(r.Context(), slog.String("path", r.URL.Path)))
-			next(w, r)
+			lrw := &logResponseWriter{w, http.StatusOK}
+			log.InfoContext(r.Context(), "Request received")
+			next(lrw, r)
+			log.InfoContext(r.Context(), "Request handled", slog.String("duration", time.Since(start).String()), slog.Int("status", lrw.statusCode))
 		}
 	}
 }

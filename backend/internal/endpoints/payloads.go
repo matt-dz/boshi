@@ -12,3 +12,7 @@ type clientMetadata struct {
 	ApplicationType         string   `json:"application_type"`
 	DpopBoundAccessTokens   bool     `json:"dpop_bound_access_tokens"`
 }
+
+type emailListPayload struct {
+	Email string `json:"email"`
+}
