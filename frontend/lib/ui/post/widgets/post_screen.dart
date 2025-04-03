@@ -48,7 +48,7 @@ class _PostFormState extends State<PostForm> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 32),
+      padding: EdgeInsets.only(top: 24, bottom: 24),
       child: ShadCard(
         width: 400,
         child: Column(
