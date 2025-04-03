@@ -12,6 +12,7 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
       explorer: ${{ steps.filter.outputs.explorer }}
       kubernetes: ${{ steps.filter.outputs.kubernetes }}
+      kubernetes_files: ${{ steps.filter.outputs.kubernetes_files }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
