@@ -17,7 +17,7 @@ spec:
       containers:
         - name: boshi-landing
           image: matthew10125/boshi-landing
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
 ---

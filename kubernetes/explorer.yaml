@@ -17,7 +17,7 @@ spec:
       containers:
         - name: explorer
           image: ${IMAGE}
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: POSTGRES_URL
               value: ${POSTGRES_URL}
