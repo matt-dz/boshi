@@ -55,10 +55,11 @@ func LogRequest() Middleware {
 func AddCors() Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			if cors.AddCors(w, r) {
-				next(w, r)
+			if !cors.AddCors(w, r) {
+				log.ErrorContext(r.Context(), "Failed to add CORS headers", slog.String("origin", r.Header.Get("Origin")))
+				return
 			}
-			log.ErrorContext(r.Context(), "Failed to add CORS headers", slog.String("origin", r.Header.Get("Origin")))
+			next(w, r)
 		}
 	}
 }
