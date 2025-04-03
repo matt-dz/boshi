@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
 
-abstract class OAuthRepository {
+abstract class OAuthRepository extends ChangeNotifier {
   OAuthRepository({
     required Uri clientId,
   })  : _clientId = clientId,

@@ -42,5 +42,5 @@ format:
 	@echo "Running dart format"
 	dart format .
 
-	@cho "Running dart fix"
+	@echo "Running dart fix"
 	dart fix --apply

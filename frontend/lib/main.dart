@@ -15,7 +15,6 @@ import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
 
-import 'package:frontend/utils/logger.dart';
 import 'package:frontend/utils/result.dart';
 
 import 'main_development.dart' as dev;
@@ -34,7 +33,7 @@ class MainApp extends StatelessWidget {
         final oauth = context.read<OAuthRepository>();
         final isLoggingIn = state.uri.path.startsWith('/login');
         if (!oauth.authorized && !isLoggingIn) {
-          final result = await oauth.generateSession(Uri.base.toString());
+          final result = await oauth.refreshSession();
           if (result is Error<void>) {
             return '/login';
           }
@@ -64,14 +63,7 @@ class MainApp extends StatelessWidget {
           routes: [
             GoRoute(
               path: '/redirect',
-              builder: (context, state) => Consumer<OAuthRepository>(
-                builder: (context, oauth, child) {
-                  if (oauth.authorized) {
-                    oauth.generateSession(Uri.base.toString());
-                  }
-                  return RedirectScreen(atpSession: oauth.atProto);
-                },
-              ),
+              builder: (context, state) => RedirectScreen(),
             ),
           ],
         ),
