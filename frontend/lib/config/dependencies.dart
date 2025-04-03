@@ -49,7 +49,7 @@ List<SingleChildWidget> get providersRemote {
     ),
     ChangeNotifierProvider(
       create: (context) => AtProtoRepositoryRemote(
-        clientId: Uri.parse('${Uri.base.origin}/atproto/client-metadata.json'),
+        clientId: Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),
         apiClient: context.read<ApiClient>(),
       ) as AtProtoRepository,
     ),
