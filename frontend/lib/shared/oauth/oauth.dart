@@ -55,13 +55,12 @@ Future<OAuthSession> generateSession(
 ) async {
   logger.d('Retrieving shared preferences instance');
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.reload();
 
   logger.d('Retrieving OAuth variables from storage');
-  final codeVerifier =
-      prefs.getString('${secure ? securePrefix : ""}oauth-code-verifier');
-  final state = prefs.getString('${secure ? securePrefix : ""}oauth-state');
-  final dpopNonce =
-      prefs.getString('${secure ? securePrefix : ""}oauth-dpop-nonce');
+  final codeVerifier = prefs.getString('oauth-code-verifier');
+  final state = prefs.getString('oauth-state');
+  final dpopNonce = prefs.getString('oauth-dpop-nonce');
 
   if (codeVerifier == null || state == null || dpopNonce == null) {
     logger.e('OAuth variables not set');
