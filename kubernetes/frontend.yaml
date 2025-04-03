@@ -43,10 +43,12 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: ${CLUSTER_ISSUER}
     nginx.ingress.kubernetes.io/server-snippet: |
-      if ($request_method = OPTIONS) {
-        rewrite ^/$ / redirect;
-        proxy_pass http://boshi-backend.${NAMESPACE}.svc.cluster.local;
-        break;
+      location / {
+        if ($request_method = OPTIONS) {
+          rewrite ^/$ / redirect;
+          proxy_pass http://boshi-backend.${NAMESPACE}.svc.cluster.local;
+          break;
+        }
       }
 spec:
   ingressClassName: nginx
