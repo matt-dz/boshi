@@ -13,6 +13,7 @@ var log = logger.GetLogger()
 
 func main() {
 	log.Info("Starting server...")
+
 	/* Setup routes */
 	mux := http.NewServeMux()
 
