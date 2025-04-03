@@ -18,7 +18,8 @@ func main() {
 
 	mux.HandleFunc("OPTIONS /",
 		middleware.Chain(
-			endpoints.AddCors,
+			func(w http.ResponseWriter, r *http.Request) {},
+			middleware.AddCors(),
 			middleware.LogRequest(),
 		),
 	)
@@ -26,6 +27,7 @@ func main() {
 	mux.HandleFunc("GET /health",
 		middleware.Chain(
 			func(w http.ResponseWriter, r *http.Request) {},
+			middleware.AddCors(),
 			middleware.LogRequest(),
 		),
 	)
@@ -33,6 +35,7 @@ func main() {
 	mux.HandleFunc("GET /oauth/client-metadata.json",
 		middleware.Chain(
 			endpoints.ServeOAuthMetadata,
+			middleware.AddCors(),
 			middleware.LogRequest(),
 		),
 	)
@@ -40,6 +43,7 @@ func main() {
 	mux.HandleFunc("POST /email-list",
 		middleware.Chain(
 			endpoints.HandleAddEmailToEmailList,
+			middleware.AddCors(),
 			middleware.LogRequest(),
 		),
 	)

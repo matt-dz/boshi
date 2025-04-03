@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"boshi-backend/internal/cors"
 	"boshi-backend/internal/database"
 	"boshi-backend/internal/email"
 	"boshi-backend/internal/logger"
@@ -88,8 +87,4 @@ func HandleAddEmailToEmailList(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to send email", http.StatusInternalServerError)
 		return
 	}
-}
-
-func AddCors(w http.ResponseWriter, r *http.Request) {
-	cors.AddCors(w, r)
 }

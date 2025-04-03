@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"boshi-backend/internal/cors"
 	"boshi-backend/internal/logger"
 	"context"
 	"log/slog"
@@ -47,6 +48,17 @@ func LogRequest() Middleware {
 			log.InfoContext(r.Context(), "Request received")
 			next(lrw, r)
 			log.InfoContext(r.Context(), "Request handled", slog.String("duration", time.Since(start).String()), slog.Int("status", lrw.statusCode))
+		}
+	}
+}
+
+func AddCors() Middleware {
+	return func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			if cors.AddCors(w, r) {
+				next(w, r)
+			}
+			log.ErrorContext(r.Context(), "Failed to add CORS headers", slog.String("origin", r.Header.Get("Origin")))
 		}
 	}
 }
