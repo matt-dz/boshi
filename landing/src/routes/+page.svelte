@@ -3,6 +3,7 @@
 	import { env } from '$env/dynamic/public';
 
 	let email: string = $state('');
+
 	async function handleSignup() {
 		const backend = env.PUBLIC_API_URL;
 		if (!backend) {
