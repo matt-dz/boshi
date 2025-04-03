@@ -13,7 +13,7 @@
 		}
 
 		try {
-			const resp = await fetch(`${backend}/api/email-list`, {
+			const resp = await fetch(`${backend}/email-list`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
