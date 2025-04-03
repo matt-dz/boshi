@@ -151,7 +151,7 @@ jobs:
           config-path: ${{ needs.clone-repo.outputs.repo-destination }}/kubernetes/backend.yaml
           docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || format('{0}-latest', needs.build-info.outputs.branch-name) }}
           namespace: ${{ needs.build-info.outputs.namespace }}
-          config-envs: CLUSTER_ISSUER, POSTGRES_URL
+          config-envs: CLUSTER_ISSUER,POSTGRES_URL,SMTP_FROM,SMTP_HOST,SMTP_PORT,SMTP_USERNAME,SMTP_PASSWORD
 
   build-and-deploy-landing:
     needs: [changes, build-info, clone-repo]
