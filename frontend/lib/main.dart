@@ -34,7 +34,7 @@ class MainApp extends StatelessWidget {
         final isLoggingIn = state.uri.path.startsWith('/login');
         if (!oauth.authorized && !isLoggingIn) {
           print('naughty naughty');
-          final result = await oauth.generateSession(Uri.base.toString());
+          final result = await oauth.refreshSession();
           if (result is Error<void>) {
             print(result.error);
             print('naughty naughty - sending you back');
