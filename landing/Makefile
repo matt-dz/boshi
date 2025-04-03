@@ -8,6 +8,7 @@ TAG ?= latest
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 PLATFORM ?= linux/arm64
 
+
 all: build
 
 docker:
