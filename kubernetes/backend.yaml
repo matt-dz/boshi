@@ -17,7 +17,7 @@ spec:
       containers:
         - name: boshi-backend
           image: ${IMAGE}
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: PORT
               value: "80"

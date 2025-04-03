@@ -143,7 +143,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{ needs.clone-repo.outputs.repo-destination }}/kubernetes/backend.yaml
-          docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || join([needs.build-info.outputs.branch-name, '-latest'], '') }}
+          docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || format('{0}-latest', needs.build-info.outputs.branch-name) }}
           namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -198,7 +198,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/landing.yaml
-          docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || join([needs.build-info.outputs.branch-name, '-latest'], '') }}
+          docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || format('{0}-latest', needs.build-info.outputs.branch-name) }}
           namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -253,7 +253,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/frontend.yaml
-          docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || join([needs.build-info.outputs.branch-name, '-latest'], '') }}
+          docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || format('{0}-latest', needs.build-info.outputs.branch-name) }}
           namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: CLUSTER_ISSUER
 
@@ -304,7 +304,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/explorer.yaml
-          docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || join([needs.build-info.outputs.branch-name, '-latest'], '') }}
+          docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || format('{0}-latest', needs.build-info.outputs.branch-name) }}
           namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: POSTGRES_URL,SOCKET_URI,FIREHOSE_IDENTIFIER
 
