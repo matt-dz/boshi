@@ -12,7 +12,6 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
       explorer: ${{ steps.filter.outputs.explorer }}
       kubernetes: ${{ steps.filter.outputs.kubernetes }}
-      changed_files: ${{ steps.filter.outputs.changed_files }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -94,7 +93,7 @@ jobs:
 
   build-and-deploy-backend:
     needs: [changes, build-info, clone-repo]
-    if: ${{ needs.changes.outputs.backend == 'true' || needs.build-info.outputs.namespace-exists == 'false' || contains(needs.changes.outputs.changed_files, 'kubernetes/backend.yaml') }}
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.build-info.outputs.namespace-exists == 'false' || contains(needs.changes.outputs.kubernetes_files, 'kubernetes/backend.yaml') }}
     name: Build and Deploy Backend
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -149,7 +148,7 @@ jobs:
 
   build-and-deploy-landing:
     needs: [changes, build-info, clone-repo]
-    if: ${{ needs.changes.outputs.landing == 'true' || needs.build-info.outputs.namespace-exists == 'false' || contains(needs.changes.outputs.changed_files, 'kubernetes/landing.yaml') }}
+    if: ${{ needs.changes.outputs.landing == 'true' || needs.build-info.outputs.namespace-exists == 'false' || contains(needs.changes.outputs.kubernetes_files, 'kubernetes/landing.yaml') }}
     name: Build and Deploy Landing
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -204,7 +203,7 @@ jobs:
 
   build-and-deploy-frontend:
     needs: [changes, build-info, clone-repo]
-    if: ${{ needs.changes.outputs.frontend == 'true' || needs.build-info.outputs.namespace-exists == 'false' || contains(needs.changes.outputs.changed_files, 'kubernetes/frontend.yaml') }}
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.build-info.outputs.namespace-exists == 'false' || contains(needs.changes.outputs.kubernetes_files, 'kubernetes/frontend.yaml') }}
     name: Build and Deploy Frontend
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -259,7 +258,7 @@ jobs:
 
   build-and-deploy-explorer:
     needs: [changes, build-info, clone-repo]
-    if: ${{ needs.changes.outputs.explorer == 'true' || needs.build-info.outputs.namespace-exists == 'false' || contains(needs.changes.outputs.changed_files, 'kubernetes/explorer.yaml')}}
+    if: ${{ needs.changes.outputs.explorer == 'true' || needs.build-info.outputs.namespace-exists == 'false' || contains(needs.changes.outputs.kubernetes_files, 'kubernetes/explorer.yaml')}}
     name: Build and Deploy Explorer
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
