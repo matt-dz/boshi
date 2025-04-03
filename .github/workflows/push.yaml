@@ -130,8 +130,8 @@ jobs:
       - uses: ./.github/actions/domain
         id: domain
         with:
-          prod: boshi
-          dev: ${{ needs.build-info.outputs.branch-name }}-boshi
+          prod: boshi-api
+          dev: ${{ needs.build-info.outputs.branch-name }}-boshi-api
       - name: Create Deployment
         uses: ./.github/actions/k8s/deploy
         env:

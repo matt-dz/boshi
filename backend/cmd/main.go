@@ -23,7 +23,7 @@ func main() {
 		),
 	)
 
-	mux.HandleFunc("GET /api/heartbeat",
+	mux.HandleFunc("GET /health",
 		middleware.Chain(
 			func(w http.ResponseWriter, r *http.Request) {},
 			middleware.LogRequest(),
@@ -37,7 +37,7 @@ func main() {
 		),
 	)
 
-	mux.HandleFunc("POST /api/email-list",
+	mux.HandleFunc("POST /email-list",
 		middleware.Chain(
 			endpoints.HandleAddEmailToEmailList,
 			middleware.LogRequest(),
