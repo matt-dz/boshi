@@ -17,17 +17,37 @@ func main() {
 	/* Setup routes */
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/api/heartbeat",
+	mux.HandleFunc("OPTIONS /",
 		middleware.Chain(
 			func(w http.ResponseWriter, r *http.Request) {},
+			middleware.AddCors(),
 			middleware.LogRequest(),
-		))
+		),
+	)
 
-	mux.HandleFunc("/oauth/client-metadata.json",
+	mux.HandleFunc("GET /health",
+		middleware.Chain(
+			func(w http.ResponseWriter, r *http.Request) {},
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
+	mux.HandleFunc("GET /oauth/client-metadata.json",
 		middleware.Chain(
 			endpoints.ServeOAuthMetadata,
+			middleware.AddCors(),
 			middleware.LogRequest(),
-		))
+		),
+	)
+
+	mux.HandleFunc("POST /email-list",
+		middleware.Chain(
+			endpoints.HandleAddEmailToEmailList,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
 
 	/* Setup server*/
 	port := os.Getenv("PORT")

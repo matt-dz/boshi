@@ -21,6 +21,18 @@ spec:
           env:
             - name: PORT
               value: "80"
+            - name: POSTGRES_URL
+              value: ${POSTGRES_URL}
+            - name: SMTP_FROM
+              value: ${SMTP_FROM}
+            - name: SMTP_HOST
+              value: ${SMTP_HOST}
+            - name: SMTP_PORT
+              value: "${SMTP_PORT}"
+            - name: SMTP_USERNAME
+              value: ${SMTP_USERNAME}
+            - name: SMTP_PASSWORD
+              value: ${SMTP_PASSWORD}
           ports:
             - containerPort: 80
 ---
@@ -55,14 +67,7 @@ spec:
     - host: ${DOMAIN}
       http:
         paths:
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: boshi-backend
-                port:
-                  number: 80
-          - path: /oauth
+          - path: /
             pathType: Prefix
             backend:
               service:

@@ -130,12 +130,18 @@ jobs:
       - uses: ./.github/actions/domain
         id: domain
         with:
-          prod: boshi
-          dev: ${{ needs.build-info.outputs.branch-name }}-boshi
+          prod: boshi-api
+          dev: ${{ needs.build-info.outputs.branch-name }}-boshi-api
       - name: Create Deployment
         uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
+          POSTGRES_URL: ${{secrets.POSTGRES_URL}}
+          SMTP_FROM: ${{secrets.SMTP_FROM}}
+          SMTP_HOST: ${{secrets.SMTP_HOST}}
+          SMTP_PORT: ${{secrets.SMTP_PORT}}
+          SMTP_USERNAME: ${{secrets.SMTP_USERNAME}}
+          SMTP_PASSWORD: ${{secrets.SMTP_PASSWORD}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -145,7 +151,7 @@ jobs:
           config-path: ${{ needs.clone-repo.outputs.repo-destination }}/kubernetes/backend.yaml
           docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || format('{0}-latest', needs.build-info.outputs.branch-name) }}
           namespace: ${{ needs.build-info.outputs.namespace }}
-          config-envs: CLUSTER_ISSUER
+          config-envs: CLUSTER_ISSUER,POSTGRES_URL,SMTP_FROM,SMTP_HOST,SMTP_PORT,SMTP_USERNAME,SMTP_PASSWORD
 
   build-and-deploy-landing:
     needs: [changes, build-info, clone-repo]
@@ -191,6 +197,7 @@ jobs:
         uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
+          PUBLIC_API_URL: https://${{ github.ref_name != 'main' && format('{0}-', needs.build-info.outputs.branch-name) }}boshi-api.deguzman.cloud
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -200,7 +207,7 @@ jobs:
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/landing.yaml
           docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || format('{0}-latest', needs.build-info.outputs.branch-name) }}
           namespace: ${{ needs.build-info.outputs.namespace }}
-          config-envs: CLUSTER_ISSUER
+          config-envs: CLUSTER_ISSUER,PUBLIC_API_URL
 
   build-and-deploy-frontend:
     needs: [changes, build-info, clone-repo]
