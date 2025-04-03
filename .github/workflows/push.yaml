@@ -313,30 +313,35 @@ jobs:
 
   build-and-deploy-tourbillon:
     needs: [changes, build-info, clone-repo]
-    if: ${{ needs.changes.outputs.tourbillon == 'true' || needs.build-info.outputs.namespace-exists == 'false' }}
+    if: ${{ needs.changes.outputs.tourbillon == 'true' || needs.build-info.outputs.namespace-exists == 'false' || contains(needs.changes.outputs.kubernetes_files, 'kubernetes/tourbillon.yaml')}}
     name: Build and Deploy Tourbillon
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
     env:
       build_name: ${{ vars.DOCKER_REGISTRY }}/boshi-tourbillon
+      build_docker: ${{ needs.changes.outputs.tourbillon == 'true' || needs.build-info.outputs.namespace-exists == 'false' }}
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
+        if: ${{ env.build_docker == 'true' }}
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Docker Image
+        if: ${{ env.build_docker == 'true' }}
         uses: ./.github/actions/docker/build
         with:
           build-name: ${{ env.build_name }}
           path: tourbillon
       - name: Push Docker Image with SHA Tag
+        if: ${{ env.build_docker == 'true' }}
         uses: ./.github/actions/docker/push
         with:
           build-name: ${{ env.build_name }}
           tag: ${{ github.sha }}
       - name: Push Docker Image with latest Tag
+        if: ${{ env.build_docker == 'true' }}
         uses: ./.github/actions/docker/push
         with:
           build-name: ${{ env.build_name }}
@@ -368,7 +373,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/tourbillon.yaml
           domain: ${{ steps.domain.outputs.domain }}.deguzman.cloud
-          docker-image: ${{vars.DOCKER_REGISTRY}}/boshi-tourbillon:${{github.sha}}
+          docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || format('{0}-latest', needs.build-info.outputs.branch-name) }}
           namespace: ${{ needs.build-info.outputs.namespace }}
           config-envs: FEEDGEN_PORT,FEEDGEN_LISTENHOST, FEEDGEN_POSTGRES_LOCATION,FEEDGEN_POSTGRES_DATABASE,FEEDGEN_POSTGRES_USERNAME,FEEDGEN_POSTGRES_PASSWORD,FEEDGEN_POSTGRES_HOST,FEEDGEN_POSTGRES_PORT,FEEDGEN_SUBSCRIPTION_ENDPOINT,FEEDGEN_HOSTNAME,FEEDGEN_PUBLISHER_DID,FEEDGEN_SUBSCRIPTION_RECONNECT_DELAY,CLUSTER_ISSUER
 
