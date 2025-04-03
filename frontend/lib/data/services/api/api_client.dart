@@ -98,7 +98,7 @@ class ApiClient {
     OAuthClient client,
     String callback,
   ) async {
-    return oauth_shared.generateSession(client, callback, true);
+    return oauth_shared.generateSession(client, callback);
   }
 
   Future<(OAuthSession, ATProto)> refreshSession(OAuthClient client) async {

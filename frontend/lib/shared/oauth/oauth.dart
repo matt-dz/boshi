@@ -5,8 +5,6 @@ import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const securePrefix = 'flutter.';
-
 Future<void> _setSessionVars(
   OAuthSession session,
   SharedPreferencesAsync? prefs,
@@ -51,7 +49,6 @@ Future<(Uri, OAuthContext)> getOAuthAuthorizationURI(
 Future<OAuthSession> generateSession(
   OAuthClient client,
   String callback,
-  bool secure,
 ) async {
   logger.d('Retrieving shared preferences instance');
   final SharedPreferencesAsync prefs = SharedPreferencesAsync();
