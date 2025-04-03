@@ -35,7 +35,6 @@ spec:
               value: ${SMTP_PASSWORD}
           ports:
             - containerPort: 80
-
 ---
 apiVersion: v1
 kind: Service
