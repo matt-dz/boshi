@@ -33,7 +33,7 @@ jobs:
               - 'kubernetes/**'
       - name: Debug
         run: |
-          echo "${{ steps.filter.outputs.changed_files }}"
+          echo "${{ steps.filter.outputs.kubernetes_files }}"
 
   build-info:
     name: Get Build Info
