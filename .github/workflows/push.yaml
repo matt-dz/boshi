@@ -192,7 +192,7 @@ jobs:
         uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
-          PUBLIC_API_URL: https://${{ github.ref_name != 'main' && format('{0}-', needs.build-info.outputs.branch-name) }}boshi-app.deguzman.cloud
+          PUBLIC_API_URL: https://${{ github.ref_name != 'main' && format('{0}-', needs.build-info.outputs.branch-name) }}boshi.deguzman.cloud
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}

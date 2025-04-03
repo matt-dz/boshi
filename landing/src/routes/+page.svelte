@@ -23,6 +23,7 @@
 			if (resp.status !== 200) {
 				alert('Error signing up for email list');
 				console.error('Error signing up for email list', resp);
+				return;
 			}
 			alert('Successfully signed up for email list!');
 		} catch (e) {
