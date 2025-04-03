@@ -1,5 +1,34 @@
 <script lang="ts">
 	import { SiGithub } from '@icons-pack/svelte-simple-icons';
+	import { env } from '$env/dynamic/public';
+
+	let email: string = $state('');
+	async function handleSignup() {
+		const backend = env.PUBLIC_API_URL;
+		if (!backend) {
+			alert('Backend URL is not defined');
+			console.error('Backend URL is not defined');
+			return;
+		}
+
+		try {
+			const resp = await fetch(`${backend}/api/email-list`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ email })
+			});
+			if (resp.status !== 200) {
+				alert('Error signing up for email list');
+				console.error('Error signing up for email list', resp);
+			}
+			alert('Successfully signed up for email list!');
+		} catch (e) {
+			alert('Error signing up for email list');
+			console.error('Error signing up for email list', e);
+		}
+	}
 </script>
 
 <div class="flex h-dvh items-center">
@@ -32,9 +61,11 @@
 						type="text"
 						class="grow rounded-lg border-2 border-solid border-gray-700 bg-black px-2.5 py-2 text-gray-300 focus:outline-2 focus:outline-blue-700"
 						placeholder="Enter email..."
+						bind:value={email}
 					/>
 					<button
 						class="transition-duration-200 ml-3 cursor-pointer rounded-lg border-2 border-solid border-blue-300 bg-black px-4 py-2 text-violet-300 drop-shadow-[0_0_6px_var(--color-blue-300)] transition-colors hover:bg-blue-950"
+						onclick={handleSignup}
 					>
 						<span class="btn-text text-sm text-blue-300 sm:text-base">Notify Me</span>
 					</button>
