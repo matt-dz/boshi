@@ -33,7 +33,7 @@ jobs:
               - 'kubernetes/**'
       - name: Debug
         run: |
-          echo "${{ steps.filter.outputs.kubernetes_files }}"
+          echo "${{ contains( fromJson(steps.filter.outputs.kubernetes_files), 'kubernetes/backend.yaml' ) }}"
 
   build-info:
     name: Get Build Info
