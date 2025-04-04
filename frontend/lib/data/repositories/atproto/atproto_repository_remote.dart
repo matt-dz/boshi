@@ -1,11 +1,12 @@
+import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/data/services/api/api_client.dart';
-import 'oauth_repository.dart';
+import './atproto_repository.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
 
-class OAuthRepositoryRemote extends OAuthRepository {
-  OAuthRepositoryRemote({
+class AtProtoRepositoryRemote extends AtProtoRepository {
+  AtProtoRepositoryRemote({
     required super.clientId,
     required ApiClient apiClient,
   }) : _apiClient = apiClient;
@@ -64,6 +65,15 @@ class OAuthRepositoryRemote extends OAuthRepository {
       return Result.error(e);
     } catch (e) {
       return Result.error(Exception(e));
+    }
+  }
+
+  @override
+  Future<Result<void>> addPost(Post post) async {
+    if (authorized) {
+      return await _apiClient.createPost(atProto!, post);
+    } else {
+      return Result.error(Exception('Not authorized to create a post'));
     }
   }
 }

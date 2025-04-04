@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -22,7 +22,7 @@ class _RedirectScreenState extends State<RedirectScreen> {
   }
 
   Future<void> _handleRedirect() async {
-    final oauth = context.read<OAuthRepository>();
+    final oauth = context.read<AtProtoRepository>();
     final uri = Uri.base;
 
     final result = await oauth.generateSession(uri.toString());

@@ -20,9 +20,8 @@ Post _$PostFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Post {
-  String get authorId => throw _privateConstructorUsedError;
-  String get content => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
+  String get content => throw _privateConstructorUsedError;
 
   /// Serializes this Post to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -38,7 +37,7 @@ abstract class $PostCopyWith<$Res> {
   factory $PostCopyWith(Post value, $Res Function(Post) then) =
       _$PostCopyWithImpl<$Res, Post>;
   @useResult
-  $Res call({String authorId, String content, String title});
+  $Res call({String title, String content});
 }
 
 /// @nodoc
@@ -56,22 +55,17 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? authorId = null,
-    Object? content = null,
     Object? title = null,
+    Object? content = null,
   }) {
     return _then(_value.copyWith(
-      authorId: null == authorId
-          ? _value.authorId
-          : authorId // ignore: cast_nullable_to_non_nullable
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
               as String,
       content: null == content
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
               as String,
     ) as $Val);
   }
@@ -84,7 +78,7 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
       __$$PostImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String authorId, String content, String title});
+  $Res call({String title, String content});
 }
 
 /// @nodoc
@@ -99,22 +93,17 @@ class __$$PostImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? authorId = null,
-    Object? content = null,
     Object? title = null,
+    Object? content = null,
   }) {
     return _then(_$PostImpl(
-      authorId: null == authorId
-          ? _value.authorId
-          : authorId // ignore: cast_nullable_to_non_nullable
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
               as String,
       content: null == content
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
@@ -123,22 +112,19 @@ class __$$PostImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$PostImpl implements _Post {
-  const _$PostImpl(
-      {required this.authorId, required this.content, required this.title});
+  _$PostImpl({required this.title, required this.content});
 
   factory _$PostImpl.fromJson(Map<String, dynamic> json) =>
       _$$PostImplFromJson(json);
 
   @override
-  final String authorId;
+  final String title;
   @override
   final String content;
-  @override
-  final String title;
 
   @override
   String toString() {
-    return 'Post(authorId: $authorId, content: $content, title: $title)';
+    return 'Post(title: $title, content: $content)';
   }
 
   @override
@@ -146,15 +132,13 @@ class _$PostImpl implements _Post {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PostImpl &&
-            (identical(other.authorId, authorId) ||
-                other.authorId == authorId) &&
-            (identical(other.content, content) || other.content == content) &&
-            (identical(other.title, title) || other.title == title));
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.content, content) || other.content == content));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, authorId, content, title);
+  int get hashCode => Object.hash(runtimeType, title, content);
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.
@@ -173,19 +157,15 @@ class _$PostImpl implements _Post {
 }
 
 abstract class _Post implements Post {
-  const factory _Post(
-      {required final String authorId,
-      required final String content,
-      required final String title}) = _$PostImpl;
+  factory _Post({required final String title, required final String content}) =
+      _$PostImpl;
 
   factory _Post.fromJson(Map<String, dynamic> json) = _$PostImpl.fromJson;
 
   @override
-  String get authorId;
+  String get title;
   @override
   String get content;
-  @override
-  String get title;
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.

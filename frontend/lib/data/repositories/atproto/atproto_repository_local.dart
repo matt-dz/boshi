@@ -1,13 +1,14 @@
 import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
+import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/utils/result.dart';
-import 'oauth_repository.dart';
+import './atproto_repository.dart';
 import 'package:atproto/atproto.dart' as atp;
 
 import 'package:frontend/utils/logger.dart';
 
-class OAuthRepositoryLocal extends OAuthRepository {
-  OAuthRepositoryLocal({
+class AtProtoRepositoryLocal extends AtProtoRepository {
+  AtProtoRepositoryLocal({
     required super.clientId,
     required LocalDataService localDataService,
   }) : _localDataService = localDataService;
@@ -81,6 +82,15 @@ class OAuthRepositoryLocal extends OAuthRepository {
       return Result.error(e);
     } catch (e) {
       return Result.error(Exception(e));
+    }
+  }
+
+  @override
+  Future<Result<void>> addPost(Post post) async {
+    if (authorized) {
+      return await _localDataService.createPost(atProto!, post);
+    } else {
+      return Result.error(Exception('Not authorized to create a post'));
     }
   }
 }

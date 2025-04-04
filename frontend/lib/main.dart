@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
+import 'package:frontend/ui/post/widgets/post_screen.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +15,7 @@ import 'package:frontend/ui/home/widgets/home_screen.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
-import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/utils/result.dart';
 
@@ -30,7 +32,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final router = GoRouter(
       redirect: (BuildContext context, GoRouterState state) async {
-        final oauth = context.read<OAuthRepository>();
+        final oauth = context.read<AtProtoRepository>();
         final isLoggingIn = state.uri.path.startsWith('/login');
         if (!oauth.authorized && !isLoggingIn) {
           final result = await oauth.refreshSession();
@@ -54,10 +56,19 @@ class MainApp extends StatelessWidget {
           ),
         ),
         GoRoute(
+          path: '/post',
+          builder: (context, state) => PostScreen(
+            title: 'Boshi',
+            viewModel: PostViewModel(
+              atprotoRepository: context.read<AtProtoRepository>(),
+            ),
+          ),
+        ),
+        GoRoute(
           path: '/login',
           builder: (context, state) => LoginScreen(
             viewModel: LoginViewModel(
-              oAuthRepository: context.read<OAuthRepository>(),
+              atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),
           routes: [
