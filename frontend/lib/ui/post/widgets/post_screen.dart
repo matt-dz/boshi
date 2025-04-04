@@ -81,6 +81,9 @@ class _PostFormState extends State<PostForm> {
                       switch (result) {
                         case Ok<void>():
                           logger.e('Successfully created post');
+                          if (context.mounted) {
+                            context.go('/');
+                          }
                           return;
                         case Error():
                           logger.e('Error creating post in: $result');
