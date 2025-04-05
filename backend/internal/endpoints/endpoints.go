@@ -232,6 +232,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	// Begin postgres transaction to make update process "transactional"
 	// The verification status will *only* be updated if the redis transaction
 	// is also successful. Otherwise, the update will be rolled back.
+	log.InfoContext(r.Context(), "Beginning database transaction")
 	tx, err := db.Begin(ctx)
 	if err != nil {
 		log.ErrorContext(r.Context(), "Failed to begin transaction", slog.Any("error", err))
@@ -240,6 +241,8 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	}
 	defer tx.Rollback(ctx)
 	qtx := sqlcDb.WithTx(tx)
+
+	log.DebugContext(r.Context(), "Updating verification status")
 	_, err = qtx.VerifyEmail(ctx, payload.Email)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.ErrorContext(r.Context(), "Email not found", slog.String("email", payload.Email))
@@ -272,6 +275,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Compare codes
+	log.DebugContext(r.Context(), "Comparing codes")
 	if subtle.ConstantTimeCompare([]byte(code), []byte(payload.Code)) != 1 {
 		log.ErrorContext(r.Context(), "Codes do not match")
 		http.Error(w, http.StatusText(http.StatusConflict), http.StatusConflict)
@@ -279,6 +283,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Delete key
+	log.DebugContext(r.Context(), "Removing key from redis")
 	err = redisClient.Del(ctx, key).Err()
 	if errors.Is(err, redis.Nil) {
 		log.ErrorContext(r.Context(), "Key not found", slog.String("key", key))
@@ -292,6 +297,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	log.DebugContext(r.Context(), "Successfully removed key")
 
 	// Commit transaction - this is not fully transaction, but good enough
+	log.DebugContext(r.Context(), "Committing transaction")
 	if err := tx.Commit(ctx); err != nil {
 		log.ErrorContext(r.Context(), "Failed to commit db transaction", slog.Any("error", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
