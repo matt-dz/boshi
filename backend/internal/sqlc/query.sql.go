@@ -9,11 +9,34 @@ import (
 	"context"
 )
 
-const insertEmail = `-- name: InsertEmail :exec
-INSERT INTO email_list (email) VALUES ($1)
+const addToMailList = `-- name: AddToMailList :exec
+INSERT INTO mail_list (email) VALUES ($1)
 `
 
-func (q *Queries) InsertEmail(ctx context.Context, email string) error {
-	_, err := q.db.Exec(ctx, insertEmail, email)
+func (q *Queries) AddToMailList(ctx context.Context, email string) error {
+	_, err := q.db.Exec(ctx, addToMailList, email)
+	return err
+}
+
+const addUnverifiedEmail = `-- name: AddUnverifiedEmail :one
+INSERT INTO emails (email)
+VALUES ($1) ON CONFLICT (email) DO UPDATE
+SET email = EXCLUDED.email
+RETURNING email, created_at, verified_at
+`
+
+func (q *Queries) AddUnverifiedEmail(ctx context.Context, email string) (Email, error) {
+	row := q.db.QueryRow(ctx, addUnverifiedEmail, email)
+	var i Email
+	err := row.Scan(&i.Email, &i.CreatedAt, &i.VerifiedAt)
+	return i, err
+}
+
+const verifyEmail = `-- name: VerifyEmail :exec
+UPDATE emails SET verified_at = NOW() WHERE email = $1
+`
+
+func (q *Queries) VerifyEmail(ctx context.Context, email string) error {
+	_, err := q.db.Exec(ctx, verifyEmail, email)
 	return err
 }

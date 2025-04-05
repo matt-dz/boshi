@@ -8,7 +8,13 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type EmailList struct {
+type Email struct {
+	Email      string
+	CreatedAt  pgtype.Timestamptz
+	VerifiedAt pgtype.Timestamptz
+}
+
+type MailList struct {
 	Email     string
 	CreatedAt pgtype.Timestamptz
 }
