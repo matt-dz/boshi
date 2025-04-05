@@ -32,11 +32,12 @@ func (q *Queries) AddUnverifiedEmail(ctx context.Context, email string) (Email, 
 	return i, err
 }
 
-const verifyEmail = `-- name: VerifyEmail :exec
-UPDATE emails SET verified_at = NOW() WHERE email = $1
+const verifyEmail = `-- name: VerifyEmail :one
+UPDATE emails SET verified_at = NOW() WHERE email = $1 RETURNING email
 `
 
-func (q *Queries) VerifyEmail(ctx context.Context, email string) error {
-	_, err := q.db.Exec(ctx, verifyEmail, email)
-	return err
+func (q *Queries) VerifyEmail(ctx context.Context, email string) (string, error) {
+	row := q.db.QueryRow(ctx, verifyEmail, email)
+	err := row.Scan(&email)
+	return email, err
 }

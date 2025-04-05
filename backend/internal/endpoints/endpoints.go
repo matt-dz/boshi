@@ -7,7 +7,9 @@ import (
 	boshiRedis "boshi-backend/internal/redis"
 	"boshi-backend/internal/sqlc"
 	"context"
+	"crypto/subtle"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -15,7 +17,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/redis/go-redis/v9"
 )
 
 var log = logger.GetLogger()
@@ -25,6 +29,10 @@ var sqlcDb = sqlc.New(db)
 var pgError *pgconn.PgError
 
 var ErrVerificationCodeExists = fmt.Errorf("verification code already exists")
+
+func generateVerificationRedisKey(email string) string {
+	return fmt.Sprintf("%s:%s", boshiRedis.EmailVerficationCodeKey, email)
+}
 
 // Returns client-metadata.json for initiating OAuth2 authorization code flow
 func ServeOAuthMetadata(w http.ResponseWriter, r *http.Request) {
@@ -126,7 +134,6 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 
 	// Add email to database and check if it is already verified
 	log.DebugContext(r.Context(), "Begin database transaction")
-	db := database.GetDb(ctx)
 	tx, err := db.Begin(ctx)
 	if err != nil {
 		log.ErrorContext(r.Context(), "Failed to begin transaction", slog.Any("error", err))
@@ -171,7 +178,7 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 
 	// Insert code into redis
 	log.DebugContext(r.Context(), "Inserting code into redis")
-	key := fmt.Sprintf("%s:%s", boshiRedis.EmailVerficationCodeKey, payload.Email)
+	key := generateVerificationRedisKey(payload.Email)
 	// key := "example"
 	log.DebugContext(r.Context(), "Key", slog.String("key", key))
 	var redisClient = boshiRedis.GetClient()
@@ -194,7 +201,7 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// // Send email
+	// Send email
 	log.DebugContext(r.Context(), "Sending email")
 	err = email.SendEmail(
 		payload.Email,
@@ -203,6 +210,90 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+}
+
+func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
+	// Decode payload
+	ctx := context.Background()
+
+	// Decode Payload
+	log.DebugContext(r.Context(), "Decoding payload")
+	var payload verifyEmailVerificationCodePayload
+	err := decodeJson(&payload, r)
+	if err != nil {
+		log.ErrorContext(r.Context(), "Failed to decode payload", slog.Any("error", err))
+		http.Error(w, "Failed to decode payload", http.StatusBadRequest)
+		return
+	}
+
+	// Begin postgres transaction to make update process "transactional"
+	// The verification status will *only* be updated if the redis transaction
+	// is also successful. Otherwise, the update will be rolled back.
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		log.ErrorContext(r.Context(), "Failed to begin transaction", slog.Any("error", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback(ctx)
+	qtx := sqlcDb.WithTx(tx)
+	_, err = qtx.VerifyEmail(ctx, payload.Email)
+	if errors.Is(err, pgx.ErrNoRows) {
+		log.ErrorContext(r.Context(), "Email not found", slog.String("email", payload.Email))
+		http.Error(w, "Email not found", http.StatusNotFound)
+		return
+	} else if err != nil {
+		log.ErrorContext(
+			r.Context(),
+			"Failed to update verification status",
+			slog.Any("error", err),
+			slog.String("email", payload.Email),
+		)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Get code from redis
+	key := generateVerificationRedisKey(payload.Email)
+	log.DebugContext(r.Context(), "Retrieving key from redis", slog.String("key", key))
+	redisClient := boshiRedis.GetClient()
+	code, err := redisClient.Get(ctx, key).Result()
+	if errors.Is(err, redis.Nil) {
+		log.ErrorContext(r.Context(), "Key not found", slog.String("key", key))
+		http.Error(w, "Invalid Key", http.StatusNotFound)
+		return
+	} else if err != nil {
+		log.ErrorContext(r.Context(), "Failed to GET key", slog.Any("error", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Compare codes
+	if subtle.ConstantTimeCompare([]byte(code), []byte(payload.Code)) != 1 {
+		log.ErrorContext(r.Context(), "Codes do not match")
+		http.Error(w, http.StatusText(http.StatusConflict), http.StatusConflict)
+		return
+	}
+
+	// Delete key
+	err = redisClient.Del(ctx, key).Err()
+	if errors.Is(err, redis.Nil) {
+		log.ErrorContext(r.Context(), "Key not found", slog.String("key", key))
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if err != nil {
+		log.ErrorContext(r.Context(), "Failed to DEL key", slog.Any("error", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	log.DebugContext(r.Context(), "Successfully removed key")
+
+	// Commit transaction - this is not fully transaction, but good enough
+	if err := tx.Commit(ctx); err != nil {
+		log.ErrorContext(r.Context(), "Failed to commit db transaction", slog.Any("error", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}

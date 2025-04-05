@@ -65,6 +65,14 @@ func main() {
 		),
 	)
 
+	mux.HandleFunc("POST /email/verify",
+		middleware.Chain(
+			endpoints.VerifyEmailCode,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
 	/* Setup server*/
 	port := os.Getenv("PORT")
 	if port == "" {

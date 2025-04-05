@@ -41,4 +41,4 @@ CREATE TABLE emails (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
     verified_at TIMESTAMPTZ,
     PRIMARY KEY (email)
-)
+);
