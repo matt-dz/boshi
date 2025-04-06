@@ -20,12 +20,6 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
-          env:
-            - name: BACKEND_HOST
-              value: "${BACKEND_HOST}"
-            - name: BACKEND_PORT
-              value: "${BACKEND_PORT}"
-
 ---
 apiVersion: v1
 kind: Service

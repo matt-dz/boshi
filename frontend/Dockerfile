@@ -1,9 +1,13 @@
 # Build flutter project
 FROM --platform=$BUILDPLATFORM ghcr.io/cirruslabs/flutter:stable AS build
 ARG BUILD_TARGET
+ARG BACKEND_BASE_URL
+ARG BACKEND_PORT=443
 WORKDIR /app
 COPY . .
-RUN flutter build web -t $BUILD_TARGET
+RUN flutter build web -t ${BUILD_TARGET} \
+    --dart-define=BACKEND_BASE_URL=${BACKEND_BASE_URL} \
+    --dart-define=BACKEND_PORT=${BACKEND_PORT}
 
 
 # Serve project with nginx
