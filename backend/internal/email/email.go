@@ -9,23 +9,16 @@ import (
 	"os"
 )
 
-const welcomeSubject string = "Welcome to Boshi"
-const welcomeBody string = "Thank you for signing up for the Boshi mail list! We are excited that you've decided to join us on our journey. Updates are coming soon."
-
-var host string
-var port string
-var username string
-var password string
-var boshiSender string
+var host string = os.Getenv("SMTP_HOST")
+var port string = os.Getenv("SMTP_PORT")
+var username string = os.Getenv("SMTP_USERNAME")
+var password string = os.Getenv("SMTP_PASSWORD")
+var boshiSender string = os.Getenv("SMTP_FROM")
 
 var ErrMissingEnvVars = errors.New("Missing SMTP environment variables")
 
-func init() {
-	host, port, username, password, boshiSender = os.Getenv("SMTP_HOST"), os.Getenv("SMTP_PORT"), os.Getenv("SMTP_USERNAME"), os.Getenv("SMTP_PASSWORD"), os.Getenv("SMTP_FROM")
-}
-
 func validateVariables() bool {
-	return host == "" || port == "" || username == "" || password == ""
+	return host == "" || port == "" || username == "" || password == "" || boshiSender == ""
 }
 
 func formatMessage(sender, recipient, subject, body string) []byte {

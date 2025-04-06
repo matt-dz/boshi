@@ -51,7 +51,7 @@ func main() {
 
 	mux.HandleFunc("POST /email-list",
 		middleware.Chain(
-			endpoints.HandleAddEmailToEmailList,
+			endpoints.AddEmailToEmailList,
 			middleware.AddCors(),
 			middleware.LogRequest(),
 		),

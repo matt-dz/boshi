@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -14,10 +13,6 @@ var log = logger.GetLogger()
 var redisOpt *redis.Options
 var redisClient *redis.Client
 var once sync.Once
-
-const EmailVerficationCodeKey = "email-verification-code"
-
-var EmailVerificationCodeTTL = time.Duration(10) * time.Minute
 
 func init() {
 	var err error
@@ -28,6 +23,7 @@ func init() {
 	}
 }
 
+// Retrieves a singleton instance of the Redis client.
 func GetClient() *redis.Client {
 	once.Do(func() {
 		redisClient = redis.NewClient(redisOpt)
@@ -35,6 +31,8 @@ func GetClient() *redis.Client {
 	return redisClient
 }
 
+// Closes redis connection. Should only be called when the
+// application is shutting down.
 func CloseRedis() {
 	if redisClient != nil {
 		err := redisClient.Close()

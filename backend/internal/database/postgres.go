@@ -21,6 +21,7 @@ func init() {
 	}
 }
 
+// Retrieves a singleton instance of the Redis client.
 func GetDb(ctx context.Context) *pgxpool.Pool {
 	once.Do(func() {
 		var err error
@@ -32,6 +33,8 @@ func GetDb(ctx context.Context) *pgxpool.Pool {
 	return pool
 }
 
+// Closes redis connection. Should only be called when the
+// application is shutting down.
 func CloseDb() {
 	if pool != nil {
 		pool.Close()
