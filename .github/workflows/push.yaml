@@ -119,7 +119,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Docker Image
         if: ${{ env.build_docker == 'true' }}
-        working-directory: frontend
+        working-directory: backend
         shell: bash
         run: |
           BASE_URL=https://${{ steps.domain.outputs.domain }}.deguzman.cloud \
