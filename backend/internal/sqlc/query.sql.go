@@ -20,8 +20,10 @@ func (q *Queries) AddToMailList(ctx context.Context, email string) error {
 
 const upsertEmail = `-- name: UpsertEmail :one
 INSERT INTO emails (user_id, email)
-VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE
+VALUES ($1, $2)
+ON CONFLICT (user_id) DO UPDATE
 SET email = EXCLUDED.email
+WHERE emails.verified_at IS NULL
 RETURNING user_id, email, created_at, verified_at
 `
 

@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/redis/go-redis/v9"
 )
@@ -59,12 +60,12 @@ func AddEmailToEmailList(w http.ResponseWriter, r *http.Request) {
 	if err := sqlcDb.AddToMailList(ctx, payload.Email); err != nil {
 		if pgError, ok := err.(*pgconn.PgError); ok && pgError.Code == "23505" {
 			// Check for unique constraint violation
-			log.DebugContext(r.Context(), "Email already exists in database")
-			http.Error(w, http.StatusText(http.StatusConflict), http.StatusConflict)
+			log.DebugContext(r.Context(), "Email already exists in database", slog.String("email", payload.Email))
+			http.Error(w, "Email already signed up", http.StatusConflict)
 			return
 		}
 		log.ErrorContext(r.Context(), "Failed to insert email into database", slog.Any("error", err))
-		http.Error(w, "Failed to insert email into database", http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -77,7 +78,7 @@ func AddEmailToEmailList(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
-		http.Error(w, "Failed to send email", http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 }
@@ -117,41 +118,27 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Add email to database and check if it is already verified
-	log.DebugContext(r.Context(), "Begin database transaction")
-	tx, err := db.Begin(ctx)
-	if err != nil {
-		log.ErrorContext(r.Context(), "Failed to begin transaction", slog.Any("error", err))
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-	defer tx.Rollback(ctx)
-	qtx := sqlcDb.WithTx(tx)
-
-	// Insert email into database
+	// "Upsert" email into database
+	// 1. If user_id does not exist in emails table, the associated email will be inserted.
+	// 2. If user_id does exist in emails table *and* the email is not verified,
+	// the email will be updated.
+	// 3. If user_id does exist in email table but the email *is* verified,
+	// the email will *not* be updated and nothing is returned.
 	log.DebugContext(r.Context(), "Inserting email into database")
-	txR, err := qtx.UpsertEmail(ctx, sqlc.UpsertEmailParams{
+	_, err = sqlcDb.UpsertEmail(ctx, sqlc.UpsertEmailParams{
 		UserID: payload.UserID,
 		Email:  payload.Email,
 	})
-	if err != nil {
+	if pgError, ok := err.(*pgconn.PgError); ok && pgError.Code == "23505" {
+		log.ErrorContext(r.Context(), "Email already exists in database", slog.String("email", payload.Email))
+		http.Error(w, "Email already in use", http.StatusConflict)
+		return
+	} else if errors.Is(err, pgx.ErrNoRows) {
+		log.ErrorContext(r.Context(), "No row returned - user_id already verified email")
+		http.Error(w, "user_id already verified email", http.StatusConflict)
+		return
+	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to insert email into database", slog.Any("error", err))
-		http.Error(w, "Failed to insert email into database", http.StatusInternalServerError)
-		return
-	}
-
-	// Check if email is already verified
-	log.DebugContext(r.Context(), "Check if email is already verified")
-	if !txR.VerifiedAt.Time.IsZero() {
-		log.ErrorContext(r.Context(), "Email already verified", slog.String("email", payload.Email))
-		http.Error(w, "Email already verified", http.StatusConflict)
-		return
-	}
-
-	// Commit transaction
-	log.DebugContext(r.Context(), "Committing transaction")
-	if err := tx.Commit(ctx); err != nil {
-		log.ErrorContext(r.Context(), "Failed to commit transaction", slog.Any("error", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -206,8 +193,8 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 
 func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	var db = database.GetDb(ctx)
-	var sqlcDb = sqlc.New(db)
+	db := database.GetDb(ctx)
+	sqlcDb := sqlc.New(db)
 
 	// Decode Payload
 	log.DebugContext(r.Context(), "Decoding payload")
@@ -258,18 +245,18 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	case sqlc.VerificationStatusNoMatch:
 		log.ErrorContext(
 			r.Context(),
-			"user_id not associated with unverified email",
+			"user_id not associated with  email",
 			slog.String("user_id", payload.UserID),
 			slog.String("email", payload.Email),
 		)
-		http.Error(w, "user_id not associated with unverified email", http.StatusConflict)
+		http.Error(w, "user_id not associated with email", http.StatusConflict)
 		return
 	case sqlc.VerificationStatusAlreadyVerified:
 		log.ErrorContext(r.Context(), "user_id already verified")
 		http.Error(w, "user_id already verified", http.StatusConflict)
 		return
 	case sqlc.VerificationStatusJustVerified:
-		log.DebugContext(r.Context(), "user successfully verified")
+		log.DebugContext(r.Context(), "email verification status updated")
 	default:
 		log.ErrorContext(
 			r.Context(),
@@ -313,7 +300,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	}
 	log.DebugContext(r.Context(), "Successfully removed key")
 
-	// Commit transaction - this is not fully transaction, but good enough
+	// Commit transaction - this is not fully transactional, but good enough
 	log.DebugContext(r.Context(), "Committing transaction")
 	if err := tx.Commit(ctx); err != nil {
 		log.ErrorContext(r.Context(), "Failed to commit db transaction", slog.Any("error", err))

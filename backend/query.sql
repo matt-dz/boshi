@@ -3,9 +3,12 @@ INSERT INTO mail_list (email) VALUES ($1);
 
 -- name: UpsertEmail :one
 INSERT INTO emails (user_id, email)
-VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE
+VALUES ($1, $2)
+ON CONFLICT (user_id) DO UPDATE
 SET email = EXCLUDED.email
+WHERE emails.verified_at IS NULL
 RETURNING *;
+
 
 -- name: VerifyEmail :one
 WITH matched AS (
