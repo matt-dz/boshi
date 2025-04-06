@@ -149,6 +149,7 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Commit transaction
 	log.DebugContext(r.Context(), "Committing transaction")
 	if err := tx.Commit(ctx); err != nil {
 		log.ErrorContext(r.Context(), "Failed to commit transaction", slog.Any("error", err))
@@ -191,17 +192,17 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send email
-	// log.DebugContext(r.Context(), "Sending email")
-	// err = email.SendEmail(
-	// 	payload.Email,
-	// 	"Boshi Email Verification Code",
-	// 	fmt.Sprintf("Your Boshi verification code is: %s", code),
-	// )
-	// if err != nil {
-	// 	log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
-	// 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-	// 	return
-	// }
+	log.DebugContext(r.Context(), "Sending email")
+	err = email.SendEmail(
+		payload.Email,
+		"Boshi Verification Code",
+		fmt.Sprintf("Your Boshi verification code is: %s", code),
+	)
+	if err != nil {
+		log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 }
 
 func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {

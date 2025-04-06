@@ -4,10 +4,12 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
-	"math/big"
 	"net/smtp"
 	"os"
 )
+
+const verificationCodeSet = "ABCDEFGHJKMNOPQRSTUVWXYZ23456789" // Similar characters removed
+const verificationCodeLength = 6
 
 var host string = os.Getenv("SMTP_HOST")
 var port string = os.Getenv("SMTP_PORT")
@@ -45,14 +47,15 @@ func SendEmail(recipient string, subject string, body string) error {
 
 }
 
-// Generate an 8 digit numeric verification code
+// Generate an alphanumeric verification code
 func GenerateVerificationCode() (string, error) {
-	var maxRand *big.Int = big.NewInt(89_999_999)
-	var offset *big.Int = big.NewInt(10_000_000)
-	code, err := rand.Int(rand.Reader, maxRand)
+	code := make([]byte, verificationCodeLength)
+	_, err := rand.Read(code)
 	if err != nil {
 		return "", err
 	}
-	code = code.Add(code, offset)
-	return code.String(), nil
+	for i := range code {
+		code[i] = verificationCodeSet[code[i]%byte(len(verificationCodeSet))]
+	}
+	return string(code), nil
 }
