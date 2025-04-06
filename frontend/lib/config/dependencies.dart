@@ -34,7 +34,7 @@ List<SingleChildWidget> get providersRemote {
     ..._sharedProviders,
     Provider<ApiClient>(
       create: (_) => ApiClient(
-        host: EnvironmentConfig.backendHost,
+        host: EnvironmentConfig.backendBaseURL,
         port: apiClientPort,
       ),
     ),
@@ -51,7 +51,7 @@ List<SingleChildWidget> get providersRemote {
     ChangeNotifierProvider(
       create: (context) => AtProtoRepositoryRemote(
         clientId: Uri.parse(
-          '${EnvironmentConfig.backendHost}:${EnvironmentConfig.backendPort}/oauth/client-metadata.json',
+          '${EnvironmentConfig.backendBaseURL}:${EnvironmentConfig.backendPort}/oauth/client-metadata.json',
         ),
         apiClient: context.read<ApiClient>(),
       ) as AtProtoRepository,

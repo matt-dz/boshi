@@ -1,7 +1,7 @@
 /// Environment configuration for the application.
 class EnvironmentConfig {
-  static const backendHost = String.fromEnvironment(
-    'BACKEND_HOST',
+  static const backendBaseURL = String.fromEnvironment(
+    'BACKEND_BASE_URL',
     defaultValue: 'localhost',
   );
 
