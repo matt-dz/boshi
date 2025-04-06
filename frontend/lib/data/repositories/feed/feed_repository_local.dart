@@ -4,7 +4,6 @@ import 'package:frontend/utils/result.dart';
 import 'package:frontend/domain/models/post/post.dart' as post_domain_model;
 import 'package:frontend/data/models/requests/reply/reply.dart'
     as reply_request;
-import 'package:frontend/data/models/requests/post/post.dart' as post_request;
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 
 import 'feed_repository.dart';
@@ -33,7 +32,7 @@ class FeedRepositoryLocal implements FeedRepository {
   }
 
   @override
-  Future<Result<post_domain_model.Post>> addReply(
+  Future<Result<post_domain_model.Post>> createReply(
     reply_request.Reply reply,
   ) async {
     return _localDataService.addReply(reply);
@@ -42,10 +41,5 @@ class FeedRepositoryLocal implements FeedRepository {
   @override
   Future<Result<void>> reportPost(Report report) async {
     return _localDataService.reportPost(report);
-  }
-
-  @override
-  Future<Result<post_domain_model.Post>> addPost(post_request.Post post) async {
-    return _localDataService.addPost(post);
   }
 }

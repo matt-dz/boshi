@@ -9,7 +9,6 @@ import 'package:frontend/shared/models/report/report.dart';
 import 'package:frontend/data/services/api/api_client.dart';
 import 'package:frontend/data/models/requests/reply/reply.dart'
     as reply_request;
-import 'package:frontend/data/models/requests/post/post.dart' as post_request;
 
 import 'feed_repository.dart';
 
@@ -37,7 +36,7 @@ class FeedRepositoryRemote implements FeedRepository {
   }
 
   @override
-  Future<Result<post_domain_model.Post>> addReply(
+  Future<Result<post_domain_model.Post>> createReply(
     reply_request.Reply reply,
   ) async {
     return _apiClient.addReply(reply);
@@ -46,10 +45,5 @@ class FeedRepositoryRemote implements FeedRepository {
   @override
   Future<Result<void>> reportPost(Report report) async {
     return _apiClient.reportPost(report);
-  }
-
-  @override
-  Future<Result<post_domain_model.Post>> addPost(post_request.Post post) async {
-    return _apiClient.addPost(post);
   }
 }

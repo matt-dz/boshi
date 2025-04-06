@@ -11,16 +11,16 @@ import 'package:frontend/data/repositories/feed/feed_repository_local.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository_remote.dart';
 import 'package:frontend/data/repositories/user/user_repository_local.dart';
-import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
-import 'package:frontend/data/repositories/oauth/oauth_repository_remote.dart';
-import 'package:frontend/data/repositories/oauth/oauth_repository_local.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository_remote.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository_local.dart';
 
 List<SingleChildWidget> _sharedProviders = [
   // ChangeNotifierProvider(
-  //   create: (context) => OAuthRepository(
+  //   create: (context) => atprotoRepository(
   //     clientId: Uri.base.isScheme('http')
   //         ? Uri.base
-  //         : Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),
+  //         : Uri.parse('${Uri.base.origin}/atproto/client-metadata.json'),
   //   ),
   // ),
 ];
@@ -48,10 +48,10 @@ List<SingleChildWidget> get providersRemote {
       ) as FeedRepository,
     ),
     ChangeNotifierProvider(
-      create: (context) => OAuthRepositoryRemote(
+      create: (context) => AtProtoRepositoryRemote(
         clientId: Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),
         apiClient: context.read<ApiClient>(),
-      ) as OAuthRepository,
+      ) as AtProtoRepository,
     ),
   ];
 }
@@ -78,10 +78,10 @@ List<SingleChildWidget> get providersLocal {
       ) as FeedRepository,
     ),
     ChangeNotifierProvider(
-      create: (context) => OAuthRepositoryLocal(
+      create: (context) => AtProtoRepositoryLocal(
         clientId: Uri.parse('http://localhost:$frontendPort'),
         localDataService: context.read<LocalDataService>(),
-      ) as OAuthRepository,
+      ) as AtProtoRepository,
     ),
   ];
 }
