@@ -3,7 +3,6 @@ import 'package:provider/single_child_widget.dart';
 
 import 'package:frontend/data/services/api/api_client.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
-import 'package:frontend/config/environment.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/feed/feed_repository_remote.dart';
