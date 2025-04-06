@@ -123,7 +123,7 @@ jobs:
         shell: bash
         run: |
           BASE_URL=https://${{ steps.domain.outputs.domain }}.deguzman.cloud \
-          OAUTH_REDIRECT_URI=https://${{ github.ref_name == 'main' && boshi || format('{0}-boshi', needs.build-info.outputs.branch-name) }}.deguzman.cloud/login/redirect/ \
+          OAUTH_REDIRECT_URI=https://${{ github.ref_name == 'main' && 'boshi' || format('{0}-boshi', needs.build-info.outputs.branch-name) }}.deguzman.cloud/login/redirect/ \
           make docker
       - name: Push Docker Image with SHA Tag
         if: ${{ env.build_docker == 'true' }}
