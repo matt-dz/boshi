@@ -36,6 +36,8 @@ CREATE TABLE mail_list (
     PRIMARY KEY (email)
 );
 
+CREATE TYPE verification_status AS ENUM ('no_match', 'already_verified', 'just_verified');
+
 CREATE TABLE emails (
     user_id VARCHAR NOT NULL,
     email VARCHAR NOT NULL,

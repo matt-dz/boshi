@@ -16,7 +16,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/redis/go-redis/v9"
 )
@@ -241,20 +240,11 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	qtx := sqlcDb.WithTx(tx)
 
 	log.DebugContext(r.Context(), "Updating verification status")
-	_, err = qtx.VerifyEmail(ctx, sqlc.VerifyEmailParams{
+	verificationStatus, err := qtx.VerifyEmail(ctx, sqlc.VerifyEmailParams{
 		UserID: payload.UserID,
 		Email:  payload.Email,
 	})
-	if errors.Is(err, pgx.ErrNoRows) {
-		log.ErrorContext(
-			r.Context(),
-			"user_id not associated with unverified email",
-			slog.String("user_id", payload.UserID),
-			slog.String("email", payload.Email),
-		)
-		http.Error(w, "user_id not associated with unverified email", http.StatusConflict)
-		return
-	} else if err != nil {
+	if err != nil {
 		log.ErrorContext(
 			r.Context(),
 			"Failed to update verification status",
@@ -263,6 +253,29 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 		)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
+	}
+	switch verificationStatus {
+	case sqlc.VerificationStatusNoMatch:
+		log.ErrorContext(
+			r.Context(),
+			"user_id not associated with unverified email",
+			slog.String("user_id", payload.UserID),
+			slog.String("email", payload.Email),
+		)
+		http.Error(w, "user_id not associated with unverified email", http.StatusConflict)
+		return
+	case sqlc.VerificationStatusAlreadyVerified:
+		log.ErrorContext(r.Context(), "user_id already verified")
+		http.Error(w, "user_id already verified", http.StatusConflict)
+		return
+	case sqlc.VerificationStatusJustVerified:
+		log.DebugContext(r.Context(), "user successfully verified")
+	default:
+		log.ErrorContext(
+			r.Context(),
+			"Received unhandled status",
+			slog.String("status", string(verificationStatus)),
+		)
 	}
 
 	// Get code from redis

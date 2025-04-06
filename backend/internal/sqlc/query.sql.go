@@ -43,10 +43,23 @@ func (q *Queries) UpsertEmail(ctx context.Context, arg UpsertEmailParams) (Email
 }
 
 const verifyEmail = `-- name: VerifyEmail :one
-UPDATE emails
-SET verified_at = NOW()
-WHERE user_id = $1 AND email = $2
-RETURNING email
+WITH matched AS (
+    SELECT user_id, email, created_at, verified_at
+    FROM emails
+    WHERE emails.user_id = $1 AND emails.email = $2
+),
+updated AS (
+    UPDATE emails
+    SET verified_at = NOW()
+    WHERE (user_id, email) IN (SELECT matched.user_id, matched.email FROM matched WHERE matched.verified_at IS NULL)
+    RETURNING user_id, email, created_at, verified_at
+)
+SELECT
+    CASE
+        WHEN NOT EXISTS (SELECT 1 FROM matched) THEN 'no_match'::verification_status
+        WHEN EXISTS (SELECT 1 FROM matched WHERE verified_at IS NOT NULL) THEN 'already_verified'::verification_status
+        ELSE 'just_verified'::verification_status
+    END AS status
 `
 
 type VerifyEmailParams struct {
@@ -54,9 +67,9 @@ type VerifyEmailParams struct {
 	Email  string
 }
 
-func (q *Queries) VerifyEmail(ctx context.Context, arg VerifyEmailParams) (string, error) {
+func (q *Queries) VerifyEmail(ctx context.Context, arg VerifyEmailParams) (VerificationStatus, error) {
 	row := q.db.QueryRow(ctx, verifyEmail, arg.UserID, arg.Email)
-	var email string
-	err := row.Scan(&email)
-	return email, err
+	var status VerificationStatus
+	err := row.Scan(&status)
+	return status, err
 }
