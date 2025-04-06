@@ -32,9 +32,11 @@ docker-push:
 
 docker:
 	@echo "Building $(BUILD_NAME)..."
-	subdomain=$$(../scripts/generate-subdomain.sh) && \
-	   if [[ subdomain == "main" ]]; then subdomain="boshi"; fi && \
-		docker build --build-arg DOMAIN=$${subdomain}.deguzman.cloud --platform $(PLATFORM) -t $(BUILD_NAME) .
+	docker build \
+	--build-arg BASE_URL=$(BASE_URL) \
+	--build-arg OAUTH_REDIRECT_URI=$(OAUTH_REDIRECT_URI) \
+    --platform $(PLATFORM) \
+    -t $(BUILD_NAME) .
 
 clean:
 	@echo "Cleaning bin directory..."
