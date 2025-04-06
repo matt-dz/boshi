@@ -68,6 +68,7 @@ class ApiClient {
     ATProto session,
     post_request.Post post,
   ) async {
+    logger.d('Creating post');
     final xrpcResponse = await session.repo.createRecord(
       collection: NSID.create('feed.boshi.app', 'post'),
       record: {

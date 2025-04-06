@@ -86,7 +86,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   }
 
   @override
-  Future<Result<void>> addPost(Post post) async {
+  Future<Result<void>> createPost(Post post) async {
     if (authorized) {
       return await _localDataService.createPost(atProto!, post);
     } else {

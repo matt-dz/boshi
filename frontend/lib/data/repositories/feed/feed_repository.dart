@@ -12,6 +12,6 @@ abstract class FeedRepository {
   Future<Result<List<Post>>> getFeed();
   Future<Result<Post>> updateReactionCount(ReactionPayload reactionPayload);
   Future<Result<Post>> getPost(String id);
-  Future<Result<void>> addReply(reply_request.Reply reply);
+  Future<Result<void>> createReply(reply_request.Reply reply);
   Future<Result<void>> reportPost(Report report);
 }

@@ -28,5 +28,5 @@ abstract class AtProtoRepository extends ChangeNotifier {
   Future<Result<Uri>> getAuthorizationURI(String identity, String service);
   Future<Result<void>> generateSession(String callback);
   Future<Result<void>> refreshSession();
-  Future<Result<void>> addPost(Post post);
+  Future<Result<void>> createPost(Post post);
 }

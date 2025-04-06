@@ -32,7 +32,7 @@ class FeedRepositoryLocal implements FeedRepository {
   }
 
   @override
-  Future<Result<post_domain_model.Post>> addReply(
+  Future<Result<post_domain_model.Post>> createReply(
     reply_request.Reply reply,
   ) async {
     return _localDataService.addReply(reply);

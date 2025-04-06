@@ -21,7 +21,7 @@ class PostViewModel extends ChangeNotifier {
   Future<Result<void>> _createPost(Post post) async {
     try {
       logger.d('Creating a post');
-      final createPostResult = await _atprotoRepository.addPost(post);
+      final createPostResult = await _atprotoRepository.createPost(post);
       switch (createPostResult) {
         case Ok<void>():
           logger.d('Successfully created post');
