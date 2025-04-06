@@ -18,26 +18,45 @@ func (q *Queries) AddToMailList(ctx context.Context, email string) error {
 	return err
 }
 
-const addUnverifiedEmail = `-- name: AddUnverifiedEmail :one
-INSERT INTO emails (email)
-VALUES ($1) ON CONFLICT (email) DO UPDATE
+const upsertEmail = `-- name: UpsertEmail :one
+INSERT INTO emails (user_id, email)
+VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE
 SET email = EXCLUDED.email
-RETURNING email, created_at, verified_at
+RETURNING user_id, email, created_at, verified_at
 `
 
-func (q *Queries) AddUnverifiedEmail(ctx context.Context, email string) (Email, error) {
-	row := q.db.QueryRow(ctx, addUnverifiedEmail, email)
+type UpsertEmailParams struct {
+	UserID string
+	Email  string
+}
+
+func (q *Queries) UpsertEmail(ctx context.Context, arg UpsertEmailParams) (Email, error) {
+	row := q.db.QueryRow(ctx, upsertEmail, arg.UserID, arg.Email)
 	var i Email
-	err := row.Scan(&i.Email, &i.CreatedAt, &i.VerifiedAt)
+	err := row.Scan(
+		&i.UserID,
+		&i.Email,
+		&i.CreatedAt,
+		&i.VerifiedAt,
+	)
 	return i, err
 }
 
 const verifyEmail = `-- name: VerifyEmail :one
-UPDATE emails SET verified_at = NOW() WHERE email = $1 RETURNING email
+UPDATE emails
+SET verified_at = NOW()
+WHERE user_id = $1 AND email = $2
+RETURNING email
 `
 
-func (q *Queries) VerifyEmail(ctx context.Context, email string) (string, error) {
-	row := q.db.QueryRow(ctx, verifyEmail, email)
+type VerifyEmailParams struct {
+	UserID string
+	Email  string
+}
+
+func (q *Queries) VerifyEmail(ctx context.Context, arg VerifyEmailParams) (string, error) {
+	row := q.db.QueryRow(ctx, verifyEmail, arg.UserID, arg.Email)
+	var email string
 	err := row.Scan(&email)
 	return email, err
 }

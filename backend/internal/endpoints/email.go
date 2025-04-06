@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/mail"
+	"regexp"
 	"strings"
 	"time"
 
@@ -21,6 +22,8 @@ import (
 )
 
 const EmailVerficationCodeKey = "email-verification-code"
+
+var DIDRegex = regexp.MustCompile(`^did:[a-z]+:[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$`)
 
 var EmailVerificationCodeTTL = time.Duration(10) * time.Minute
 var pgError *pgconn.PgError
@@ -87,11 +90,18 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 
 	// Decode Payload
 	log.DebugContext(r.Context(), "Decoding payload")
-	var payload emailListPayload
+	var payload createEmailVerificationCodePayload
 	err := decodeJson(&payload, r)
 	if err != nil {
 		log.ErrorContext(r.Context(), "Failed to decode payload", slog.Any("error", err))
 		http.Error(w, "Failed to decode payload", http.StatusBadRequest)
+		return
+	}
+
+	// Validate user id
+	if !DIDRegex.MatchString(payload.UserID) {
+		log.ErrorContext(r.Context(), "user_id not a valid DID", slog.String("did", payload.UserID))
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
@@ -121,7 +131,10 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 
 	// Insert email into database
 	log.DebugContext(r.Context(), "Inserting email into database")
-	txR, err := qtx.AddUnverifiedEmail(ctx, payload.Email)
+	txR, err := qtx.UpsertEmail(ctx, sqlc.UpsertEmailParams{
+		UserID: payload.UserID,
+		Email:  payload.Email,
+	})
 	if err != nil {
 		log.ErrorContext(r.Context(), "Failed to insert email into database", slog.Any("error", err))
 		http.Error(w, "Failed to insert email into database", http.StatusInternalServerError)
@@ -178,17 +191,17 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send email
-	log.DebugContext(r.Context(), "Sending email")
-	err = email.SendEmail(
-		payload.Email,
-		"Boshi Email Verification Code",
-		fmt.Sprintf("Your Boshi verification code is: %s", code),
-	)
-	if err != nil {
-		log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+	// log.DebugContext(r.Context(), "Sending email")
+	// err = email.SendEmail(
+	// 	payload.Email,
+	// 	"Boshi Email Verification Code",
+	// 	fmt.Sprintf("Your Boshi verification code is: %s", code),
+	// )
+	// if err != nil {
+	// 	log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
+	// 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	// 	return
+	// }
 }
 
 func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
@@ -206,6 +219,13 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate user id
+	if !DIDRegex.MatchString(payload.UserID) {
+		log.ErrorContext(r.Context(), "user_id not a valid DID", slog.String("did", payload.UserID))
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
 	// Begin postgres transaction to make update process "transactional"
 	// The verification status will *only* be updated if the redis transaction
 	// is also successful. Otherwise, the update will be rolled back.
@@ -220,10 +240,18 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	qtx := sqlcDb.WithTx(tx)
 
 	log.DebugContext(r.Context(), "Updating verification status")
-	_, err = qtx.VerifyEmail(ctx, payload.Email)
+	_, err = qtx.VerifyEmail(ctx, sqlc.VerifyEmailParams{
+		UserID: payload.UserID,
+		Email:  payload.Email,
+	})
 	if errors.Is(err, pgx.ErrNoRows) {
-		log.ErrorContext(r.Context(), "Email not found", slog.String("email", payload.Email))
-		http.Error(w, "Email not found", http.StatusNotFound)
+		log.ErrorContext(
+			r.Context(),
+			"Email not associated with user_id",
+			slog.String("user_id", payload.UserID),
+			slog.String("email", payload.Email),
+		)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	} else if err != nil {
 		log.ErrorContext(

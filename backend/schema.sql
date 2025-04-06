@@ -37,8 +37,10 @@ CREATE TABLE mail_list (
 );
 
 CREATE TABLE emails (
+    user_id VARCHAR NOT NULL,
     email VARCHAR NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
     verified_at TIMESTAMPTZ,
-    PRIMARY KEY (email)
+    PRIMARY KEY (user_id),
+    UNIQUE (email)
 );

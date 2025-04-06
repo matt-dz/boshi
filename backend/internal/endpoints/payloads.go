@@ -18,10 +18,12 @@ type emailListPayload struct {
 }
 
 type createEmailVerificationCodePayload struct {
-	Email string `json:"email"`
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
 }
 
 type verifyEmailVerificationCodePayload struct {
-	Email string `json:"email"`
-	Code  string `json:"code"`
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
+	Code   string `json:"code"`
 }

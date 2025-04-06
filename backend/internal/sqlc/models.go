@@ -9,6 +9,7 @@ import (
 )
 
 type Email struct {
+	UserID     string
 	Email      string
 	CreatedAt  pgtype.Timestamptz
 	VerifiedAt pgtype.Timestamptz
