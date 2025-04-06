@@ -34,8 +34,8 @@ func generateVerificationRedisKey(email string) string {
 
 func AddEmailToEmailList(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	var db = database.GetDb(ctx)
-	var sqlcDb = sqlc.New(db)
+	db := database.GetDb(ctx)
+	sqlcDb := sqlc.New(db)
 
 	// Decode Payload
 	log.DebugContext(r.Context(), "Decoding payload")
@@ -85,8 +85,8 @@ func AddEmailToEmailList(w http.ResponseWriter, r *http.Request) {
 
 func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	var db = database.GetDb(ctx)
-	var sqlcDb = sqlc.New(db)
+	db := database.GetDb(ctx)
+	sqlcDb := sqlc.New(db)
 
 	// Decode Payload
 	log.DebugContext(r.Context(), "Decoding payload")
@@ -101,7 +101,7 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	// Validate user id
 	if !DIDRegex.MatchString(payload.UserID) {
 		log.ErrorContext(r.Context(), "user_id not a valid DID", slog.String("did", payload.UserID))
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, "user_id is not a valid DID", http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -114,7 +114,7 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	}
 	if !strings.HasSuffix(payload.Email, ".edu") {
 		log.ErrorContext(r.Context(), "Email address must end with .edu", slog.String("email", payload.Email))
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, "Email address must end with .edu", http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -223,7 +223,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	// Validate user id
 	if !DIDRegex.MatchString(payload.UserID) {
 		log.ErrorContext(r.Context(), "user_id not a valid DID", slog.String("did", payload.UserID))
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, "user_id not a valid DID", http.StatusBadRequest)
 		return
 	}
 
@@ -248,11 +248,11 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.ErrorContext(
 			r.Context(),
-			"Email not associated with user_id",
+			"user_id not associated with unverified email",
 			slog.String("user_id", payload.UserID),
 			slog.String("email", payload.Email),
 		)
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		http.Error(w, "user_id not associated with unverified email", http.StatusConflict)
 		return
 	} else if err != nil {
 		log.ErrorContext(
@@ -272,7 +272,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	code, err := redisClient.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
 		log.ErrorContext(r.Context(), "Key not found", slog.String("key", key))
-		http.Error(w, "Invalid Key", http.StatusNotFound)
+		http.Error(w, "Code does not exist for user", http.StatusConflict)
 		return
 	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to GET key", slog.Any("error", err))
@@ -284,7 +284,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	log.DebugContext(r.Context(), "Comparing codes")
 	if subtle.ConstantTimeCompare([]byte(code), []byte(payload.Code)) != 1 {
 		log.ErrorContext(r.Context(), "Codes do not match")
-		http.Error(w, http.StatusText(http.StatusConflict), http.StatusConflict)
+		http.Error(w, "Incorrect code", http.StatusConflict)
 		return
 	}
 
@@ -292,9 +292,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	log.DebugContext(r.Context(), "Removing key from redis")
 	err = redisClient.Del(ctx, key).Err()
 	if errors.Is(err, redis.Nil) {
-		log.ErrorContext(r.Context(), "Key not found", slog.String("key", key))
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
+		log.WarnContext(r.Context(), "Unable to remove key", slog.String("key", key))
 	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to DEL key", slog.Any("error", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
