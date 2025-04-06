@@ -256,6 +256,8 @@ jobs:
         uses: ./.github/actions/k8s/deploy
         env:
           CLUSTER_ISSUER: ${{secrets.CERT_MANAGER_CLUSTER_ISSUER}}
+          BACKEND_HOST: ${{ steps.domain.outputs.domain }}-api.deguzman.cloud
+          BACKEND_PORT: 443
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -265,7 +267,7 @@ jobs:
           config-path: ${{needs.clone-repo.outputs.repo-destination}}/kubernetes/frontend.yaml
           docker-image: ${{ env.build_name }}:${{ env.build_docker == 'true' && github.sha || format('{0}-latest', needs.build-info.outputs.branch-name) }}
           namespace: ${{ needs.build-info.outputs.namespace }}
-          config-envs: CLUSTER_ISSUER
+          config-envs: CLUSTER_ISSUER,BACKEND_HOST,BACKEND_PORT
 
   build-and-deploy-explorer:
     needs: [changes, build-info, clone-repo]
