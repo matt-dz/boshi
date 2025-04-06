@@ -5,10 +5,63 @@
 package sqlc
 
 import (
+	"database/sql/driver"
+	"fmt"
+
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type EmailList struct {
+type VerificationStatus string
+
+const (
+	VerificationStatusNoMatch         VerificationStatus = "no_match"
+	VerificationStatusAlreadyVerified VerificationStatus = "already_verified"
+	VerificationStatusJustVerified    VerificationStatus = "just_verified"
+)
+
+func (e *VerificationStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = VerificationStatus(s)
+	case string:
+		*e = VerificationStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for VerificationStatus: %T", src)
+	}
+	return nil
+}
+
+type NullVerificationStatus struct {
+	VerificationStatus VerificationStatus
+	Valid              bool // Valid is true if VerificationStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullVerificationStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.VerificationStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.VerificationStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullVerificationStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.VerificationStatus), nil
+}
+
+type Email struct {
+	UserID     string
+	Email      string
+	CreatedAt  pgtype.Timestamptz
+	VerifiedAt pgtype.Timestamptz
+}
+
+type MailList struct {
 	Email     string
 	CreatedAt pgtype.Timestamptz
 }

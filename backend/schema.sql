@@ -30,8 +30,19 @@ CREATE TABLE reaction (
     FOREIGN KEY (post_uri) REFERENCES post (uri) ON DELETE CASCADE
 );
 
-CREATE TABLE email_list (
+CREATE TABLE mail_list (
     email VARCHAR NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
     PRIMARY KEY (email)
+);
+
+CREATE TYPE verification_status AS ENUM ('no_match', 'already_verified', 'just_verified');
+
+CREATE TABLE emails (
+    user_id VARCHAR NOT NULL,
+    email VARCHAR NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
+    verified_at TIMESTAMPTZ,
+    PRIMARY KEY (user_id),
+    UNIQUE (email)
 );
