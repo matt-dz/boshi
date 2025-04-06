@@ -263,6 +263,8 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 			"Received unhandled status",
 			slog.String("status", string(verificationStatus)),
 		)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	// Get code from redis
