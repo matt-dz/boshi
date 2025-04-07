@@ -23,20 +23,19 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - boshi-network
 
   backend:
     build:
       context: .
       args:
-        PORT: 8080
         OAUTH_BASE_URL: http://frontend:3000/client-metadata.json
         OAUTH_REDIRECT_URI: http://frontend:3000/login/redirect
-        POSTGRES_URL: postgresql://admin:password@postgres:5432/boshi
-        SMTP_FROM: noreply@boshi.com
-        SMTP_HOST: smtp.host.com
-        SMTP_PORT: 587
-        SMTP_USERNAME: username
-        SMTP_PASSWORD: password
+    env_file: .env
+    depends_on:
+      - redis
+      - postgres
     ports:
       - "8080:8080"
     networks:
@@ -48,5 +47,5 @@ volumes:
   redis_data:
     driver: local
 networks:
-  app-network:
+  boshi-network:
     external: true
