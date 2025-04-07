@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:frontend/ui/post/widgets/post_screen.dart';
-import 'package:web/web.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'package:frontend/ui/login/widgets/login_screen.dart';
-import 'package:frontend/ui/login/widgets/redirect_screen.dart';
+import 'package:frontend/ui/login/widgets/oauth_callback_screen.dart';
 import 'package:frontend/ui/login/view_model/login_viewmodel.dart';
 
 import 'package:frontend/ui/home/view_model/home_viewmodel.dart';
@@ -19,6 +18,7 @@ import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/utils/result.dart';
+import 'package:frontend/config/environment.dart';
 
 import 'main_development.dart' as dev;
 
@@ -33,6 +33,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final router = GoRouter(
       redirect: (BuildContext context, GoRouterState state) async {
+        // if (EnvironmentConfig.prod) {
         final oauth = context.read<AtProtoRepository>();
         final isLoggingIn = state.uri.path.startsWith('/login');
         if (!oauth.authorized && !isLoggingIn) {
@@ -43,6 +44,7 @@ class MainApp extends StatelessWidget {
         } else if (oauth.authorized && isLoggingIn) {
           return '/';
         }
+        // }
         return null;
       },
       routes: [
@@ -72,12 +74,10 @@ class MainApp extends StatelessWidget {
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),
-          routes: [
-            GoRoute(
-              path: '/redirect',
-              builder: (context, state) => RedirectScreen(),
-            ),
-          ],
+        ),
+        GoRoute(
+          path: '/oauth/callback',
+          builder: (context, state) => OAuthCallback(),
         ),
       ],
     );

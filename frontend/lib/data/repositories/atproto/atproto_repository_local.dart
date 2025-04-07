@@ -16,15 +16,15 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   final LocalDataService _localDataService;
 
   void _initializeOAuthClient() {
+    final url = 'http://127.0.0.1:${clientId.port}';
     clientMetadata ??= OAuthClientMetadata(
-      clientId: '${clientId.scheme}://${clientId.host}',
+      clientId: 'http://localhost'
+          '?redirect_uri=${Uri.encodeComponent("$url/login/redirect")}'
+          '&scope=${Uri.encodeComponent("atproto transition:generic")}',
       clientName: 'Boshi',
-      clientUri: clientId.toString(),
-      redirectUris: ['http://127.0.0.1:${clientId.port}'],
-      grantTypes: [
-        'authorization_code',
-        'refresh_token',
-      ],
+      clientUri: url,
+      redirectUris: ['$url/oauth/callback'],
+      grantTypes: ['authorization_code', 'refresh_token'],
       scope: 'atproto',
       responseTypes: ['code'],
       applicationType: 'web',

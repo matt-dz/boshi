@@ -4,14 +4,14 @@ import 'package:frontend/utils/result.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
-class RedirectScreen extends StatefulWidget {
-  const RedirectScreen({super.key});
+class OAuthCallback extends StatefulWidget {
+  const OAuthCallback({super.key});
 
   @override
-  State<RedirectScreen> createState() => _RedirectScreenState();
+  State<OAuthCallback> createState() => _OAuthCallbackState();
 }
 
-class _RedirectScreenState extends State<RedirectScreen> {
+class _OAuthCallbackState extends State<OAuthCallback> {
   bool _loading = true;
   String? _error;
 

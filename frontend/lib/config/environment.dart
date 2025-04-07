@@ -4,4 +4,8 @@ class EnvironmentConfig {
     'BACKEND_BASE_URL',
     defaultValue: 'localhost',
   );
+  static const prod = bool.fromEnvironment(
+    'PROD',
+    defaultValue: false,
+  );
 }
