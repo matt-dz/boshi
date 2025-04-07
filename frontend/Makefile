@@ -17,7 +17,7 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
-all:
+run:
 	scripts/start.sh &
 	flutter run -d ${DEVICE_ID} --target ${DEV_STAGING} --pid-file /tmp/flutter.pid --web-hostname 127.0.0.1 --web-port ${FRONTEND_PORT}
 
@@ -42,9 +42,25 @@ docker-push:
 	docker tag $(BUILD_NAME) $(BUILD_NAME):$(TAG)
 	docker push $(BUILD_NAME):$(TAG)
 
+compose-build:
+	@echo "Building docker image"
+	docker compose build
+
+docker-network:
+	@echo "Creating network"
+	docker network create -d bridge boshi-network
+
+dev:
+	@echo "Setting up services"
+	docker compose up
+
 format:
 	@echo "Running dart format"
 	dart format .
 
 	@echo "Running dart fix"
 	dart fix --apply
+
+clean:
+	@echo "Stopping docker services"
+	docker compose down
