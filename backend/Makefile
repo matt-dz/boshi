@@ -20,6 +20,9 @@ build:
 	go build -o bin/boshi-backend cmd/main.go
 
 run:
+	@echo "Setting up services..."
+	docker compose up -d
+
 	@echo "Running the application..."
 	go run cmd/main.go
 
@@ -38,7 +41,14 @@ docker:
     --platform $(PLATFORM) \
     -t $(BUILD_NAME) .
 
+stop:
+	@echo "Stopping services"
+	docker compose down
+
 clean:
+	@echo "Cleaning up docker containers"
+	docker compose down --remove-orphans -v
+
 	@echo "Cleaning bin directory..."
 	rm bin/*
 

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"boshi-backend/internal/database"
 	"boshi-backend/internal/endpoints"
 	"boshi-backend/internal/logger"
 	"boshi-backend/internal/middleware"
+	"boshi-backend/internal/redis"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,8 +13,14 @@ import (
 
 var log = logger.GetLogger()
 
+func cleanup() {
+	database.CloseDb()
+	redis.CloseRedis()
+}
+
 func main() {
 	log.Info("Starting server...")
+	defer cleanup()
 
 	/* Setup routes */
 	mux := http.NewServeMux()
@@ -43,7 +51,23 @@ func main() {
 
 	mux.HandleFunc("POST /email-list",
 		middleware.Chain(
-			endpoints.HandleAddEmailToEmailList,
+			endpoints.AddEmailToEmailList,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
+	mux.HandleFunc("POST /email/code",
+		middleware.Chain(
+			endpoints.CreateEmailVerificationCode,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
+	mux.HandleFunc("POST /email/verify",
+		middleware.Chain(
+			endpoints.VerifyEmailCode,
 			middleware.AddCors(),
 			middleware.LogRequest(),
 		),

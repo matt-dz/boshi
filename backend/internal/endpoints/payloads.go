@@ -16,3 +16,14 @@ type clientMetadata struct {
 type emailListPayload struct {
 	Email string `json:"email"`
 }
+
+type createEmailVerificationCodePayload struct {
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
+}
+
+type verifyEmailVerificationCodePayload struct {
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
+	Code   string `json:"code"`
+}
