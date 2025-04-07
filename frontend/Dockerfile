@@ -13,13 +13,16 @@ RUN flutter build web -t ${BUILD_TARGET} \
 # Serve project with nginx
 FROM nginx:alpine
 ARG NGINX_HOST
+ARG BACKEND_BASE_URL
 
 # Set template variables
-ENV NGINX_HOST=$NGINX_HOST
+ENV NGINX_HOST=${NGINX_HOST}
+ENV CLIENT_METADATA_PATH=${BACKEND_BASE_URL}/client-metadata.json
 ENV NGINX_PORT=80
 ENV ENV=PROD
 
-EXPOSE $NGINX_PORT
+
+EXPOSE ${NGINX_PORT}
 
 # Copy nginx files
 COPY --from=build /app/build/web /usr/share/nginx/html

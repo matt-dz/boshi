@@ -33,7 +33,7 @@ docker-push:
 docker:
 	@echo "Building $(BUILD_NAME)..."
 	docker build \
-	--build-arg BASE_URL=$(BASE_URL) \
+	--build-arg OAUTH_BASE_URL=$(OAUTH_BASE_URL) \
 	--build-arg OAUTH_REDIRECT_URI=$(OAUTH_REDIRECT_URI) \
     --platform $(PLATFORM) \
     -t $(BUILD_NAME) .

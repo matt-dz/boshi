@@ -33,7 +33,7 @@ func main() {
 		),
 	)
 
-	mux.HandleFunc("GET /oauth/client-metadata.json",
+	mux.HandleFunc("GET /client-metadata.json",
 		middleware.Chain(
 			endpoints.ServeOAuthMetadata,
 			middleware.AddCors(),

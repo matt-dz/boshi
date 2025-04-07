@@ -19,13 +19,11 @@ import 'package:frontend/shared/models/mock_data/feed/feed.dart';
 import 'package:frontend/utils/logger.dart';
 
 class ApiClient {
-  ApiClient({String? host, int? port, HttpClient Function()? clientFactory})
+  ApiClient({String? host, HttpClient Function()? clientFactory})
       : _host = host ?? 'localhost',
-        _port = port ?? 8080,
         _clientFactory = clientFactory ?? HttpClient.new;
 
   final String _host;
-  final int _port;
   final HttpClient Function() _clientFactory;
 
   // TODO: Implement the getFeed method

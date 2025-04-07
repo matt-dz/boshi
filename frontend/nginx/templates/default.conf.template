@@ -5,6 +5,11 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # Redirect /client-metadata.json to backend
+    location = /client-metadata.json {
+        return 302 ${CLIENT_METADATA_PATH};
+    }
+
     # Redirect to /index.html for flutter client-side routing
     location / {
         try_files $uri $uri/ /index.html;

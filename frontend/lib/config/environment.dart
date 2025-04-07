@@ -4,9 +4,4 @@ class EnvironmentConfig {
     'BACKEND_BASE_URL',
     defaultValue: 'localhost',
   );
-
-  static const backendPort = String.fromEnvironment(
-    'BACKEND_PORT',
-    defaultValue: '8080',
-  );
 }

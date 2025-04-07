@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:frontend/ui/post/widgets/post_screen.dart';
+import 'package:web/web.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';

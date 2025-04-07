@@ -104,6 +104,7 @@ jobs:
     env:
       build_name: ${{vars.DOCKER_REGISTRY}}/boshi-backend
       build_docker: ${{ needs.changes.outputs.backend == 'true' || needs.build-info.outputs.namespace-exists == 'false' }}
+      frontend_base_url: https://${{ github.ref_name == 'main' && 'boshi' || format('{0}-boshi', needs.build-info.outputs.branch-name) }}.deguzman.cloud
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/domain
@@ -122,8 +123,8 @@ jobs:
         working-directory: backend
         shell: bash
         run: |
-          BASE_URL=https://${{ steps.domain.outputs.domain }}.deguzman.cloud \
-          OAUTH_REDIRECT_URI=https://${{ github.ref_name == 'main' && 'boshi' || format('{0}-boshi', needs.build-info.outputs.branch-name) }}.deguzman.cloud/login/redirect/ \
+          OAUTH_BASE_URL=${{ env.frontend_base_url }} \
+          OAUTH_REDIRECT_URI=${{ env.frontend_base_url }}/login/redirect/ \
           make docker
       - name: Push Docker Image with SHA Tag
         if: ${{ env.build_docker == 'true' }}
