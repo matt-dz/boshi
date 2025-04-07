@@ -8,6 +8,14 @@ server {
     # Redirect /client-metadata.json to backend
     location = /client-metadata.json {
         proxy_pass ${CLIENT_METADATA_PATH};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+
+        # Enable caching
+        proxy_cache client_metadata_cache;
+        proxy_cache_valid 200 302 10m; # cache 200/302 responses for 10 minutes
+        proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+        add_header X-Cache-Status $upstream_cache_status;
     }
 
     # Redirect to /index.html for flutter client-side routing
