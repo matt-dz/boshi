@@ -9,7 +9,6 @@ RUN flutter build web -t ${BUILD_TARGET} \
     --dart-define=BACKEND_BASE_URL=${BACKEND_BASE_URL} \
     --dart-define=BACKEND_PORT=${BACKEND_PORT}
 
-
 # Serve project with nginx
 FROM nginx:alpine
 ARG NGINX_HOST
