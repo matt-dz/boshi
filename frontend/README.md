@@ -1,17 +1,46 @@
 # Boshi Frontend
 
-A new Flutter project.
+Boshi frontend built with Flutter.
 
+## Dependencies
 
-## Getting Started
+- [Flutter](https://docs.flutter.dev/get-started/install)
+- [entr](https://github.com/eradman/entr)
 
-This project is a starting point for a Flutter application.
+## Development
 
-A few resources to get you started if this is your first Flutter project:
+To simply run the application in development, run:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+make run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This will start the flutter application on chrome and sets up `entr` to hot reload the application whenever a file in `lib/` changes.
+
+## Docker setup
+
+To setup the frontend with Docker, first create the network with the command
+
+```bash
+make docker-network
+```
+
+Next, build the docker image with
+
+```bash
+docker compose build
+```
+
+Finally, run the compose file with
+
+```bash
+make dev
+```
+
+This setup is useful if you would like to test the changes before pushing them to prod.
+
+To stop the services, run
+
+```bash
+make clean
+```

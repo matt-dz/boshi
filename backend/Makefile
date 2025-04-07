@@ -20,11 +20,12 @@ build:
 	go build -o bin/boshi-backend cmd/main.go
 
 run:
-	@echo "Setting up services..."
-	docker compose up -d
-
 	@echo "Running the application..."
 	go run cmd/main.go
+
+dev:
+	@echo "Starting services..."
+	docker compose up
 
 docker-push:
 	@echo "Tagging $(BUILD_NAME):$(TAG)..."
@@ -32,12 +33,17 @@ docker-push:
 	@echo "Pushing $(BUILD_NAME):$(TAG)..."
 	docker push $(BUILD_NAME):$(TAG)
 
-
 docker:
 	@echo "Building $(BUILD_NAME)..."
-	subdomain=$$(../scripts/generate-subdomain.sh) && \
-	   if [[ subdomain == "main" ]]; then subdomain="boshi"; fi && \
-		docker build --build-arg DOMAIN=$${subdomain}.deguzman.cloud --platform $(PLATFORM) -t $(BUILD_NAME) .
+	docker build \
+	--build-arg OAUTH_BASE_URL=$(OAUTH_BASE_URL) \
+	--build-arg OAUTH_REDIRECT_URI=$(OAUTH_REDIRECT_URI) \
+    --platform $(PLATFORM) \
+    -t $(BUILD_NAME) .
+
+docker-network:
+	@echo "Creating network"
+	docker network create -d bridge boshi-network
 
 stop:
 	@echo "Stopping services"

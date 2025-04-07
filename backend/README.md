@@ -1,21 +1,35 @@
 # Boshi Backend
 
-## Setup
-
-To run the backend, ensure you have the following installed:
+## Dependencies
 
 - [Go 1.23](https://go.dev/dl/)
 - [Docker](https://docs.docker.com/compose/install/)
 
+## Setup
+
 Next, copy the `.env.example` file to `.env` and fill in the required environment variables.
 
-Then run the following command to start up the PostgreSQL and Redis instances and the server.
+Then run the following command to run the standalone server.
 
 ```bash
 make run
 ```
 
-The PostgreSQL and Redis instances are setup via the `docker-compose.yaml` file and can be adjusted to your liking. Be sure to update any necessary variables in `.env` to reflect your changes.
+Be sure to have a PostgreSQL and Redis instance up if you run the server independently.
+
+## Docker setup
+
+You can set the backend up with docker to connect it with the frontend and test the full application locally. First, setup the docker network if you haven't already with the command:
+
+```bash
+make docker-network
+```
+
+The PostgreSQL and Redis instances are setup via the `docker-compose.yaml` file and can be adjusted to your liking. Be sure to update any necessary variables in `.env` to reflect your changes. Next, start the services with the command:
+
+```bash
+make dev
+```
 
 ## Stop
 

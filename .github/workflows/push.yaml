@@ -104,8 +104,14 @@ jobs:
     env:
       build_name: ${{vars.DOCKER_REGISTRY}}/boshi-backend
       build_docker: ${{ needs.changes.outputs.backend == 'true' || needs.build-info.outputs.namespace-exists == 'false' }}
+      frontend_base_url: https://${{ github.ref_name == 'main' && 'boshi' || format('{0}-boshi', needs.build-info.outputs.branch-name) }}.deguzman.cloud
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/domain
+        id: domain
+        with:
+          prod: boshi-api
+          dev: ${{ needs.build-info.outputs.branch-name }}-boshi-api
       - name: Login to Docker Hub
         if: ${{ env.build_docker == 'true' }}
         uses: docker/login-action@v3
@@ -114,10 +120,12 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Docker Image
         if: ${{ env.build_docker == 'true' }}
-        uses: ./.github/actions/docker/build
-        with:
-          build-name: ${{ env.build_name }}
-          path: backend
+        working-directory: backend
+        shell: bash
+        run: |
+          OAUTH_BASE_URL=${{ env.frontend_base_url }} \
+          OAUTH_REDIRECT_URI=${{ env.frontend_base_url }}/login/redirect/ \
+          make docker
       - name: Push Docker Image with SHA Tag
         if: ${{ env.build_docker == 'true' }}
         uses: ./.github/actions/docker/push
@@ -130,11 +138,6 @@ jobs:
         with:
           build-name: ${{ env.build_name }}
           tag: ${{ needs.build-info.outputs.branch-name }}-latest
-      - uses: ./.github/actions/domain
-        id: domain
-        with:
-          prod: boshi-api
-          dev: ${{ needs.build-info.outputs.branch-name }}-boshi-api
       - name: Create Deployment
         uses: ./.github/actions/k8s/deploy
         env:
@@ -222,8 +225,14 @@ jobs:
     env:
       build_name: ${{ vars.DOCKER_REGISTRY }}/boshi-frontend
       build_docker: ${{ needs.changes.outputs.frontend == 'true' || needs.build-info.outputs.namespace-exists == 'false' }}
+      namespace: ${{ github.ref_name == 'main' && 'boshi' || format('boshi-{0}', needs.build-info.outputs.branch-name) }}
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/domain
+        id: domain
+        with:
+          prod: boshi
+          dev: ${{needs.build-info.outputs.branch-name}}-boshi
       - name: Login to Docker Hub
         if: ${{ env.build_docker == 'true' }}
         uses: docker/login-action@v3
@@ -232,10 +241,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Docker Image
         if: ${{ env.build_docker == 'true' }}
-        uses: ./.github/actions/docker/build
-        with:
-          build-name: ${{ env.build_name }}
-          path: frontend
+        working-directory: frontend
+        shell: bash
+        run: |
+          HOST=${{ steps.domain.outputs.domain }} \
+          BACKEND_BASE_URL=https://${{ steps.domain.outputs.domain }}-api.deguzman.cloud \
+          CLIENT_METADATA_PATH=http://boshi-backend.${{ env.namespace }}.svc.cluster.local/client-metadata.json \
+          make docker
       - name: Push Docker Image with SHA Tag
         if: ${{ env.build_docker == 'true' }}
         uses: ./.github/actions/docker/push
@@ -248,11 +260,6 @@ jobs:
         with:
           build-name: ${{ env.build_name }}
           tag: ${{ needs.build-info.outputs.branch-name }}-latest
-      - uses: ./.github/actions/domain
-        id: domain
-        with:
-          prod: boshi
-          dev: ${{needs.build-info.outputs.branch-name}}-boshi
       - name: Create/Update Deployment
         uses: ./.github/actions/k8s/deploy
         env:

@@ -3,7 +3,6 @@ import 'package:provider/single_child_widget.dart';
 
 import 'package:frontend/data/services/api/api_client.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
-import 'package:frontend/config/environment.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/feed/feed_repository_remote.dart';
@@ -14,6 +13,8 @@ import 'package:frontend/data/repositories/user/user_repository_local.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository_remote.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository_local.dart';
+
+import 'environment.dart';
 
 List<SingleChildWidget> _sharedProviders = [
   // ChangeNotifierProvider(
@@ -26,15 +27,11 @@ List<SingleChildWidget> _sharedProviders = [
 ];
 
 List<SingleChildWidget> get providersRemote {
-  // TODO: Add logging
-  final apiClientPort = int.parse(EnvironmentConfig.backendPort);
-
   return [
     ..._sharedProviders,
     Provider<ApiClient>(
       create: (_) => ApiClient(
-        host: EnvironmentConfig.backendHost,
-        port: apiClientPort,
+        host: EnvironmentConfig.backendBaseURL,
       ),
     ),
     Provider(
@@ -49,7 +46,9 @@ List<SingleChildWidget> get providersRemote {
     ),
     ChangeNotifierProvider(
       create: (context) => AtProtoRepositoryRemote(
-        clientId: Uri.parse('${Uri.base.origin}/oauth/client-metadata.json'),
+        clientId: Uri.parse(
+          '${EnvironmentConfig.backendBaseURL}/client-metadata.json',
+        ),
         apiClient: context.read<ApiClient>(),
       ) as AtProtoRepository,
     ),
