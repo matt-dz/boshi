@@ -33,7 +33,7 @@ docker:
 	--build-arg NGINX_HOST=$(HOST) \
 	--build-arg BACKEND_BASE_URL=$(BACKEND_BASE_URL) \
 	--build-arg BUILD_TARGET=$(MAIN_STAGING) \
-	--build-arg CLIENT_METADATA_PATH=$(CLIENT_METADATA_PATH)
+	--build-arg CLIENT_METADATA_PATH=$(CLIENT_METADATA_PATH) \
 	--platform $(PLATFORM) \
 	-t $(BUILD_NAME) .
 
