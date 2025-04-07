@@ -6,5 +6,12 @@ services:
         BUILD_TARGET: lib/main_staging.dart
         BACKEND_BASE_URL: http://localhost:8080
         NGINX_HOST: http://localhost:3000
+        CLIENT_METADATA_PATH: http://localhost:8080/client-metadata.json
     ports:
       - 3000:80
+    networks:
+      - boshi-network
+
+networks:
+  app-network:
+    external: true
