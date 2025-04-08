@@ -23,9 +23,8 @@ class _OAuthCallbackState extends State<OAuthCallback> {
 
   Future<void> _handleRedirect() async {
     final oauth = context.read<AtProtoRepository>();
-    final uri = Uri.base;
 
-    final result = await oauth.generateSession(uri.toString());
+    final result = await oauth.generateSession(Uri.base.toString());
 
     if (!mounted) {
       return;
@@ -35,6 +34,7 @@ class _OAuthCallbackState extends State<OAuthCallback> {
       context.go('/');
     } else {
       setState(() {
+        print(result.toString());
         _error = 'Failed to generate session.';
         _loading = false;
       });
