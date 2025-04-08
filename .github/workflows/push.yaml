@@ -124,7 +124,7 @@ jobs:
         shell: bash
         run: |
           OAUTH_BASE_URL=${{ env.frontend_base_url }} \
-          OAUTH_REDIRECT_URI=${{ env.frontend_base_url }}/login/redirect/ \
+          OAUTH_REDIRECT_URI=${{ env.frontend_base_url }}/oauth/callback \
           make docker
       - name: Push Docker Image with SHA Tag
         if: ${{ env.build_docker == 'true' }}
