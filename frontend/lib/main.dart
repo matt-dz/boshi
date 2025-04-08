@@ -18,6 +18,7 @@ import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/utils/result.dart';
+import 'package:frontend/utils/logger.dart';
 import 'package:frontend/config/environment.dart';
 
 import 'main_development.dart' as dev;
@@ -33,18 +34,41 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final router = GoRouter(
       redirect: (BuildContext context, GoRouterState state) async {
-        // if (EnvironmentConfig.prod) {
         final oauth = context.read<AtProtoRepository>();
         final isLoggingIn = state.uri.path.startsWith('/login');
-        if (!oauth.authorized && !isLoggingIn) {
-          final result = await oauth.refreshSession();
-          if (result is Error<void>) {
-            return '/login';
+
+        if (EnvironmentConfig.prod) {
+          if (!oauth.authorized && !isLoggingIn) {
+            final result = await oauth.refreshSession();
+            if (result is Error<void>) {
+              return '/login';
+            }
+          } else if (oauth.authorized && isLoggingIn) {
+            return '/';
           }
-        } else if (oauth.authorized && isLoggingIn) {
-          return '/';
+        } else {
+          if (oauth.authorized) {
+            logger.d('user is authorized');
+            return null;
+          }
+
+          logger.d('user not authorized, refreshing session...');
+          var result = await oauth.refreshSession();
+          if (result is Ok<void>) {
+            logger.d('user is authorized');
+            return null;
+          }
+          logger.e(result);
+          logger.e('Failed to refresh session. Attempting to generate...');
+
+          result = await oauth.generateSession(Uri.base.toString());
+          if (result is Ok<void>) {
+            logger.d('session generated');
+            return null;
+          }
+          logger.e('Failed to generate session: ${result.toString()}');
+          return '/login';
         }
-        // }
         return null;
       },
       routes: [
