@@ -247,6 +247,7 @@ jobs:
           HOST=${{ steps.domain.outputs.domain }} \
           BACKEND_BASE_URL=https://${{ steps.domain.outputs.domain }}-api.deguzman.cloud \
           CLIENT_METADATA_PATH=http://boshi-backend.${{ env.namespace }}.svc.cluster.local/client-metadata.json \
+          PROD=true \
           make docker
       - name: Push Docker Image with SHA Tag
         if: ${{ env.build_docker == 'true' }}

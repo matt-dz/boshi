@@ -1,6 +1,5 @@
 .PHONY: docker docker-push staging types all format
 
-
 DOCKER_REGISTRY ?= matthew10125
 IMAGE_NAME ?= boshi-frontend
 TAG ?= latest
