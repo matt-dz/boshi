@@ -10,7 +10,6 @@ DEVICE_ID ?= chrome
 MAIN_STAGING = lib/main_staging.dart
 DEV_STAGING = lib/main_development.dart
 FRONTEND_PORT=3000
-PROD=false
 
 ifneq (,$(wildcard ./.env))
     include .env
