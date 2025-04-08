@@ -11,6 +11,7 @@ DEVICE_ID ?= chrome
 MAIN_STAGING = lib/main_staging.dart
 DEV_STAGING = lib/main_development.dart
 FRONTEND_PORT=3000
+PROD=false
 
 ifneq (,$(wildcard ./.env))
     include .env
@@ -34,6 +35,7 @@ docker:
 	--build-arg BACKEND_BASE_URL=$(BACKEND_BASE_URL) \
 	--build-arg BUILD_TARGET=$(MAIN_STAGING) \
 	--build-arg CLIENT_METADATA_PATH=$(CLIENT_METADATA_PATH) \
+	--build-arg PROD=$(PROD) \
 	--platform $(PLATFORM) \
 	-t $(BUILD_NAME) .
 
