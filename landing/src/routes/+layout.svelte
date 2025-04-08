@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	let { children } = $props();
+	import { env } from '$env/dynamic/public';
 
 	const description = 'Join the only university-exclusive social media built on the at protocol.';
 </script>
@@ -14,9 +15,9 @@
 	<meta name="description" content={description} />
 	<meta property="og:title" content="Boshi" />
 	<meta property="og:description" content={description} />
-	<meta property="og:image" content={`${import.meta.env.VITE_BASE_URL}/og-image.png`} />
+	<meta property="og:image" content={`${env.PUBLIC_BASE_URL}/og-image.png`} />
 
-	<meta property="og:url" content={`${import.meta.env.VITE_BASE_URL}`} />
+	<meta property="og:url" content={`${env.PUBLIC_BASE_URL}`} />
 	<meta property="og:type" content="website" />
 
 	<!-- Twitter Card -->

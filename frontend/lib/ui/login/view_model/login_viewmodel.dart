@@ -1,4 +1,4 @@
-import 'package:frontend/data/repositories/oauth/oauth_repository.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:flutter/widgets.dart';
 
@@ -10,16 +10,16 @@ import 'package:frontend/ui/models/login/login.dart';
 
 class LoginViewModel extends ChangeNotifier {
   LoginViewModel({
-    required OAuthRepository oAuthRepository,
-  }) : _oAuthRepository = oAuthRepository {
+    required AtProtoRepository atProtoRepository,
+  }) : _atProtoRepository = atProtoRepository {
     login = Command1<Uri, Login>(_login);
   }
 
-  final OAuthRepository _oAuthRepository;
+  final AtProtoRepository _atProtoRepository;
   late Command1<Uri, Login> login;
 
   Future<Result<Uri>> _login(Login signinPayload) async {
-    final result = await _oAuthRepository.getAuthorizationURI(
+    final result = await _atProtoRepository.getAuthorizationURI(
       signinPayload.identity,
       signinPayload.oAuthService,
     );

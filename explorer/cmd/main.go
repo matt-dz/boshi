@@ -3,7 +3,7 @@ package main
 import (
 	"boshi-explorer/internal/database"
 	"boshi-explorer/internal/logger"
-	"boshi-explorer/sql/dbutil"
+	"boshi-explorer/internal/sqlc"
 	"context"
 	"fmt"
 
@@ -21,12 +21,22 @@ import (
 
 var log = logger.GetLogger()
 
-func main() {
-	uri := os.Getenv("SOCKET_URI")
+var uri string
+var firehoseIdentifier string
+
+func init() {
+	uri = os.Getenv("SOCKET_URI")
 	if uri == "" {
 		panic("Expected SOCKET_URI to be set")
 	}
 
+	firehoseIdentifier = os.Getenv("FIREHOSE_IDENTIFIER")
+	if firehoseIdentifier == "" {
+		panic("Expected FIREHOSE_IDENTIFIER to be set")
+	}
+}
+
+func main() {
 	log.Debug("Connecting to firehose", "uri", uri)
 	firehoseConnection, _, err := websocket.DefaultDialer.Dial(uri, http.Header{})
 	if err != nil {
@@ -36,7 +46,7 @@ func main() {
 	log.Debug("Connecting to postgres")
 	pool := database.Connect(context.Background())
 	defer pool.Close()
-	queries := dbutil.New(pool)
+	queries := sqlc.New(pool)
 
 	/* Create event processor and connect it to the firehose */
 	log.Debug("Starting repo stream")
@@ -47,7 +57,7 @@ func main() {
 				if strings.HasPrefix(op.Path, "app.boshi.feed") {
 					uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
 					log.Info("New Activity @", "uri", uri)
-					queries.CreatePost(context.Background(), dbutil.CreatePostParams{Uri: uri, Cid: op.Cid.String(), IndexedAt: pgtype.Timestamptz{
+					queries.CreatePost(context.Background(), sqlc.CreatePostParams{Uri: uri, Cid: op.Cid.String(), IndexedAt: pgtype.Timestamptz{
 						Time:  time.Now(),
 						Valid: true,
 					}})
@@ -58,10 +68,6 @@ func main() {
 		},
 	}
 
-	firehoseIdentifier := os.Getenv("FIREHOSE_IDENTIFIER")
-	if firehoseIdentifier == "" {
-		panic("Expected FIREHOSE_IDENTIFIER to be set")
-	}
 	workScheduler := sequential.NewScheduler(firehoseIdentifier, repoCallbacks.EventHandler)
 	err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
 	if err != nil {

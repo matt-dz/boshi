@@ -1,43 +1,88 @@
 package main
 
 import (
+	"boshi-backend/internal/database"
 	"boshi-backend/internal/endpoints"
 	"boshi-backend/internal/logger"
 	"boshi-backend/internal/middleware"
+	"boshi-backend/internal/redis"
 	"fmt"
 	"net/http"
 	"os"
 )
 
-var bLogger = logger.GetLogger()
+var log = logger.GetLogger()
+
+func cleanup() {
+	database.CloseDb()
+	redis.CloseRedis()
+}
 
 func main() {
-	bLogger.Info("Starting server...")
+	log.Info("Starting server...")
+	defer cleanup()
 
 	/* Setup routes */
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/api/heartbeat",
+	mux.HandleFunc("OPTIONS /",
 		middleware.Chain(
-			endpoints.Heartbeat,
+			func(w http.ResponseWriter, r *http.Request) {},
+			middleware.AddCors(),
 			middleware.LogRequest(),
-		))
+		),
+	)
 
-	mux.HandleFunc("/oauth/client-metadata.json",
+	mux.HandleFunc("GET /health",
 		middleware.Chain(
-			endpoints.ServeOauthMetadata,
+			func(w http.ResponseWriter, r *http.Request) {},
+			middleware.AddCors(),
 			middleware.LogRequest(),
-		))
+		),
+	)
+
+	mux.HandleFunc("GET /client-metadata.json",
+		middleware.Chain(
+			endpoints.ServeOAuthMetadata,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
+	mux.HandleFunc("POST /email-list",
+		middleware.Chain(
+			endpoints.AddEmailToEmailList,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
+	mux.HandleFunc("POST /email/code",
+		middleware.Chain(
+			endpoints.CreateEmailVerificationCode,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
+	mux.HandleFunc("POST /email/verify",
+		middleware.Chain(
+			endpoints.VerifyEmailCode,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
 
 	/* Setup server*/
 	port := os.Getenv("PORT")
 	if port == "" {
+		log.Info("No port specified, defaulting to 8080")
 		port = "8080"
 	}
 
 	server := &http.Server{Addr: fmt.Sprintf(":%s", port), Handler: mux}
-	bLogger.Info("Listening on port " + port + "...")
+	log.Info("Listening on port " + port + "...")
 	if err := server.ListenAndServe(); err != nil {
-		bLogger.Error("Server failed to start ", "error", err)
+		log.Error("Server failed to start ", "error", err)
 	}
 }

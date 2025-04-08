@@ -16,10 +16,16 @@ spec:
     spec:
       containers:
         - name: boshi-landing
-          image: matthew10125/boshi-landing
+          image: ${IMAGE}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
+          env:
+            - name: PUBLIC_BASE_URL
+              value: ${DOMAIN}
+            - name: PUBLIC_API_URL
+              value: ${PUBLIC_API_URL}
+
 ---
 apiVersion: v1
 kind: Service

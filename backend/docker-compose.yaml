@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: boshi-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: boshi
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - boshi-network
+
+  redis:
+    image: redis:7.4.1
+    container_name: boshi-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - boshi-network
+
+  backend:
+    build:
+      context: .
+      args:
+        OAUTH_BASE_URL: http://frontend:3000/client-metadata.json
+        OAUTH_REDIRECT_URI: http://frontend:3000/login/redirect
+    env_file: .env
+    depends_on:
+      - redis
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - boshi-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+networks:
+  boshi-network:
+    external: true

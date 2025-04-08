@@ -1,6 +1,6 @@
 package endpoints
 
-type ClientMetadata struct {
+type clientMetadata struct {
 	ClientID                string   `json:"client_id"`
 	ClientName              string   `json:"client_name"`
 	ClientURI               string   `json:"client_uri"`
@@ -11,4 +11,19 @@ type ClientMetadata struct {
 	TokenEndpointAuthMethod string   `json:"token_endpoint_auth_method"`
 	ApplicationType         string   `json:"application_type"`
 	DpopBoundAccessTokens   bool     `json:"dpop_bound_access_tokens"`
+}
+
+type emailListPayload struct {
+	Email string `json:"email"`
+}
+
+type createEmailVerificationCodePayload struct {
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
+}
+
+type verifyEmailVerificationCodePayload struct {
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
+	Code   string `json:"code"`
 }

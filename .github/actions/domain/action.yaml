@@ -18,7 +18,7 @@ runs:
       id: determine
       shell: bash
       run: |
-        if [ "${{ github.head_ref || github.ref_name }}" == "main" ]; then
+        if [ "${{ github.ref_name }}" == "main" ]; then
           echo "domain=${{ inputs.prod }}" >> $GITHUB_OUTPUT
         else
           echo "domain=${{ inputs.dev }}" >> $GITHUB_OUTPUT
