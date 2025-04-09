@@ -101,13 +101,8 @@ class MainApp extends StatelessWidget {
           ),
         ),
         GoRoute(
-          path: '/oauth',
-          routes: [
-            GoRoute(
-              path: '/callback',
-              builder: (context, state) => OAuthCallback(),
-            ),
-          ],
+          path: '/oauth/callback',
+          builder: (context, state) => OAuthCallback(),
         ),
       ],
     );
