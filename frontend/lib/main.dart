@@ -41,6 +41,7 @@ class MainApp extends StatelessWidget {
           if (!oauth.authorized && !isLoggingIn) {
             final result = await oauth.refreshSession();
             if (result is Error<void>) {
+              print(result.toString());
               return '/login';
             }
           } else if (oauth.authorized && isLoggingIn) {
