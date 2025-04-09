@@ -3,7 +3,7 @@ import { AppContext } from '../config'
 import { validateSkeletonFeedPost } from '@atproto/api/dist/client/types/app/bsky/feed/defs'
 
 // max 15 chars
-export const shortname = 'whats-alf'
+export const shortname = 'boshi'
 
 export const handler = async (ctx: AppContext, params: QueryParams) => {
   let builder = ctx.db
