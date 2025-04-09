@@ -36,9 +36,10 @@ class MainApp extends StatelessWidget {
       redirect: (BuildContext context, GoRouterState state) async {
         final oauth = context.read<AtProtoRepository>();
         final isLoggingIn = state.uri.path.startsWith('/login');
+        final onOAuthCallback = state.uri.path.startsWith('/oauth/callback');
 
         if (EnvironmentConfig.prod) {
-          if (!oauth.authorized && !isLoggingIn) {
+          if (!oauth.authorized && !(isLoggingIn || onOAuthCallback)) {
             final result = await oauth.refreshSession();
             if (result is Error<void>) {
               print(result.toString());
