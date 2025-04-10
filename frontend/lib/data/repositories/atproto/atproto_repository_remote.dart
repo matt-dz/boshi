@@ -1,4 +1,7 @@
+import 'package:bluesky/bluesky.dart' as bsky;
+import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/shared/models/post/post.dart';
+import 'package:frontend/domain/models/post/post.dart' as domain_models;
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/data/services/api/api_client.dart';
 import './atproto_repository.dart';
@@ -74,6 +77,40 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
       return await _apiClient.createPost(atProto!, post);
     } else {
       return Result.error(Exception('Not authorized to create a post'));
+    }
+  }
+
+  @override
+  Future<Result<List<domain_models.Post>>> getFeed() async {
+    if (authorized) {
+      final bskyFeed = await _apiClient.getFeed(atProto!.oAuthSession!);
+
+      switch (bskyFeed) {
+        case Ok<bsky.Feed>():
+          return Result.ok(
+            bskyFeed.value.feed
+                .map(
+                  (feedView) => domain_models.Post(
+                    id: feedView.post.cid,
+                    author: User(
+                      id: feedView.post.author.did,
+                      username: feedView.post.author.displayName!,
+                      school: '',
+                    ),
+                    content: feedView.post.record.text,
+                    timestamp: feedView.post.indexedAt,
+                    reactions: List.empty(),
+                    comments: List.empty(),
+                    title: feedView.post.record.text,
+                  ),
+                )
+                .toList(),
+          );
+        case Error<bsky.Feed>():
+          return Result.error(bskyFeed.error);
+      }
+    } else {
+      return Result.error(Exception('Not authorized to get feed'));
     }
   }
 }

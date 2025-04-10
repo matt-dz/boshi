@@ -17,12 +17,6 @@ class FeedRepositoryRemote implements FeedRepository {
 
   final ApiClient _apiClient;
 
-  // TODO: Implement the getFeed method
-  @override
-  Future<Result<List<post_domain_model.Post>>> getFeed() async {
-    return _apiClient.getFeed();
-  }
-
   @override
   Future<Result<post_domain_model.Post>> updateReactionCount(
     ReactionPayload reactionPayload,

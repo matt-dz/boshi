@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:frontend/shared/models/post/post.dart';
+import 'package:frontend/domain/models/post/post.dart' as domain_models;
 import 'package:frontend/utils/result.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
@@ -29,4 +30,5 @@ abstract class AtProtoRepository extends ChangeNotifier {
   Future<Result<void>> generateSession(String callback);
   Future<Result<void>> refreshSession();
   Future<Result<void>> createPost(Post post);
+  Future<Result<List<domain_models.Post>>> getFeed();
 }

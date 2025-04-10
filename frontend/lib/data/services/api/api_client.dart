@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
+import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/shared/models/report/report.dart' as boshi_report;
@@ -27,9 +28,27 @@ class ApiClient {
   final HttpClient Function() _clientFactory;
 
   // TODO: Implement the getFeed method
-  Future<Result<List<Post>>> getFeed() async {
-    logger.w('Function not implemented. Returning default list.');
-    return Result.ok(mockFeed);
+  Future<Result<bsky.Feed>> getFeed(OAuthSession session) async {
+    logger.d('Getting Feed');
+    final bskyServer = bsky.Bluesky.fromOAuthSession(session);
+    final generatorUri = AtUri.parse(
+      String.fromEnvironment(
+        'FEED_GENERATOR_URI',
+        defaultValue: 'at://did:example:alice/app.bsky.feed.generator/boshi',
+      ),
+    );
+    final xrpcResponse =
+        await bskyServer.feed.getFeed(generatorUri: generatorUri);
+
+    if (xrpcResponse.status == HttpStatus.ok) {
+      return Result.ok(xrpcResponse.data);
+    } else {
+      return Result.error(
+        Exception(
+          'Failed to get feed with status: ${xrpcResponse.status}',
+        ),
+      );
+    }
   }
 
   // TODO: Implement the getUser method
