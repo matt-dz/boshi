@@ -1,16 +1,19 @@
-import { QueryParams } from '../lexicon/types/app/bsky/feed/getFeedSkeleton'
+import { QueryParams as FeedSkeletonQueryParams } from '../lexicon/types/app/bsky/feed/getFeedSkeleton'
+import { QueryParams as FeedQueryParams } from '../lexicon/types/app/bsky/feed/getFeed'
 import { AppContext } from '../config'
-import { validateSkeletonFeedPost } from '@atproto/api/dist/client/types/app/bsky/feed/defs'
+import { Agent } from '@atproto/api'
 
 // max 15 chars
 export const shortname = 'boshi'
 
-export const handler = async (ctx: AppContext, params: QueryParams) => {
+export const handler = async (
+  ctx: AppContext,
+  params: FeedSkeletonQueryParams,
+) => {
   let builder = ctx.db
     .selectFrom('post')
     .selectAll()
     .orderBy('indexed_at', 'desc')
-    .orderBy('cid', 'desc')
     .limit(params.limit)
 
   if (params.cursor) {
@@ -23,9 +26,47 @@ export const handler = async (ctx: AppContext, params: QueryParams) => {
     post: row.uri,
   }))
 
-  const valid = validateSkeletonFeedPost(feed)
-  if (valid.success) console.log('successful validation')
-  else console.log('unsuccessful validation')
+  return {
+    feed,
+  }
+}
+
+export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
+  let builder = ctx.db
+    .selectFrom('post')
+    .selectAll()
+    .orderBy('indexed_at', 'desc')
+    .limit(params.limit)
+
+  if (params.cursor) {
+    const timeStr = new Date(parseInt(params.cursor, 10))
+    builder = builder.where('post.indexed_at', '<', timeStr)
+  }
+  const res = await builder.execute()
+
+  const agent = new Agent('https://bsky.social')
+  const profiles = await agent.getProfiles({
+    actors: res.map((row) => row.author_did),
+  })
+
+  const feed = res.map((row) => {
+    const author = profiles.data.profiles.filter(
+      (profile) => profile.did === row.author_did,
+    )[0]
+
+    return {
+      post: {
+        uri: row.uri,
+        cid: row.cid,
+        author: author,
+        record: {
+          title: row.title,
+          content: row.content,
+        },
+        indexedAt: row.indexed_at.toISOString(),
+      },
+    }
+  })
 
   return {
     feed,
