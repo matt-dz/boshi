@@ -1,6 +1,5 @@
 .PHONY: docker docker-push staging types all format
 
-
 DOCKER_REGISTRY ?= matthew10125
 IMAGE_NAME ?= boshi-frontend
 TAG ?= latest
@@ -34,6 +33,7 @@ docker:
 	--build-arg BACKEND_BASE_URL=$(BACKEND_BASE_URL) \
 	--build-arg BUILD_TARGET=$(MAIN_STAGING) \
 	--build-arg CLIENT_METADATA_PATH=$(CLIENT_METADATA_PATH) \
+	--build-arg PROD=$(PROD) \
 	--platform $(PLATFORM) \
 	-t $(BUILD_NAME) .
 
