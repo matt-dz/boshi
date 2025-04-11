@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/mail"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -179,15 +180,17 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 
 	// Send email
 	log.DebugContext(r.Context(), "Sending email")
-	err = email.SendEmail(
-		payload.Email,
-		"Boshi Verification Code",
-		fmt.Sprintf("Your Boshi verification code is: %s", code),
-	)
-	if err != nil {
-		log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
+	if os.Getenv("SEND_EMAIL") == "true" {
+		err = email.SendEmail(
+			payload.Email,
+			"Boshi Verification Code",
+			fmt.Sprintf("Your Boshi verification code is: %s", code),
+		)
+		if err != nil {
+			log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
 	}
 }
 
