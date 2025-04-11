@@ -29,4 +29,6 @@ abstract class AtProtoRepository extends ChangeNotifier {
   Future<Result<void>> generateSession(String callback);
   Future<Result<void>> refreshSession();
   Future<Result<void>> createPost(Post post);
+  Future<Result<void>> addVerificationEmail(String email);
+  Future<Result<void>> confirmVerificationCode(String email, String code);
 }

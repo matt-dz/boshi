@@ -76,4 +76,15 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
       return Result.error(Exception('Not authorized to create a post'));
     }
   }
+
+  @override
+  Future<Result<void>> addVerificationEmail(String email) async {
+    return Result.ok(null);
+  }
+
+  @override
+  Future<Result<void>> confirmVerificationCode(
+      String email, String code) async {
+    return Result.ok(null);
+  }
 }

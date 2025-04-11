@@ -3,7 +3,6 @@ import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/utils/command.dart';
-import 'package:frontend/utils/logger.dart';
 
 class EmailRegisterViewModel extends ChangeNotifier {
   EmailRegisterViewModel({
@@ -16,6 +15,10 @@ class EmailRegisterViewModel extends ChangeNotifier {
   late Command1<void, String> addEmail;
 
   Future<Result<void>> _addEmail(String email) async {
-    return Result.ok(null);
+    try {
+      return await _atProtoRepository.addVerificationEmail(email);
+    } finally {
+      notifyListeners();
+    }
   }
 }

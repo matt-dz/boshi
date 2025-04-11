@@ -1,4 +1,3 @@
-import 'package:atproto/atproto.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:frontend/ui/post/widgets/post_screen.dart';
@@ -15,13 +14,14 @@ import 'package:frontend/ui/home/view_model/home_viewmodel.dart';
 import 'package:frontend/ui/home/widgets/home_screen.dart';
 import 'package:frontend/ui/signup/widgets/email_register_screen.dart';
 import 'package:frontend/ui/signup/view_model/email_register_viewmodel.dart';
+import 'package:frontend/ui/signup/widgets/email_verification_viewmodel.dart';
+import 'package:frontend/ui/signup/view_model/email_verification_viewmodel.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/utils/result.dart';
-import 'package:frontend/utils/logger.dart';
 import 'package:frontend/config/environment.dart';
 
 import 'main_development.dart' as dev;
@@ -107,6 +107,7 @@ class MainApp extends StatelessWidget {
           path: '/oauth/callback',
           builder: (context, state) => OAuthCallback(),
         ),
+        // TODO: add route guards for signup routes
         GoRoute(
           path: '/signup',
           builder: (context, state) => EmailRegisterScreen(
@@ -114,6 +115,16 @@ class MainApp extends StatelessWidget {
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),
+          routes: [
+            GoRoute(
+              path: '/verify',
+              builder: (context, state) => EmailVerificationScreen(
+                viewModel: EmailVerificationViewModel(
+                  atProtoRepository: context.read<AtProtoRepository>(),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

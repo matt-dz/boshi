@@ -2,7 +2,7 @@
 class EnvironmentConfig {
   static const backendBaseURL = String.fromEnvironment(
     'BACKEND_BASE_URL',
-    defaultValue: 'localhost',
+    defaultValue: 'localhost:8080',
   );
   static const prod = bool.fromEnvironment(
     'PROD',
