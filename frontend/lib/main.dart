@@ -1,3 +1,4 @@
+import 'package:atproto/atproto.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:frontend/ui/post/widgets/post_screen.dart';
@@ -12,6 +13,8 @@ import 'package:frontend/ui/login/view_model/login_viewmodel.dart';
 
 import 'package:frontend/ui/home/view_model/home_viewmodel.dart';
 import 'package:frontend/ui/home/widgets/home_screen.dart';
+import 'package:frontend/ui/signup/widgets/email_register_screen.dart';
+import 'package:frontend/ui/signup/view_model/email_register_viewmodel.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/user/user_repository.dart';
@@ -48,27 +51,27 @@ class MainApp extends StatelessWidget {
             return '/';
           }
         } else {
-          if (oauth.authorized) {
-            logger.d('user is authorized');
-            return null;
-          }
+          // if (oauth.authorized) {
+          //   logger.d('user is authorized');
+          //   return null;
+          // }
 
-          logger.d('user not authorized, refreshing session...');
-          var result = await oauth.refreshSession();
-          if (result is Ok<void>) {
-            logger.d('user is authorized');
-            return null;
-          }
-          logger.e(result);
-          logger.e('Failed to refresh session. Attempting to generate...');
+          // logger.d('user not authorized, refreshing session...');
+          // var result = await oauth.refreshSession();
+          // if (result is Ok<void>) {
+          //   logger.d('user is authorized');
+          //   return null;
+          // }
+          // logger.e(result);
+          // logger.e('Failed to refresh session. Attempting to generate...');
 
-          result = await oauth.generateSession(Uri.base.toString());
-          if (result is Ok<void>) {
-            logger.d('session generated');
-            return null;
-          }
-          logger.e('Failed to generate session: ${result.toString()}');
-          return '/login';
+          // result = await oauth.generateSession(Uri.base.toString());
+          // if (result is Ok<void>) {
+          //   logger.d('session generated');
+          //   return null;
+          // }
+          // logger.e('Failed to generate session: ${result.toString()}');
+          // return '/login';
         }
         return null;
       },
@@ -103,6 +106,14 @@ class MainApp extends StatelessWidget {
         GoRoute(
           path: '/oauth/callback',
           builder: (context, state) => OAuthCallback(),
+        ),
+        GoRoute(
+          path: '/signup',
+          builder: (context, state) => EmailRegisterScreen(
+            viewModel: EmailRegisterViewModel(
+              atProtoRepository: context.read<AtProtoRepository>(),
+            ),
+          ),
         ),
       ],
     );
