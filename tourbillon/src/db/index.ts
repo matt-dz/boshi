@@ -1,7 +1,6 @@
 import { Pool } from 'pg'
-import { Kysely, Migrator, PostgresDialect } from 'kysely'
+import { Kysely, PostgresDialect } from 'kysely'
 import { DatabaseSchema } from './schema'
-import { migrationProvider } from './migrations'
 import { PostgresConfig } from '../config'
 
 export const createDb = (config: PostgresConfig): Database => {
@@ -17,14 +16,9 @@ export const createDb = (config: PostgresConfig): Database => {
   })
 
   return new Kysely<DatabaseSchema>({
+    log: ['query', 'error'],
     dialect,
   })
-}
-
-export const migrateToLatest = async (db: Database) => {
-  const migrator = new Migrator({ db, provider: migrationProvider })
-  const { error } = await migrator.migrateToLatest()
-  if (error) throw error
 }
 
 export type Database = Kysely<DatabaseSchema>

@@ -51,6 +51,7 @@ dependencies:
   json_annotation: ^4.9.0
   flutter_dotenv: ^5.2.1
   logger: ^2.5.0
+  bluesky: ^0.18.10
 
 dev_dependencies:
   flutter_test:

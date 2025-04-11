@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
@@ -18,8 +19,10 @@ class HomeViewModel extends ChangeNotifier {
   HomeViewModel({
     required FeedRepository feedRepository,
     required UserRepository userRepository,
+    required AtProtoRepository atProtoRepository,
   })  : _feedRepository = feedRepository,
-        _userRepository = userRepository {
+        _userRepository = userRepository,
+        _atProtoRepository = atProtoRepository {
     load = Command0(_load)..execute();
     updateReactionCount = Command1<Post, ReactionPayload>(
       _updateReactionCount,
@@ -30,6 +33,7 @@ class HomeViewModel extends ChangeNotifier {
   late Command1 updateReactionCount;
   final FeedRepository _feedRepository;
   final UserRepository _userRepository;
+  final AtProtoRepository _atProtoRepository;
 
   User? _user;
   User? get user => _user;
@@ -40,7 +44,7 @@ class HomeViewModel extends ChangeNotifier {
   Future<Result> _load() async {
     try {
       logger.d('Retrieving feed');
-      final feedResult = await _feedRepository.getFeed();
+      final feedResult = await _atProtoRepository.getFeed();
       switch (feedResult) {
         case Ok<List<Post>>():
           _posts = feedResult.value;
