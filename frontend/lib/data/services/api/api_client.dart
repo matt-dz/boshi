@@ -33,8 +33,10 @@ class ApiClient {
     logger.d('Getting Feed');
     final bskyServer = bsky.Bluesky.fromOAuthSession(session);
 
-    final feedGenUri = dotenv.get('FEED_GENERATOR_URI',
-        fallback: 'at://did:example:alice/app.bsky.feed.generator/boshi');
+    final feedGenUri = dotenv.get(
+      'FEED_GENERATOR_URI',
+      fallback: 'at://did:example:alice/app.bsky.feed.generator/boshi',
+    );
 
     final generatorUri = AtUri.parse(feedGenUri);
 
