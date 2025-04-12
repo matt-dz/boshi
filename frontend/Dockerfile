@@ -3,10 +3,11 @@ FROM --platform=$BUILDPLATFORM ghcr.io/cirruslabs/flutter:stable AS build
 ARG BUILD_TARGET
 ARG BACKEND_BASE_URL
 ARG BACKEND_PORT=443
-ARG FEED_GENERATOR_URI=at://did:plc:botpky7qdfpdvhcwl5mheif4/app.bsky.feed.generator/boshi
+ARG FEED_GENERATOR_URI
 WORKDIR /app
 COPY . .
-RUN echo FEED_GENERATOR_URI=${FEED_GENERATOR_URI} >> .env
+RUN echo FEED_GENERATOR_URI=${FEED_GENERATOR_URI}
+RUN echo FEED_GENERATOR_URI=${FEED_GENERATOR_URI} > .env
 RUN flutter build web -t ${BUILD_TARGET} \
     --dart-define=BACKEND_BASE_URL=${BACKEND_BASE_URL} \
     --dart-define=BACKEND_PORT=${BACKEND_PORT}
