@@ -1,5 +1,7 @@
 services:
   app:
+    environment:
+      - FEED_GENERATOR_URI=at://did:plc:botpky7qdfpdvhcwl5mheif4/app.bsky.feed.generator/boshi
     build:
       context: .
       args:
@@ -7,7 +9,6 @@ services:
         BACKEND_BASE_URL: http://backend:8080
         NGINX_HOST: http://frontend:3000
         CLIENT_METADATA_PATH: http://backend:8080/client-metadata.json
-        FEED_GENERATOR_URI: at://did:plc:botpky7qdfpdvhcwl5mheif4/app.bsky.feed.generator/boshi
     ports:
       - 3000:80
     networks:
