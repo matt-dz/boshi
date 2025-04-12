@@ -34,6 +34,7 @@ docker:
 	--build-arg BACKEND_BASE_URL=$(BACKEND_BASE_URL) \
 	--build-arg BUILD_TARGET=$(MAIN_STAGING) \
 	--build-arg CLIENT_METADATA_PATH=$(CLIENT_METADATA_PATH) \
+	--build-arg FEED_GENERATOR_URI=$(FEED_GENERATOR_URI) \
 	--platform $(PLATFORM) \
 	-t $(BUILD_NAME) .
 
