@@ -5,7 +5,6 @@ ARG BACKEND_BASE_URL
 ARG BACKEND_PORT=443
 WORKDIR /app
 COPY . .
-RUN touch .env
 RUN flutter build web -t ${BUILD_TARGET} \
     --dart-define=BACKEND_BASE_URL=${BACKEND_BASE_URL} \
     --dart-define=BACKEND_PORT=${BACKEND_PORT}
