@@ -57,7 +57,7 @@ func main() {
 				if strings.HasPrefix(op.Path, "app.boshi.feed") {
 					uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
 					log.Info("New Activity @", "uri", uri)
-					queries.CreatePost(context.Background(), sqlc.CreatePostParams{Uri: uri, Cid: op.Cid.String(), IndexedAt: pgtype.Timestamptz{
+					queries.CreatePost(context.Background(), sqlc.CreatePostParams{Uri: uri, Cid: op.Cid.String(), AuthorDid: evt.Repo, IndexedAt: pgtype.Timestamptz{
 						Time:  time.Now(),
 						Valid: true,
 					}})
