@@ -18,29 +18,7 @@ import 'package:frontend/shared/oauth/oauth.dart' as oauth_shared;
 class LocalDataService {
   Future<Result<bsky.Feed>> getFeed(OAuthSession session) async {
     logger.d('Getting Feed');
-    final bskyServer = bsky.Bluesky.fromOAuthSession(session);
-
-    final feedGenUri = dotenv.get(
-      'FEED_GENERATOR_URI',
-      fallback: 'at://did:example:alice/app.bsky.feed.generator/boshi',
-    );
-
-    final generatorUri = AtUri.parse(feedGenUri);
-
-    final xrpcResponse =
-        await bskyServer.feed.getFeed(generatorUri: generatorUri);
-
-    logger.d(xrpcResponse.data);
-
-    if (xrpcResponse.status == HttpStatus.ok) {
-      return Result.ok(xrpcResponse.data);
-    } else {
-      return Result.error(
-        Exception(
-          'Failed to get feed with status: ${xrpcResponse.status}',
-        ),
-      );
-    }
+    return Result.ok(mockGetFeedResult);
   }
 
   Future<Result<User>> getUser() async {

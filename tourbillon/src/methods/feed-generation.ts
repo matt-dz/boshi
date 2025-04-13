@@ -5,7 +5,7 @@ import { feedAlgos } from '../algos'
 import { AtUri } from '@atproto/syntax'
 
 export default function (server: Server, ctx: AppContext) {
-  server.app.bsky.feed.getFeed(async ({ params, req }) => {
+  server.app.bsky.feed.getFeed(async ({ params }) => {
     const feedUri = new AtUri(params.feed)
     const algo = feedAlgos[feedUri.rkey]
     if (

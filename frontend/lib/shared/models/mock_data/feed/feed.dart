@@ -1,7 +1,26 @@
+import 'package:atproto/core.dart';
+import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/reply/reply.dart';
 import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/domain/models/reaction/reaction.dart';
+
+var mockPost = bsky.Post(
+  record: bsky.PostRecord(
+    text: "{title: 'mock title', content: 'mock content'}",
+    createdAt: DateTime.now(),
+  ),
+  author: bsky.ActorBasic(did: 'mockDid', handle: 'mockHandle'),
+  uri: AtUri('mockUri'),
+  cid: 'mockCid',
+  indexedAt: DateTime.now(),
+);
+
+var mockFeedView = bsky.FeedView(post: mockPost);
+
+var mockGetFeedResult = bsky.Feed(
+  feed: List.from([mockFeedView]),
+);
 
 var mockFeed = [
   Post(

@@ -1,9 +1,9 @@
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
-import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
+import 'package:frontend/shared/util/convert_feed_to_domain_posts.dart';
 import 'package:frontend/utils/result.dart';
 import './atproto_repository.dart';
 import 'package:atproto/atproto.dart' as atp;
@@ -104,25 +104,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
 
       switch (bskyFeed) {
         case Ok<bsky.Feed>():
-          return Result.ok(
-            bskyFeed.value.feed
-                .map(
-                  (feedView) => domain_models.Post(
-                    id: feedView.post.cid,
-                    author: User(
-                      id: feedView.post.author.did,
-                      username: feedView.post.author.displayName!,
-                      school: '',
-                    ),
-                    content: feedView.post.record.text,
-                    timestamp: feedView.post.indexedAt,
-                    reactions: List.empty(),
-                    comments: List.empty(),
-                    title: feedView.post.record.text,
-                  ),
-                )
-                .toList(),
-          );
+          return Result.ok(convertFeedToDomainPosts(bskyFeed.value));
         case Error<bsky.Feed>():
           return Result.error(bskyFeed.error);
       }
