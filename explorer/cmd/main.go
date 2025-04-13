@@ -17,6 +17,7 @@ import (
 	"github.com/bluesky-social/indigo/events/schedulers/sequential"
 	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/joho/godotenv"
 )
 
 var log = logger.GetLogger()
@@ -25,6 +26,11 @@ var uri string
 var firehoseIdentifier string
 
 func init() {
+	err := godotenv.Load()
+	if err != nil {
+		panic("Failed to load env")
+	}
+
 	uri = os.Getenv("SOCKET_URI")
 	if uri == "" {
 		panic("Expected SOCKET_URI to be set")
@@ -36,21 +42,38 @@ func init() {
 	}
 }
 
-func main() {
-	log.Debug("Connecting to firehose", "uri", uri)
-	firehoseConnection, _, err := websocket.DefaultDialer.Dial(uri, http.Header{})
-	if err != nil {
-		panic(err)
-	}
+func runExplorer(repoCallbacks *events.RepoStreamCallbacks) {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("Recovered from panic: ", r)
+			}
+		}()
 
+		log.Debug("Connecting to firehose", "uri", uri)
+
+		firehoseConnection, _, err := websocket.DefaultDialer.Dial(uri, http.Header{})
+		if err != nil {
+			log.Error("Failed to create firehose connection", "error", err.Error())
+		}
+		
+		workScheduler := sequential.NewScheduler(firehoseIdentifier, repoCallbacks.EventHandler)
+		err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
+		if err != nil {
+			log.Error("Failed while handling firehose stream", "error", err.Error())
+		}
+}
+
+func main() {
+	
 	log.Debug("Connecting to postgres")
 	pool := database.Connect(context.Background())
 	defer pool.Close()
 	queries := sqlc.New(pool)
-
+	
+	
 	/* Create event processor and connect it to the firehose */
 	log.Debug("Starting repo stream")
-
+	
 	repoCallbacks := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
 			for _, op := range evt.Ops {
@@ -68,9 +91,7 @@ func main() {
 		},
 	}
 
-	workScheduler := sequential.NewScheduler(firehoseIdentifier, repoCallbacks.EventHandler)
-	err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
-	if err != nil {
-		panic(err)
+	for {
+		runExplorer(repoCallbacks)
 	}
 }

@@ -6,6 +6,7 @@ require (
 	github.com/bluesky-social/indigo v0.0.0-20250301025210-a4e0cc37e188
 	github.com/gorilla/websocket v1.5.3
 	github.com/jackc/pgx/v5 v5.7.2
+	github.com/joho/godotenv v1.5.1
 )
 
 require (
