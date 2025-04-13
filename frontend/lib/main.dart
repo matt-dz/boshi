@@ -117,11 +117,18 @@ class MainApp extends StatelessWidget {
           ),
           routes: [
             GoRoute(
+              redirect: (BuildContext context, GoRouterState state) {
+                if (state.uri.queryParameters['email'] == null) {
+                  return '/login';
+                }
+                return null;
+              },
               path: '/verify',
               builder: (context, state) => EmailVerificationScreen(
                 viewModel: EmailVerificationViewModel(
                   atProtoRepository: context.read<AtProtoRepository>(),
                 ),
+                email: state.uri.queryParameters['email']!,
               ),
             ),
           ],
