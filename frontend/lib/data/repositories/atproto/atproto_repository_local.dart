@@ -1,6 +1,7 @@
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
+import 'package:frontend/shared/exceptions/not_authorized_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
 import 'package:frontend/shared/util/convert_feed_to_domain_posts.dart';
@@ -93,7 +94,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     if (authorized) {
       return await _localDataService.createPost(atProto!, post);
     } else {
-      return Result.error(Exception('Not authorized to create a post'));
+      return Result.error(NotAuthorizedException('createPost'));
     }
   }
 
@@ -109,7 +110,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
           return Result.error(bskyFeed.error);
       }
     } else {
-      return Result.error(Exception('Not authorized to get feed'));
+      return Result.error(NotAuthorizedException('getFeed'));
     }
   }
 }
