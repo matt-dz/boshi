@@ -74,7 +74,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   }
 }
 
-class VerificationForm extends StatelessWidget {
+class VerificationForm extends StatefulWidget {
   const VerificationForm({
     super.key,
     required this.viewModel,
@@ -85,8 +85,14 @@ class VerificationForm extends StatelessWidget {
   final String email;
 
   @override
+  State<VerificationForm> createState() => _VerificationForm();
+}
+
+class _VerificationForm extends State<VerificationForm> {
+  @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<ShadFormState>();
+
     return ShadForm(
       key: formKey,
       child: Column(
@@ -133,10 +139,10 @@ class VerificationForm extends StatelessWidget {
             child: Text('Enter'),
             onPressed: () async {
               if (formKey.currentState!.saveAndValidate()) {
-                await viewModel.verifyCode.execute(
+                await widget.viewModel.verifyCode.execute(
                   VerificationCode(
                     code: formKey.currentState!.value[verificationInputId],
-                    email: email,
+                    email: widget.email,
                   ),
                 );
               }
