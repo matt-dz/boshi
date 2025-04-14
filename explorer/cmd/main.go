@@ -6,6 +6,7 @@ import (
 	"boshi-explorer/internal/sqlc"
 	"context"
 	"fmt"
+	"math"
 
 	"net/http"
 	"os"
@@ -25,6 +26,9 @@ var log = logger.GetLogger()
 var uri string
 var firehoseIdentifier string
 
+var retries = 5
+var baseDelay = 100 * time.Millisecond
+
 func init() {
 	err := godotenv.Load()
 	if err != nil {
@@ -42,29 +46,44 @@ func init() {
 	}
 }
 
-func runExplorer(repoCallbacks *events.RepoStreamCallbacks) {
+func runExplorer(workScheduler *sequential.Scheduler) {
 		defer func() {
 			if r := recover(); r != nil {
 				log.Error("Recovered from panic: ", r)
 			}
 		}()
 
-		log.Debug("Connecting to firehose", "uri", uri)
+		for {
+			var firehoseConnection *websocket.Conn = nil
+			var err error
 
-		firehoseConnection, _, err := websocket.DefaultDialer.Dial(uri, http.Header{})
-		if err != nil {
-			log.Error("Failed to create firehose connection", "error", err.Error())
-		}
-		
-		workScheduler := sequential.NewScheduler(firehoseIdentifier, repoCallbacks.EventHandler)
-		err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
-		if err != nil {
-			log.Error("Failed while handling firehose stream", "error", err.Error())
-		}
-}
+			log.Debug("Connecting to firehose", "uri", uri)
 
-func main() {
+			for i := range retries {
+				firehoseConnection, _, err = websocket.DefaultDialer.Dial(uri, http.Header{})
+				if err != nil {
+					log.Error("Failed to create firehose connection", "error", err.Error())
+					retryPow := math.Pow(2, float64(i))
+					log.Error("Retrying operation", "in (s)", retryPow / 10)
+					delay := time.Duration(retryPow) * baseDelay
+					time.Sleep(delay)
+					continue
+				}
+			}
+
+			if firehoseConnection == nil {
+				break
+			}
+
+			err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
+			if err != nil {
+				log.Error("Failed while handling firehose stream", "error", err.Error())
+			}
+		}
+	}
 	
+func main() {
+
 	log.Debug("Connecting to postgres")
 	pool := database.Connect(context.Background())
 	defer pool.Close()
@@ -91,7 +110,6 @@ func main() {
 		},
 	}
 
-	for {
-		runExplorer(repoCallbacks)
-	}
+	workScheduler := sequential.NewScheduler(firehoseIdentifier, repoCallbacks.EventHandler)
+	runExplorer(workScheduler)
 }
