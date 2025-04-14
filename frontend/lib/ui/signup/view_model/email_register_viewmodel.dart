@@ -1,6 +1,5 @@
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
-
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/utils/command.dart';
 

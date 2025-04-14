@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import '../view_model/email_register_viewmodel.dart';
 import 'package:frontend/utils/result.dart';
-import 'package:frontend/utils/logger.dart';
 
 const emailId = 'email';
 
@@ -23,7 +22,7 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
       body: SafeArea(
         child: ListenableBuilder(
           listenable: widget.viewModel,
-          builder: (context, _) {
+          builder: (context, state) {
             return Center(
               child: SignupForm(
                 viewModel: widget.viewModel,
@@ -36,7 +35,7 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
   }
 }
 
-class SignupForm extends StatelessWidget {
+class SignupForm extends StatefulWidget {
   const SignupForm({
     super.key,
     required this.viewModel,
@@ -45,21 +44,35 @@ class SignupForm extends StatelessWidget {
   final EmailRegisterViewModel viewModel;
 
   @override
+  State<SignupForm> createState() => _SignupForm();
+}
+
+class _SignupForm extends State<SignupForm> {
+  String _email = '';
+
+  @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<ShadFormState>();
     Widget error = SizedBox(height: 0, width: 0); // Empty space placeholder
     // to indicate no error
 
-    if (viewModel.addEmail.result is Ok<void>) {
-      context.go('/signup/verify');
-    } else if (viewModel.addEmail.result is Error<void>) {
-      error = Text(
-        viewModel.addEmail.result.toString(),
-        style: TextStyle(
-          color: Color.fromRGBO(255, 0, 0, 1),
-          fontWeight: FontWeight.w500,
-        ),
-      );
+    final result = widget.viewModel.addEmail.result;
+    switch (result) {
+      case null:
+        break;
+      case Ok<void>():
+        context.go(
+          '/signup/verify?email='
+          '${Uri.encodeComponent(_email)}',
+        );
+      case Error<void>():
+        error = Text(
+          result.error.toString(),
+          style: TextStyle(
+            color: Color.fromRGBO(255, 0, 0, 1),
+            fontWeight: FontWeight.w500,
+          ),
+        );
     }
 
     return ShadCard(
@@ -75,6 +88,7 @@ class SignupForm extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ShadInputFormField(
+                enabled: !widget.viewModel.addEmail.running,
                 keyboardType: TextInputType.emailAddress,
                 id: emailId,
                 placeholder: const Text('wcj@ufl.edu'),
@@ -91,10 +105,13 @@ class SignupForm extends StatelessWidget {
               error,
               const SizedBox(height: 16),
               ShadButton(
-                enabled: !viewModel.addEmail.running,
+                enabled: !widget.viewModel.addEmail.running,
                 onPressed: () async {
                   if (formKey.currentState!.saveAndValidate()) {
-                    await viewModel.addEmail
+                    setState(() {
+                      _email = formKey.currentState!.value[emailId];
+                    });
+                    await widget.viewModel.addEmail
                         .execute(formKey.currentState!.value[emailId]);
                   }
                 },

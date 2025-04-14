@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/signup/view_model/email_register_viewmodel.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:frontend/ui/models/verification_code/verification_code.dart';
 import '../view_model/email_verification_viewmodel.dart';
@@ -7,22 +8,6 @@ import 'package:frontend/utils/result.dart';
 import 'package:flutter/services.dart';
 
 const verificationInputId = 'verification-input';
-
-class VerificationInputFormatter extends TextInputFormatter {
-  const VerificationInputFormatter();
-
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    return TextEditingValue(
-      composing: newValue.composing,
-      selection: newValue.selection,
-      text: newValue.text.toUpperCase(),
-    );
-  }
-}
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({
@@ -46,28 +31,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: ListenableBuilder(
-          listenable: widget.viewModel,
-          builder: (context, _) {
-            return Scaffold(
-              body: SafeArea(
-                child: ListenableBuilder(
-                  listenable: widget.viewModel,
-                  builder: (context, _) {
-                    return Center(
-                      child: ShadCard(
-                        width: 400,
-                        child: VerificationForm(
-                          viewModel: widget.viewModel,
-                          email: widget.email,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            );
-          },
+        child: Center(
+          child: ShadCard(
+            width: 400,
+            child: ListenableBuilder(
+              listenable: widget.viewModel,
+              builder: (context, state) {
+                return VerificationForm(
+                  viewModel: widget.viewModel,
+                  email: widget.email,
+                );
+              },
+            ),
+          ),
         ),
       ),
     );
@@ -92,6 +68,24 @@ class _VerificationForm extends State<VerificationForm> {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<ShadFormState>();
+    Widget error = SizedBox(height: 0, width: 0); // Empty space placeholder
+    // to indicate no error
+
+    final result = widget.viewModel.verifyCode.result;
+    switch (result) {
+      case null:
+        break;
+      case Ok<void>():
+        context.go('/');
+      case Error<void>():
+        error = Text(
+          result.error.toString(),
+          style: TextStyle(
+            color: Color.fromRGBO(255, 0, 0, 1),
+            fontWeight: FontWeight.w500,
+          ),
+        );
+    }
 
     return ShadForm(
       key: formKey,
@@ -104,7 +98,7 @@ class _VerificationForm extends State<VerificationForm> {
             maxLength: 6,
             label: const Text('Verification Code'),
             inputFormatters: const [
-              VerificationInputFormatter(),
+              _VerificationInputFormatter(),
             ],
             description: const Text('Enter your verification code.'),
             validator: (v) {
@@ -131,6 +125,7 @@ class _VerificationForm extends State<VerificationForm> {
               ),
             ],
           ),
+          error,
           SizedBox(height: 16),
           // TODO: add use state to enable button when input
           // is filled
@@ -150,6 +145,22 @@ class _VerificationForm extends State<VerificationForm> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _VerificationInputFormatter extends TextInputFormatter {
+  const _VerificationInputFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      composing: newValue.composing,
+      selection: newValue.selection,
+      text: newValue.text.toUpperCase(),
     );
   }
 }

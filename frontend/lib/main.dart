@@ -14,7 +14,7 @@ import 'package:frontend/ui/home/view_model/home_viewmodel.dart';
 import 'package:frontend/ui/home/widgets/home_screen.dart';
 import 'package:frontend/ui/signup/widgets/email_register_screen.dart';
 import 'package:frontend/ui/signup/view_model/email_register_viewmodel.dart';
-import 'package:frontend/ui/signup/widgets/email_verification_viewmodel.dart';
+import 'package:frontend/ui/signup/widgets/email_verification_screen.dart';
 import 'package:frontend/ui/signup/view_model/email_verification_viewmodel.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
