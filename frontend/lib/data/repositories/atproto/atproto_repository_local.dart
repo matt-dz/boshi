@@ -25,10 +25,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
       clientName: 'Boshi',
       clientUri: clientId.toString(),
       redirectUris: ['http://127.0.0.1:${clientId.port}'],
-      grantTypes: [
-        'authorization_code',
-        'refresh_token',
-      ],
+      grantTypes: ['authorization_code', 'refresh_token'],
       scope: 'atproto',
       responseTypes: ['code'],
       applicationType: 'web',

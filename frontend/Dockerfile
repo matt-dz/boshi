@@ -2,6 +2,7 @@
 FROM --platform=$BUILDPLATFORM ghcr.io/cirruslabs/flutter:stable AS build
 ARG BUILD_TARGET
 ARG BACKEND_BASE_URL
+ARG PROD=false
 ARG BACKEND_PORT=443
 ARG FEED_GENERATOR_URI
 WORKDIR /app
@@ -9,7 +10,8 @@ COPY . .
 RUN flutter build web -t ${BUILD_TARGET} \
     --dart-define=BACKEND_BASE_URL=${BACKEND_BASE_URL} \
     --dart-define=BACKEND_PORT=${BACKEND_PORT} \
-    --dart-define=FEED_GENERATOR_URI=${FEED_GENERATOR_URI}
+    --dart-define=FEED_GENERATOR_URI=${FEED_GENERATOR_URI} \
+    --dart-define=PROD=${PROD}
 
 # Serve project with nginx
 FROM nginx:alpine
