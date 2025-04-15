@@ -20,8 +20,10 @@ Post _$PostFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Post {
+  String get school => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
+  DateTime get indexedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Post to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -37,7 +39,7 @@ abstract class $PostCopyWith<$Res> {
   factory $PostCopyWith(Post value, $Res Function(Post) then) =
       _$PostCopyWithImpl<$Res, Post>;
   @useResult
-  $Res call({String title, String content});
+  $Res call({String school, String title, String content, DateTime indexedAt});
 }
 
 /// @nodoc
@@ -55,10 +57,16 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? school = null,
     Object? title = null,
     Object? content = null,
+    Object? indexedAt = null,
   }) {
     return _then(_value.copyWith(
+      school: null == school
+          ? _value.school
+          : school // ignore: cast_nullable_to_non_nullable
+              as String,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -67,6 +75,10 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      indexedAt: null == indexedAt
+          ? _value.indexedAt
+          : indexedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ) as $Val);
   }
 }
@@ -78,7 +90,7 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
       __$$PostImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, String content});
+  $Res call({String school, String title, String content, DateTime indexedAt});
 }
 
 /// @nodoc
@@ -93,10 +105,16 @@ class __$$PostImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? school = null,
     Object? title = null,
     Object? content = null,
+    Object? indexedAt = null,
   }) {
     return _then(_$PostImpl(
+      school: null == school
+          ? _value.school
+          : school // ignore: cast_nullable_to_non_nullable
+              as String,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -105,6 +123,10 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      indexedAt: null == indexedAt
+          ? _value.indexedAt
+          : indexedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
@@ -112,19 +134,27 @@ class __$$PostImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$PostImpl implements _Post {
-  _$PostImpl({required this.title, required this.content});
+  _$PostImpl(
+      {required this.school,
+      required this.title,
+      required this.content,
+      required this.indexedAt});
 
   factory _$PostImpl.fromJson(Map<String, dynamic> json) =>
       _$$PostImplFromJson(json);
 
   @override
+  final String school;
+  @override
   final String title;
   @override
   final String content;
+  @override
+  final DateTime indexedAt;
 
   @override
   String toString() {
-    return 'Post(title: $title, content: $content)';
+    return 'Post(school: $school, title: $title, content: $content, indexedAt: $indexedAt)';
   }
 
   @override
@@ -132,13 +162,17 @@ class _$PostImpl implements _Post {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PostImpl &&
+            (identical(other.school, school) || other.school == school) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.content, content) || other.content == content));
+            (identical(other.content, content) || other.content == content) &&
+            (identical(other.indexedAt, indexedAt) ||
+                other.indexedAt == indexedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, title, content);
+  int get hashCode =>
+      Object.hash(runtimeType, school, title, content, indexedAt);
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.
@@ -157,15 +191,22 @@ class _$PostImpl implements _Post {
 }
 
 abstract class _Post implements Post {
-  factory _Post({required final String title, required final String content}) =
-      _$PostImpl;
+  factory _Post(
+      {required final String school,
+      required final String title,
+      required final String content,
+      required final DateTime indexedAt}) = _$PostImpl;
 
   factory _Post.fromJson(Map<String, dynamic> json) = _$PostImpl.fromJson;
 
   @override
+  String get school;
+  @override
   String get title;
   @override
   String get content;
+  @override
+  DateTime get indexedAt;
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:convert';
-import 'dart:js_interop';
 import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
@@ -59,10 +58,12 @@ class ApiClient {
   }
 
   // TODO: Implement the getUser method
-  Future<Result<User>> getUser() async {
-    logger.w('Function not implemented. Returning default user.');
+  Future<Result<User>> getUser(String did) async {
+    logger.d('Sending GET request for User $did');
+    logger.d(_host);
+    // final response = await http.get(Uri.parse(_host));
     return Result.ok(
-      User(id: '1', username: 'anonymous1', school: 'University of Florida'),
+      User(id: '1', school: 'University of Florida'),
     );
   }
 
@@ -98,7 +99,7 @@ class ApiClient {
       record: {
         'title': post.title,
         'content': post.content,
-        'timestamp': DateTime.now().toString(),
+        'timestamp': post.indexedAt,
       },
     );
 

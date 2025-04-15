@@ -22,7 +22,7 @@ class LocalDataService {
   Future<Result<User>> getUser() async {
     logger.d('Retrieving user');
     return Result.ok(
-      User(id: '1', username: 'anonymous1', school: 'University of Florida'),
+      User(id: '1', school: 'University of Florida'),
     );
   }
 

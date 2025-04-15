@@ -1,4 +1,5 @@
 import 'package:bluesky/bluesky.dart' as bsky;
+import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/shared/exceptions/not_authorized_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
@@ -95,5 +96,10 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
     } else {
       return Result.error(NotAuthorizedException('getFeed'));
     }
+  }
+
+  @override
+  Future<Result<User>> getUser(String did) async {
+    return await _apiClient.getUser(did);
   }
 }

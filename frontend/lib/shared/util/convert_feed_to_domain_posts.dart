@@ -9,8 +9,7 @@ List<Post> convertFeedToDomainPosts(bsky.Feed feed) {
           id: feedView.post.cid,
           author: User(
             id: feedView.post.author.did,
-            username: feedView.post.author.handle,
-            school: '',
+            school: feedView.post.record.text,
           ),
           content: feedView.post.record.text,
           timestamp: feedView.post.indexedAt,

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
 import 'package:frontend/utils/result.dart';
@@ -12,9 +13,11 @@ abstract class AtProtoRepository extends ChangeNotifier {
         clientMetadata = null,
         oAuthClient = null,
         service = 'bsky.social',
+        identity = '',
         initialized = false;
 
   String service;
+  String identity;
   bool initialized;
   final Uri _clientId;
   late OAuthContext oAuthContext;
@@ -31,4 +34,6 @@ abstract class AtProtoRepository extends ChangeNotifier {
   Future<Result<void>> refreshSession();
   Future<Result<void>> createPost(Post post);
   Future<Result<List<domain_models.Post>>> getFeed();
+
+  Future<Result<User>> getUser(String did);
 }

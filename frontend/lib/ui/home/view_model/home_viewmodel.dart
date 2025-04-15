@@ -5,10 +5,10 @@ import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
+import 'package:frontend/shared/exceptions/not_authorized_exception.dart';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
-import 'package:frontend/data/repositories/user/user_repository.dart';
 
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/utils/command.dart';
@@ -18,10 +18,8 @@ import 'package:frontend/utils/logger.dart';
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel({
     required FeedRepository feedRepository,
-    required UserRepository userRepository,
     required AtProtoRepository atProtoRepository,
   })  : _feedRepository = feedRepository,
-        _userRepository = userRepository,
         _atProtoRepository = atProtoRepository {
     load = Command0(_load)..execute();
     updateReactionCount = Command1<Post, ReactionPayload>(
@@ -32,7 +30,6 @@ class HomeViewModel extends ChangeNotifier {
   late Command0 load;
   late Command1 updateReactionCount;
   final FeedRepository _feedRepository;
-  final UserRepository _userRepository;
   final AtProtoRepository _atProtoRepository;
 
   User? _user;
@@ -54,15 +51,19 @@ class HomeViewModel extends ChangeNotifier {
           return feedResult;
       }
 
-      logger.d('Retrieving user');
-      final userResult = await _userRepository.getUser();
-      switch (userResult) {
-        case Ok<User>():
-          _user = userResult.value;
-        case Error<User>():
-          logger.e('Error retrieving user: ${userResult.error}');
+      if (_atProtoRepository.authorized) {
+        logger.d('Retrieving user ');
+        final userResult =
+            await _atProtoRepository.getUser(_atProtoRepository.identity);
+        switch (userResult) {
+          case Ok<User>():
+            _user = userResult.value;
+          case Error<User>():
+            logger.e('Error retrieving user: ${userResult.error}');
+        }
+        return userResult;
       }
-      return userResult;
+      return Result.error(NotAuthorizedException('GetUser'));
     } finally {
       notifyListeners();
     }

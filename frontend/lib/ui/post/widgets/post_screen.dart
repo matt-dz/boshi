@@ -73,8 +73,10 @@ class _PostFormState extends State<PostForm> {
                     if (formKey.currentState!.saveAndValidate()) {
                       final result = await widget.viewModel.createPost.execute(
                         Post(
+                          school: '',
                           title: formKey.currentState!.value['title'],
                           content: formKey.currentState!.value['content'],
+                          indexedAt: DateTime.now(),
                         ),
                       );
 

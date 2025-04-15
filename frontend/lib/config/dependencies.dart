@@ -7,9 +7,6 @@ import 'package:frontend/data/services/local/local_data_service.dart';
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
 import 'package:frontend/data/repositories/feed/feed_repository_remote.dart';
 import 'package:frontend/data/repositories/feed/feed_repository_local.dart';
-import 'package:frontend/data/repositories/user/user_repository.dart';
-import 'package:frontend/data/repositories/user/user_repository_remote.dart';
-import 'package:frontend/data/repositories/user/user_repository_local.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository_remote.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository_local.dart';
@@ -33,11 +30,6 @@ List<SingleChildWidget> get providersRemote {
       create: (_) => ApiClient(
         host: EnvironmentConfig.backendBaseURL,
       ),
-    ),
-    Provider(
-      create: (context) => UserRepositoryRemote(
-        apiClient: context.read<ApiClient>(),
-      ) as UserRepository,
     ),
     Provider(
       create: (context) => FeedRepositoryRemote(
@@ -65,11 +57,6 @@ List<SingleChildWidget> get providersLocal {
     ..._sharedProviders,
     Provider<LocalDataService>(
       create: (_) => LocalDataService(),
-    ),
-    Provider(
-      create: (context) => UserRepositoryLocal(
-        localDataService: context.read<LocalDataService>(),
-      ) as UserRepository,
     ),
     Provider(
       create: (context) => FeedRepositoryLocal(

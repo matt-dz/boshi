@@ -1,6 +1,7 @@
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
+import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/shared/exceptions/not_authorized_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
@@ -42,6 +43,8 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     String service,
   ) async {
     try {
+      this.identity = identity;
+      this.service = service;
       _initializeOAuthClient();
       final (uri, context) = await _localDataService.getOAuthAuthorizationURI(
         oAuthClient!,
@@ -109,5 +112,10 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     } else {
       return Result.error(NotAuthorizedException('getFeed'));
     }
+  }
+
+  @override
+  Future<Result<User>> getUser(String did) async {
+    return _localDataService.getUser();
   }
 }
