@@ -50,20 +50,17 @@ class HomeViewModel extends ChangeNotifier {
           logger.e('Error loading feed: ${feedResult.error}');
           return feedResult;
       }
-      logger.w('Retrieving user');
-      if (_atProtoRepository.authorized) {
-        logger.d('Retrieving user ');
-        final userResult =
-            await _atProtoRepository.getUser(_atProtoRepository.identity);
-        switch (userResult) {
-          case Ok<User>():
-            _user = userResult.value;
-          case Error<User>():
-            logger.e('Error retrieving user: ${userResult.error}');
-        }
-        return userResult;
+      logger.d('Retrieving user ');
+      final userResult =
+          await _atProtoRepository.getUser(_atProtoRepository.identity);
+      switch (userResult) {
+        case Ok<User>():
+          _user = userResult.value;
+        case Error<User>():
+          logger.e('Error retrieving user: ${userResult.error}');
       }
-      return Result.error(NotAuthorizedException('GetUser'));
+      return userResult;
+      // return Result.error(NotAuthorizedException('GetUser'));
     } finally {
       notifyListeners();
     }
