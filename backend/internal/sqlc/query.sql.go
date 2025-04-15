@@ -18,13 +18,26 @@ func (q *Queries) AddToMailList(ctx context.Context, email string) error {
 	return err
 }
 
+const getUser = `-- name: GetUser :one
+SELECT (school, verified_at)
+FROM emails
+WHERE emails.user_id = $1
+`
+
+func (q *Queries) GetUser(ctx context.Context, userID string) (interface{}, error) {
+	row := q.db.QueryRow(ctx, getUser, userID)
+	var column_1 interface{}
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const upsertEmail = `-- name: UpsertEmail :one
 INSERT INTO emails (user_id, email)
 VALUES ($1, $2)
 ON CONFLICT (user_id) DO UPDATE
 SET email = EXCLUDED.email
 WHERE emails.verified_at IS NULL
-RETURNING user_id, email, created_at, verified_at
+RETURNING user_id, email, school, created_at, verified_at
 `
 
 type UpsertEmailParams struct {
@@ -38,6 +51,7 @@ func (q *Queries) UpsertEmail(ctx context.Context, arg UpsertEmailParams) (Email
 	err := row.Scan(
 		&i.UserID,
 		&i.Email,
+		&i.School,
 		&i.CreatedAt,
 		&i.VerifiedAt,
 	)
@@ -46,7 +60,7 @@ func (q *Queries) UpsertEmail(ctx context.Context, arg UpsertEmailParams) (Email
 
 const verifyEmail = `-- name: VerifyEmail :one
 WITH matched AS (
-    SELECT user_id, email, created_at, verified_at
+    SELECT user_id, email, school, created_at, verified_at
     FROM emails
     WHERE emails.user_id = $1 AND emails.email = $2
 ),
@@ -54,7 +68,7 @@ updated AS (
     UPDATE emails
     SET verified_at = NOW()
     WHERE (user_id, email) IN (SELECT matched.user_id, matched.email FROM matched WHERE matched.verified_at IS NULL)
-    RETURNING user_id, email, created_at, verified_at
+    RETURNING user_id, email, school, created_at, verified_at
 )
 SELECT
     CASE

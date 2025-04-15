@@ -28,3 +28,8 @@ SELECT
         WHEN EXISTS (SELECT 1 FROM matched WHERE verified_at IS NOT NULL) THEN 'already_verified'::verification_status
         ELSE 'just_verified'::verification_status
     END AS status;
+
+-- name: GetUser :one
+SELECT (school, verified_at)
+FROM emails
+WHERE emails.user_id = $1;

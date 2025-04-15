@@ -57,6 +57,7 @@ func (ns NullVerificationStatus) Value() (driver.Value, error) {
 type Email struct {
 	UserID     string
 	Email      string
+	School     pgtype.Text
 	CreatedAt  pgtype.Timestamptz
 	VerifiedAt pgtype.Timestamptz
 }

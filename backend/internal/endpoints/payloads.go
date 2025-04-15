@@ -13,6 +13,10 @@ type clientMetadata struct {
 	DpopBoundAccessTokens   bool     `json:"dpop_bound_access_tokens"`
 }
 
+type getUserPayload struct {
+	UserID string `json:"user_id"`
+}
+
 type emailListPayload struct {
 	Email string `json:"email"`
 }

@@ -41,6 +41,7 @@ CREATE TYPE verification_status AS ENUM ('no_match', 'already_verified', 'just_v
 CREATE TABLE emails (
     user_id VARCHAR NOT NULL,
     email VARCHAR NOT NULL,
+    school VARCHAR,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
     verified_at TIMESTAMPTZ,
     PRIMARY KEY (user_id),
