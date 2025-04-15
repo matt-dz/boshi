@@ -50,7 +50,7 @@ class HomeViewModel extends ChangeNotifier {
           logger.e('Error loading feed: ${feedResult.error}');
           return feedResult;
       }
-
+      logger.w('Retrieving user');
       if (_atProtoRepository.authorized) {
         logger.d('Retrieving user ');
         final userResult =
