@@ -7,6 +7,8 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const addToMailList = `-- name: AddToMailList :exec
@@ -44,6 +46,17 @@ func (q *Queries) UpsertEmail(ctx context.Context, arg UpsertEmailParams) (Email
 	return i, err
 }
 
+const verificationStatus = `-- name: VerificationStatus :one
+SELECT verified_at FROM emails WHERE user_id = $1
+`
+
+func (q *Queries) VerificationStatus(ctx context.Context, userID string) (pgtype.Timestamptz, error) {
+	row := q.db.QueryRow(ctx, verificationStatus, userID)
+	var verified_at pgtype.Timestamptz
+	err := row.Scan(&verified_at)
+	return verified_at, err
+}
+
 const verifyEmail = `-- name: VerifyEmail :one
 WITH matched AS (
     SELECT user_id, email, created_at, verified_at
@@ -58,9 +71,9 @@ updated AS (
 )
 SELECT
     CASE
-        WHEN NOT EXISTS (SELECT 1 FROM matched) THEN 'no_match'::verification_status
-        WHEN EXISTS (SELECT 1 FROM matched WHERE verified_at IS NOT NULL) THEN 'already_verified'::verification_status
-        ELSE 'just_verified'::verification_status
+        WHEN NOT EXISTS (SELECT 1 FROM matched) THEN 'no_match'::verify_email_result
+        WHEN EXISTS (SELECT 1 FROM matched WHERE verified_at IS NOT NULL) THEN 'already_verified'::verify_email_result
+        ELSE 'just_verified'::verify_email_result
     END AS status
 `
 
@@ -69,9 +82,9 @@ type VerifyEmailParams struct {
 	Email  string
 }
 
-func (q *Queries) VerifyEmail(ctx context.Context, arg VerifyEmailParams) (VerificationStatus, error) {
+func (q *Queries) VerifyEmail(ctx context.Context, arg VerifyEmailParams) (VerifyEmailResult, error) {
 	row := q.db.QueryRow(ctx, verifyEmail, arg.UserID, arg.Email)
-	var status VerificationStatus
+	var status VerifyEmailResult
 	err := row.Scan(&status)
 	return status, err
 }

@@ -11,47 +11,47 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type VerificationStatus string
+type VerifyEmailResult string
 
 const (
-	VerificationStatusNoMatch         VerificationStatus = "no_match"
-	VerificationStatusAlreadyVerified VerificationStatus = "already_verified"
-	VerificationStatusJustVerified    VerificationStatus = "just_verified"
+	VerifyEmailResultNoMatch         VerifyEmailResult = "no_match"
+	VerifyEmailResultAlreadyVerified VerifyEmailResult = "already_verified"
+	VerifyEmailResultJustVerified    VerifyEmailResult = "just_verified"
 )
 
-func (e *VerificationStatus) Scan(src interface{}) error {
+func (e *VerifyEmailResult) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = VerificationStatus(s)
+		*e = VerifyEmailResult(s)
 	case string:
-		*e = VerificationStatus(s)
+		*e = VerifyEmailResult(s)
 	default:
-		return fmt.Errorf("unsupported scan type for VerificationStatus: %T", src)
+		return fmt.Errorf("unsupported scan type for VerifyEmailResult: %T", src)
 	}
 	return nil
 }
 
-type NullVerificationStatus struct {
-	VerificationStatus VerificationStatus
-	Valid              bool // Valid is true if VerificationStatus is not NULL
+type NullVerifyEmailResult struct {
+	VerifyEmailResult VerifyEmailResult
+	Valid             bool // Valid is true if VerifyEmailResult is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullVerificationStatus) Scan(value interface{}) error {
+func (ns *NullVerifyEmailResult) Scan(value interface{}) error {
 	if value == nil {
-		ns.VerificationStatus, ns.Valid = "", false
+		ns.VerifyEmailResult, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.VerificationStatus.Scan(value)
+	return ns.VerifyEmailResult.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullVerificationStatus) Value() (driver.Value, error) {
+func (ns NullVerifyEmailResult) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.VerificationStatus), nil
+	return string(ns.VerifyEmailResult), nil
 }
 
 type Email struct {

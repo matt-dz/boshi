@@ -3,6 +3,7 @@ import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
+import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
 
 abstract class AtProtoRepository extends ChangeNotifier {
   AtProtoRepository({
@@ -31,4 +32,5 @@ abstract class AtProtoRepository extends ChangeNotifier {
   Future<Result<void>> createPost(Post post);
   Future<Result<void>> addVerificationEmail(String email);
   Future<Result<void>> confirmVerificationCode(String email, String code);
+  Future<Result<bool>> isUserVerified();
 }

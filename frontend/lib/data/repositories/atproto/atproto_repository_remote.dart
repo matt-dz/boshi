@@ -89,4 +89,9 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
   ) async {
     return Result.ok(null);
   }
+
+  @override
+  Future<Result<bool>> isUserVerified() {
+    throw UnimplementedError();
+  }
 }

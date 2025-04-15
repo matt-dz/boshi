@@ -19,6 +19,7 @@ import 'package:frontend/shared/oauth/oauth.dart' as oauth_shared;
 import 'package:frontend/config/environment.dart';
 import 'package:frontend/data/models/requests/add_email/add_email.dart';
 import 'package:frontend/data/models/requests/verify_code/verify_code.dart';
+import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
 
 class LocalDataService {
   Result<List<Post>> getFeed() {
@@ -154,6 +155,30 @@ class LocalDataService {
       return Result.error(e);
     } catch (e) {
       logger.e('Failed to confirm verification code. error=$e');
+      return Result.error(Exception(e));
+    }
+  }
+
+  Future<Result<VerificationStatus>> isUserVerified(
+    String userDID,
+  ) async {
+    logger.d('Sending request');
+    try {
+      final result = await http.get(
+        Uri.parse(
+          '${EnvironmentConfig.backendBaseURL}/user/$userDID/verification-status',
+        ),
+      );
+      if (result.statusCode >= 400) {
+        throw HttpException(result.body);
+      }
+      logger.d('Successfully retrieved status');
+      return Result.ok(VerificationStatus.fromJson(jsonDecode(result.body)));
+    } on Exception catch (e) {
+      logger.e('Failed to verify user. error=$e');
+      return Result.error(e);
+    } catch (e) {
+      logger.e('Failed to verify user. error=$e');
       return Result.error(Exception(e));
     }
   }

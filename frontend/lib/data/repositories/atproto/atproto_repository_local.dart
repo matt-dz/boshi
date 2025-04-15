@@ -3,9 +3,9 @@ import 'package:frontend/data/services/local/local_data_service.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/utils/result.dart';
 import './atproto_repository.dart';
-import 'package:frontend/config/environment.dart';
 import 'package:frontend/shared/exceptions/oauth_unauthorized.dart';
 import 'package:atproto/atproto.dart' as atp;
+import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
 
 import 'package:frontend/utils/logger.dart';
 
@@ -127,5 +127,29 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     }
 
     return _localDataService.confirmVerificationCode(email, code, userDid);
+  }
+
+  @override
+  Future<Result<bool>> isUserVerified() async {
+    if (!authorized) {
+      return Result.error(
+        OAuthUnauthorized('Not authorized'),
+      );
+    }
+
+    logger.d('Retrieving user DID');
+    final userDid = atProto!.oAuthSession?.sub;
+    if (userDid == null) {
+      logger.e('User DID is null');
+      return Result.error(OAuthUnauthorized('Not authorized to verify email'));
+    }
+
+    final result = await _localDataService.isUserVerified(userDid);
+    switch (result) {
+      case Ok<VerificationStatus>():
+        return Result.ok(result.value.verified);
+      case Error<VerificationStatus>():
+        return Result.error(result.error);
+    }
   }
 }

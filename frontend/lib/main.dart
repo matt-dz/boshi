@@ -79,6 +79,21 @@ class MainApp extends StatelessWidget {
       routes: [
         GoRoute(
           path: '/',
+          redirect: (context, state) async {
+            final atProto = context.read<AtProtoRepository>();
+            final verified = await atProto.isUserVerified();
+            logger.d(verified);
+            switch (verified) {
+              case Ok<bool>():
+                if (!verified.value) {
+                  return '/signup';
+                }
+              case Error<bool>():
+                print(verified.error.toString());
+                return '/login';
+            }
+            return null;
+          },
           builder: (context, state) => HomeScreen(
             title: 'Boshi',
             viewModel: HomeViewModel(
@@ -121,7 +136,7 @@ class MainApp extends StatelessWidget {
             GoRoute(
               redirect: (BuildContext context, GoRouterState state) {
                 if (state.uri.queryParameters['email'] == null) {
-                  return '/login';
+                  return '/signup';
                 }
                 return null;
               },

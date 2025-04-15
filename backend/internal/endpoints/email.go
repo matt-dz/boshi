@@ -247,7 +247,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	switch verificationStatus {
-	case sqlc.VerificationStatusNoMatch:
+	case sqlc.VerifyEmailResultNoMatch:
 		log.ErrorContext(
 			r.Context(),
 			"user_id not associated with email",
@@ -256,11 +256,11 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 		)
 		http.Error(w, "User not associated with email", http.StatusConflict)
 		return
-	case sqlc.VerificationStatusAlreadyVerified:
+	case sqlc.VerifyEmailResultAlreadyVerified:
 		log.ErrorContext(r.Context(), "user_id already verified")
 		http.Error(w, "User already verified", http.StatusConflict)
 		return
-	case sqlc.VerificationStatusJustVerified:
+	case sqlc.VerifyEmailResultJustVerified:
 		log.DebugContext(r.Context(), "email verification status updated")
 	default:
 		log.ErrorContext(
