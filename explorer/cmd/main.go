@@ -62,10 +62,8 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 			for i := range retries {
 				firehoseConnection, _, err = websocket.DefaultDialer.Dial(uri, http.Header{})
 				if err != nil {
-					log.Error("Failed to create firehose connection", "error", err.Error())
-					retryPow := math.Pow(2, float64(i))
-					log.Error("Retrying operation", "in (s)", retryPow / 10)
-					delay := time.Duration(retryPow) * baseDelay
+					delay := time.Duration(math.Pow(2, float64(i))) * baseDelay
+					log.Error("WebSocket retry", "attempt", i+1, "waiting", delay)
 					time.Sleep(delay)
 					continue
 				} else {
