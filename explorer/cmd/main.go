@@ -74,6 +74,7 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 			}
 
 			if firehoseConnection == nil {
+				log.Error("Failed to establish a connection -- killing explorer.")
 				break
 			}
 
