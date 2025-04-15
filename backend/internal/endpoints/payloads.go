@@ -1,5 +1,9 @@
 package endpoints
 
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
 type clientMetadata struct {
 	ClientID                string   `json:"client_id"`
 	ClientName              string   `json:"client_name"`
@@ -15,6 +19,11 @@ type clientMetadata struct {
 
 type getUserPayload struct {
 	UserID string `json:"user_id"`
+}
+
+type getUserResponse struct {
+	School     string             `json:"school"`
+	VerifiedAt pgtype.Timestamptz `json:"verified_at"`
 }
 
 type emailListPayload struct {
