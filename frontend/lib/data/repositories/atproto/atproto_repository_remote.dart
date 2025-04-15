@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/data/services/api/api_client.dart';
@@ -92,6 +93,11 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
 
   @override
   Future<Result<bool>> isUserVerified() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<Double>> getVerificationCodeExpiration(String email) {
     throw UnimplementedError();
   }
 }

@@ -20,6 +20,17 @@ func (q *Queries) AddToMailList(ctx context.Context, email string) error {
 	return err
 }
 
+const getEmail = `-- name: GetEmail :one
+SELECT email FROM emails WHERE user_id = $1
+`
+
+func (q *Queries) GetEmail(ctx context.Context, userID string) (string, error) {
+	row := q.db.QueryRow(ctx, getEmail, userID)
+	var email string
+	err := row.Scan(&email)
+	return email, err
+}
+
 const upsertEmail = `-- name: UpsertEmail :one
 INSERT INTO emails (user_id, email)
 VALUES ($1, $2)

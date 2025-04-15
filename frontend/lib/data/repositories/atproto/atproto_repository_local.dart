@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
 import 'package:frontend/shared/models/post/post.dart';
@@ -163,5 +164,10 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
       case Error<VerificationStatus>():
         return Result.error(result.error);
     }
+  }
+
+  @override
+  Future<Result<Double>> getVerificationCodeExpiration(String email) {
+    throw UnimplementedError('Not implemented');
   }
 }

@@ -81,6 +81,14 @@ func main() {
 		),
 	)
 
+	mux.HandleFunc("GET /user/{user_id}/code/expiry",
+		middleware.Chain(
+			endpoints.GetCodeExpiry,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
 	/* Setup server*/
 	port := os.Getenv("PORT")
 	if port == "" {

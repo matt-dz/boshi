@@ -32,3 +32,6 @@ SELECT
 
 -- name: VerificationStatus :one
 SELECT verified_at FROM emails WHERE user_id = $1;
+
+-- name: GetEmail :one
+SELECT email FROM emails WHERE user_id = $1;
