@@ -68,6 +68,8 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 					delay := time.Duration(retryPow) * baseDelay
 					time.Sleep(delay)
 					continue
+				} else {
+					break
 				}
 			}
 
