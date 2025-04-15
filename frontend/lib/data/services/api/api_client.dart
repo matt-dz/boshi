@@ -60,7 +60,7 @@ class ApiClient {
   // TODO: Implement the getUser method
   Future<Result<User>> getUser(String did) async {
     logger.d('Sending GET request for User $did');
-    logger.d(_host);
+    logger.i(_host);
     // final response = await http.get(Uri.parse(_host));
     return Result.ok(
       User(id: '1', school: 'University of Florida'),
