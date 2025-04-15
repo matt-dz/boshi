@@ -124,7 +124,7 @@ jobs:
         shell: bash
         run: |
           OAUTH_BASE_URL=${{ env.frontend_base_url }} \
-          OAUTH_REDIRECT_URI=${{ env.frontend_base_url }}/login/redirect/ \
+          OAUTH_REDIRECT_URI=${{ env.frontend_base_url }}/oauth/callback/ \
           make docker
       - name: Push Docker Image with SHA Tag
         if: ${{ env.build_docker == 'true' }}
@@ -246,7 +246,9 @@ jobs:
         run: |
           HOST=${{ steps.domain.outputs.domain }} \
           BACKEND_BASE_URL=https://${{ steps.domain.outputs.domain }}-api.deguzman.cloud \
+          FEED_GENERATOR_URI=at://did:plc:botpky7qdfpdvhcwl5mheif4/app.bsky.feed.generator/boshi \
           CLIENT_METADATA_PATH=http://boshi-backend.${{ env.namespace }}.svc.cluster.local/client-metadata.json \
+          PROD=true \
           make docker
       - name: Push Docker Image with SHA Tag
         if: ${{ env.build_docker == 'true' }}

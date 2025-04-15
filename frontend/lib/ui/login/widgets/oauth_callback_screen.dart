@@ -4,14 +4,14 @@ import 'package:frontend/utils/result.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
-class RedirectScreen extends StatefulWidget {
-  const RedirectScreen({super.key});
+class OAuthCallback extends StatefulWidget {
+  const OAuthCallback({super.key});
 
   @override
-  State<RedirectScreen> createState() => _RedirectScreenState();
+  State<OAuthCallback> createState() => _OAuthCallbackState();
 }
 
-class _RedirectScreenState extends State<RedirectScreen> {
+class _OAuthCallbackState extends State<OAuthCallback> {
   bool _loading = true;
   String? _error;
 
@@ -23,9 +23,8 @@ class _RedirectScreenState extends State<RedirectScreen> {
 
   Future<void> _handleRedirect() async {
     final oauth = context.read<AtProtoRepository>();
-    final uri = Uri.base;
 
-    final result = await oauth.generateSession(uri.toString());
+    final result = await oauth.generateSession(Uri.base.toString());
 
     if (!mounted) {
       return;
@@ -35,6 +34,7 @@ class _RedirectScreenState extends State<RedirectScreen> {
       context.go('/');
     } else {
       setState(() {
+        print(result.toString());
         _error = 'Failed to generate session.';
         _loading = false;
       });

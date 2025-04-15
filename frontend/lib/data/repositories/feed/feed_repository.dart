@@ -9,7 +9,6 @@ import 'package:frontend/data/models/requests/reply/reply.dart'
 
 /// Retrieves and formats data from the feed service
 abstract class FeedRepository {
-  Future<Result<List<Post>>> getFeed();
   Future<Result<Post>> updateReactionCount(ReactionPayload reactionPayload);
   Future<Result<Post>> getPost(String id);
   Future<Result<void>> createReply(reply_request.Reply reply);

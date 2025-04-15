@@ -9,7 +9,7 @@ import 'main.dart';
 /// Development config entry point.
 /// Launch with `flutter run --target lib/main_development.dart`.
 /// Uses local data.
-void main() {
+void main() async {
   Logger.level = Level.all;
 
   usePathUrlStrategy();

@@ -1,6 +1,10 @@
+import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
+import 'package:frontend/shared/exceptions/not_authorized_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
+import 'package:frontend/domain/models/post/post.dart' as domain_models;
+import 'package:frontend/shared/util/convert_feed_to_domain_posts.dart';
 import 'package:frontend/utils/result.dart';
 import './atproto_repository.dart';
 import 'package:atproto/atproto.dart' as atp;
@@ -21,10 +25,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
       clientName: 'Boshi',
       clientUri: clientId.toString(),
       redirectUris: ['http://127.0.0.1:${clientId.port}'],
-      grantTypes: [
-        'authorization_code',
-        'refresh_token',
-      ],
+      grantTypes: ['authorization_code', 'refresh_token'],
       scope: 'atproto',
       responseTypes: ['code'],
       applicationType: 'web',
@@ -90,7 +91,23 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     if (authorized) {
       return await _localDataService.createPost(atProto!, post);
     } else {
-      return Result.error(Exception('Not authorized to create a post'));
+      return Result.error(NotAuthorizedException('createPost'));
+    }
+  }
+
+  @override
+  Future<Result<List<domain_models.Post>>> getFeed() async {
+    if (authorized) {
+      final bskyFeed = _localDataService.getFeed();
+
+      switch (bskyFeed) {
+        case Ok<bsky.Feed>():
+          return Result.ok(convertFeedToDomainPosts(bskyFeed.value));
+        case Error<bsky.Feed>():
+          return Result.error(bskyFeed.error);
+      }
+    } else {
+      return Result.error(NotAuthorizedException('getFeed'));
     }
   }
 }
