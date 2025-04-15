@@ -32,7 +32,7 @@ var baseDelay = 100 * time.Millisecond
 func init() {
 	err := godotenv.Load()
 	if err != nil {
-		panic("Failed to load env")
+		log.Info("Failed to load env -- defaulting to environment")
 	}
 
 	uri = os.Getenv("SOCKET_URI")
