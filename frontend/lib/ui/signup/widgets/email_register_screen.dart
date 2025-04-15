@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import '../view_model/email_register_viewmodel.dart';
 import 'package:frontend/utils/result.dart';
+import 'package:frontend/utils/logger.dart';
 
 const emailId = 'email';
+final emailRegex = RegExp(r'.+\@.+'); // lax af
 
 class EmailRegisterScreen extends StatefulWidget {
   const EmailRegisterScreen({super.key, required this.viewModel});
@@ -48,34 +50,23 @@ class SignupForm extends StatefulWidget {
 }
 
 class _SignupForm extends State<SignupForm> {
-  String _email = '';
+  final _formKey = GlobalKey<FormState>();
+  String? _errMsg;
+  final emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final formKey = GlobalKey<ShadFormState>();
-    Widget error = SizedBox(height: 0, width: 0); // Empty space placeholder
-    // to indicate no error
-
     final result = widget.viewModel.addEmail.result;
     switch (result) {
-      case null:
-        break;
       case Ok<void>():
         context.go(
           '/signup/verify?email='
-          '${Uri.encodeComponent(_email)}',
+          '${Uri.encodeComponent(emailController.text)}',
         );
-      case Error<void>():
-        final err = result.error.toString();
-        final text = err.substring(err.indexOf(' ') + 1);
-        error = Text(
-          text,
-          style: TextStyle(
-            color: Color.fromRGBO(255, 0, 0, 1),
-            fontWeight: FontWeight.w500,
-          ),
-        );
+      default:
+        break;
     }
+    widget.viewModel.addEmail.clearResult();
 
     return ShadCard(
       width: 400,
@@ -84,37 +75,52 @@ class _SignupForm extends State<SignupForm> {
           'to verify your student status. We will never sell your data.'),
       child: Padding(
         padding: const EdgeInsets.only(top: 16),
-        child: ShadForm(
-          key: formKey,
+        child: Form(
+          key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ShadInputFormField(
+              TextFormField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  errorText: _errMsg,
+                ),
                 enabled: !widget.viewModel.addEmail.running,
                 keyboardType: TextInputType.emailAddress,
-                id: emailId,
-                placeholder: const Text('wcj@ufl.edu'),
                 validator: (v) {
-                  if (v.isEmpty) {
-                    return 'Email must not be empty.';
+                  if (v == null || v.isEmpty) {
+                    return 'Email must not be empty';
                   }
+
+                  if (emailRegex.matchAsPrefix(v) == null) {
+                    return 'Invalid email';
+                  }
+
                   if (!v.endsWith('.edu')) {
                     return 'Email must end in .edu';
                   }
+
                   return null;
                 },
               ),
-              error,
               const SizedBox(height: 16),
-              ShadButton(
-                enabled: !widget.viewModel.addEmail.running,
+              ElevatedButton(
                 onPressed: () async {
-                  if (formKey.currentState!.saveAndValidate()) {
+                  // Reset error message
+                  setState(() {
+                    _errMsg = null;
+                  });
+
+                  if (!_formKey.currentState!.validate()) {
+                    logger.d('here');
+                    return;
+                  }
+                  final result = await widget.viewModel.addEmail
+                      .execute(emailController.text);
+                  if (result is Error<void>) {
                     setState(() {
-                      _email = formKey.currentState!.value[emailId];
+                      _errMsg = result.error.toString();
                     });
-                    await widget.viewModel.addEmail
-                        .execute(formKey.currentState!.value[emailId]);
                   }
                 },
                 child: const Text('Enter'),

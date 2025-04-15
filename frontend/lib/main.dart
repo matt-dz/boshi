@@ -75,8 +75,6 @@ class MainApp extends StatelessWidget {
           path: '/oauth/callback',
           builder: (context, state) => OAuthCallback(),
         ),
-        // TODO: add route guard to /login if user is not logged in
-        // or is already authorized
         GoRoute(
           path: '/signup',
           builder: (context, state) => EmailRegisterScreen(
