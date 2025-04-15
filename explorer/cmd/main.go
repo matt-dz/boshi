@@ -77,6 +77,9 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 				break
 			}
 
+			/* Create event processor and connect it to the firehose */
+			log.Debug("Starting repo stream")
+
 			err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
 			if err != nil {
 				log.Error("Failed while handling firehose stream", "error", err.Error())
@@ -90,10 +93,6 @@ func main() {
 	pool := database.Connect(context.Background())
 	defer pool.Close()
 	queries := sqlc.New(pool)
-	
-	
-	/* Create event processor and connect it to the firehose */
-	log.Debug("Starting repo stream")
 	
 	repoCallbacks := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
