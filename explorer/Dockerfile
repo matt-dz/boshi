@@ -7,5 +7,5 @@ RUN make build
 
 FROM alpine
 COPY --from=builder /app/bin/boshi-explorer /boshi-explorer
-COPY .env .env
+COPY .env /boshi-explorer
 ENTRYPOINT ["/boshi-explorer"]
