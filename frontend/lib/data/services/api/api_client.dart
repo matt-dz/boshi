@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:js_interop';
 import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/shared/models/report/report.dart' as boshi_report;
@@ -32,27 +32,29 @@ class ApiClient {
     logger.d('Getting Feed');
     final bskyServer = bsky.Bluesky.fromOAuthSession(session);
 
-    try {
-      final feedGenUri = dotenv.get('FEED_GENERATOR_URI');
+    final feedGenUri = const String.fromEnvironment('FEED_GENERATOR_URI');
 
-      final generatorUri = AtUri.parse(feedGenUri);
+    if (feedGenUri == '') {
+      return Result.error(
+        Exception('Failed to get FEED_GENERATOR_URI env'),
+      );
+    }
 
-      final xrpcResponse =
-          await bskyServer.feed.getFeed(generatorUri: generatorUri);
+    final generatorUri = AtUri.parse(feedGenUri);
 
-      logger.d(xrpcResponse.data);
+    final xrpcResponse =
+        await bskyServer.feed.getFeed(generatorUri: generatorUri);
 
-      if (xrpcResponse.status == HttpStatus.ok) {
-        return Result.ok(xrpcResponse.data);
-      } else {
-        return Result.error(
-          Exception(
-            'Failed to get feed with status: ${xrpcResponse.status}',
-          ),
-        );
-      }
-    } on Exception catch (err) {
-      return Result.error(err);
+    logger.d(xrpcResponse.data);
+
+    if (xrpcResponse.status == HttpStatus.ok) {
+      return Result.ok(xrpcResponse.data);
+    } else {
+      return Result.error(
+        Exception(
+          'Failed to get feed with status: ${xrpcResponse.status}',
+        ),
+      );
     }
   }
 

@@ -101,7 +101,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   @override
   Future<Result<List<domain_models.Post>>> getFeed() async {
     if (authorized) {
-      final bskyFeed = await _localDataService.getFeed(atProto!.oAuthSession!);
+      final bskyFeed = _localDataService.getFeed();
 
       switch (bskyFeed) {
         case Ok<bsky.Feed>():

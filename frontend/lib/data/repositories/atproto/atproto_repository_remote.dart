@@ -1,5 +1,4 @@
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/shared/exceptions/not_authorized_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;

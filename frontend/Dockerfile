@@ -6,10 +6,10 @@ ARG BACKEND_PORT=443
 ARG FEED_GENERATOR_URI
 WORKDIR /app
 COPY . .
-RUN echo FEED_GENERATOR_URI=${FEED_GENERATOR_URI} > .env
 RUN flutter build web -t ${BUILD_TARGET} \
     --dart-define=BACKEND_BASE_URL=${BACKEND_BASE_URL} \
-    --dart-define=BACKEND_PORT=${BACKEND_PORT}
+    --dart-define=BACKEND_PORT=${BACKEND_PORT} \
+    --dart-define=FEED_GENERATOR_URI=${FEED_GENERATOR_URI}
 
 # Serve project with nginx
 FROM nginx:alpine

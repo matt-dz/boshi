@@ -2,7 +2,6 @@ import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/domain/models/post/post.dart';
@@ -16,8 +15,7 @@ import 'package:frontend/shared/models/post/post.dart' as post_request;
 import 'package:frontend/shared/oauth/oauth.dart' as oauth_shared;
 
 class LocalDataService {
-  Future<Result<bsky.Feed>> getFeed(OAuthSession session) async {
-    logger.d('Getting Feed');
+  Result<bsky.Feed> getFeed() {
     return Result.ok(mockGetFeedResult);
   }
 
