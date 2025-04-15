@@ -59,12 +59,12 @@ class ApiClient {
 
   // TODO: Implement the getUser method
   Future<Result<User>> getUser(String did) async {
-    logger.w('Sending GET request for User $did');
-    logger.w(_host);
+    logger.f('Sending GET request for User $did');
+    logger.f(_host);
     final response = await http.get(
       Uri(scheme: 'https', host: _host, path: 'user/$did'),
     );
-    logger.w(response);
+    logger.f(response);
 
     // final response = await http.get(Uri.parse(_host));
     return Result.ok(
