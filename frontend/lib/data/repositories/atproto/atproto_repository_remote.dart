@@ -84,7 +84,9 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
 
   @override
   Future<Result<void>> confirmVerificationCode(
-      String email, String code) async {
+    String email,
+    String code,
+  ) async {
     return Result.ok(null);
   }
 }

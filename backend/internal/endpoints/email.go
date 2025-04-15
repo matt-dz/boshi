@@ -136,7 +136,7 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if errors.Is(err, pgx.ErrNoRows) {
 		log.ErrorContext(r.Context(), "No row returned - user_id already verified email")
-		http.Error(w, "user_id already verified email", http.StatusConflict)
+		http.Error(w, "User already verified email", http.StatusConflict)
 		return
 	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to insert email into database", slog.Any("error", err))
@@ -178,19 +178,21 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if os.Getenv("SEND_EMAIL") != "true" {
+		log.DebugContext(r.Context(), "Skipping email send...")
+		return
+	}
+
 	// Send email
 	log.DebugContext(r.Context(), "Sending email")
-	if os.Getenv("SEND_EMAIL") == "true" {
-		err = email.SendEmail(
-			payload.Email,
-			"Boshi Verification Code",
-			fmt.Sprintf("Your Boshi verification code is: %s", code),
-		)
-		if err != nil {
-			log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
+	err = email.SendEmail(
+		payload.Email,
+		"Boshi Verification Code",
+		fmt.Sprintf("Your Boshi verification code is: %s", code),
+	)
+	if err != nil {
+		log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
 
@@ -248,15 +250,15 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	case sqlc.VerificationStatusNoMatch:
 		log.ErrorContext(
 			r.Context(),
-			"user_id not associated with  email",
+			"user_id not associated with email",
 			slog.String("user_id", payload.UserID),
 			slog.String("email", payload.Email),
 		)
-		http.Error(w, "user_id not associated with email", http.StatusConflict)
+		http.Error(w, "User not associated with email", http.StatusConflict)
 		return
 	case sqlc.VerificationStatusAlreadyVerified:
 		log.ErrorContext(r.Context(), "user_id already verified")
-		http.Error(w, "user_id already verified", http.StatusConflict)
+		http.Error(w, "User already verified", http.StatusConflict)
 		return
 	case sqlc.VerificationStatusJustVerified:
 		log.DebugContext(r.Context(), "email verification status updated")
@@ -277,7 +279,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	code, err := redisClient.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
 		log.ErrorContext(r.Context(), "Key not found", slog.String("key", key))
-		http.Error(w, "Code does not exist for user", http.StatusConflict)
+		http.Error(w, "No code found, try requesting a new one", http.StatusConflict)
 		return
 	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to GET key", slog.Any("error", err))

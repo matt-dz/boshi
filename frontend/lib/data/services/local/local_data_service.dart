@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
+import 'dart:convert';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 import 'package:frontend/utils/result.dart';
+import 'package:http/http.dart' as http;
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/shared/models/mock_data/feed/feed.dart';
@@ -12,6 +16,9 @@ import 'package:frontend/data/models/requests/reply/reply.dart'
     as reply_request;
 import 'package:frontend/shared/models/post/post.dart' as post_request;
 import 'package:frontend/shared/oauth/oauth.dart' as oauth_shared;
+import 'package:frontend/config/environment.dart';
+import 'package:frontend/data/models/requests/add_email/add_email.dart';
+import 'package:frontend/data/models/requests/verify_code/verify_code.dart';
 
 class LocalDataService {
   Result<List<Post>> getFeed() {
@@ -88,5 +95,66 @@ class LocalDataService {
 
   Future<(OAuthSession, ATProto)> refreshSession(OAuthClient client) async {
     return oauth_shared.refreshSession(client);
+  }
+
+  Future<Result<void>> addVerificationEmail(
+    String email,
+    String authorDID,
+  ) async {
+    try {
+      logger.d('Sending request to add verification email');
+      final result = await http.post(
+        Uri.parse('${EnvironmentConfig.backendBaseURL}/email/code'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(AddEmail(userId: authorDID, email: email).toJson()),
+      );
+
+      if (result.statusCode >= 400) {
+        throw HttpException(result.body);
+      }
+      return Result.ok(null);
+    } on Exception catch (e) {
+      logger.e('Failed to add verification email. error=$e');
+      return Result.error(e);
+    } catch (e) {
+      logger.e('Failed to add verification email. error=$e');
+      return Result.error(Exception(e));
+    }
+  }
+
+  Future<Result<void>> confirmVerificationCode(
+    String email,
+    String code,
+    String authorDID,
+  ) async {
+    try {
+      logger.d('Sending request');
+      final result = await http.post(
+        Uri.parse('${EnvironmentConfig.backendBaseURL}/email/verify'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          VerifyCode(
+            userId: authorDID,
+            email: email,
+            code: code,
+          ),
+        ),
+      );
+      if (result.statusCode >= 400) {
+        throw HttpException(result.body);
+      }
+      logger.d('Successfully confirmed code');
+      return Result.ok(null);
+    } on Exception catch (e) {
+      logger.e('Failed to confirm verification code. error=$e');
+      return Result.error(e);
+    } catch (e) {
+      logger.e('Failed to confirm verification code. error=$e');
+      return Result.error(Exception(e));
+    }
   }
 }

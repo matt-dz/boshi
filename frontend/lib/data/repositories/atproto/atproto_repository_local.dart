@@ -3,6 +3,8 @@ import 'package:frontend/data/services/local/local_data_service.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/utils/result.dart';
 import './atproto_repository.dart';
+import 'package:frontend/config/environment.dart';
+import 'package:frontend/shared/exceptions/oauth_unauthorized.dart';
 import 'package:atproto/atproto.dart' as atp;
 
 import 'package:frontend/utils/logger.dart';
@@ -84,16 +86,26 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
 
   @override
   Future<Result<void>> createPost(Post post) async {
-    if (authorized) {
-      return await _localDataService.createPost(atProto!, post);
-    } else {
-      return Result.error(Exception('Not authorized to create a post'));
+    if (!authorized) {
+      return Result.error(OAuthUnauthorized('Not authorized to create a post'));
     }
+    return await _localDataService.createPost(atProto!, post);
   }
 
   @override
   Future<Result<void>> addVerificationEmail(String email) async {
-    return Result.ok(null);
+    if (!authorized) {
+      return Result.error(OAuthUnauthorized('Not authorized to verify email'));
+    }
+
+    logger.d('Retrieving user DID');
+    final userDid = atProto!.oAuthSession?.sub;
+    if (userDid == null) {
+      logger.e('User DID is null');
+      return Result.error(OAuthUnauthorized('Not authorized to verify email'));
+    }
+
+    return _localDataService.addVerificationEmail(email, userDid);
   }
 
   @override
@@ -101,6 +113,19 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     String email,
     String code,
   ) async {
-    return Result.ok(null);
+    if (!authorized) {
+      return Result.error(
+        OAuthUnauthorized('Not authorized to confirm verification code'),
+      );
+    }
+
+    logger.d('Retrieving user DID');
+    final userDid = atProto!.oAuthSession?.sub;
+    if (userDid == null) {
+      logger.e('User DID is null');
+      return Result.error(OAuthUnauthorized('Not authorized to verify email'));
+    }
+
+    return _localDataService.confirmVerificationCode(email, code, userDid);
   }
 }

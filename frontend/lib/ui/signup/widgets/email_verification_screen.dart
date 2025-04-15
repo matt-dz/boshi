@@ -78,8 +78,9 @@ class _VerificationForm extends State<VerificationForm> {
       case Ok<void>():
         context.go('/');
       case Error<void>():
+        final errorText = result.error.toString();
         error = Text(
-          result.error.toString(),
+          errorText.substring(errorText.indexOf(' ')),
           style: TextStyle(
             color: Color.fromRGBO(255, 0, 0, 1),
             fontWeight: FontWeight.w500,

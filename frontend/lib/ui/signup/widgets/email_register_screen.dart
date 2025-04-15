@@ -66,8 +66,10 @@ class _SignupForm extends State<SignupForm> {
           '${Uri.encodeComponent(_email)}',
         );
       case Error<void>():
+        final err = result.error.toString();
+        final text = err.substring(err.indexOf(' ') + 1);
         error = Text(
-          result.error.toString(),
+          text,
           style: TextStyle(
             color: Color.fromRGBO(255, 0, 0, 1),
             fontWeight: FontWeight.w500,
