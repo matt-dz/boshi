@@ -1,6 +1,21 @@
 export type DatabaseSchema = {
   post: Post
   sub_state: SubState
+  reaction: Reaction
+  reply: Reply
+}
+
+export type Email = {
+  user_id: string
+  email: string
+  school: string
+  created_at: Date
+  verified_at: Date
+}
+
+export type MailList = {
+  email: string
+  created_at: Date
 }
 
 export type Post = {
