@@ -14,7 +14,7 @@ import 'package:frontend/ui/home/view_model/home_viewmodel.dart';
 import 'package:frontend/ui/home/widgets/home_screen.dart';
 
 import 'package:frontend/data/repositories/feed/feed_repository.dart';
-import 'package:frontend/data/repositories/user/user_repository.dart';
+
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/utils/result.dart';
@@ -79,7 +79,6 @@ class MainApp extends StatelessWidget {
             title: 'Boshi',
             viewModel: HomeViewModel(
               feedRepository: context.read<FeedRepository>(),
-              userRepository: context.read<UserRepository>(),
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),

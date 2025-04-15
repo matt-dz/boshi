@@ -30,6 +30,7 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
     String service,
   ) async {
     try {
+      this.identity = identity;
       this.service = service;
       await _initializeOAuthClient();
       final (uri, context) = await _apiClient.getOAuthAuthorizationURI(
