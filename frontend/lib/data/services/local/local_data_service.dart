@@ -20,6 +20,7 @@ import 'package:frontend/config/environment.dart';
 import 'package:frontend/data/models/requests/add_email/add_email.dart';
 import 'package:frontend/data/models/requests/verify_code/verify_code.dart';
 import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
+import 'package:frontend/shared/exceptions/verification_code_already_set_exception.dart';
 
 class LocalDataService {
   Result<List<Post>> getFeed() {
@@ -112,7 +113,9 @@ class LocalDataService {
         body: jsonEncode(AddEmail(userId: authorDID, email: email).toJson()),
       );
 
-      if (result.statusCode >= 400) {
+      if (result.statusCode == 429) {
+        throw VerificationCodeAlreadySetException(result.body);
+      } else if (result.statusCode >= 400) {
         throw HttpException(result.body);
       }
       return Result.ok(null);
@@ -169,9 +172,11 @@ class LocalDataService {
           '${EnvironmentConfig.backendBaseURL}/user/$userDID/verification-status',
         ),
       );
+
       if (result.statusCode >= 400) {
         throw HttpException(result.body);
       }
+
       logger.d('Successfully retrieved status');
       return Result.ok(VerificationStatus.fromJson(jsonDecode(result.body)));
     } on Exception catch (e) {

@@ -4,9 +4,27 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import '../view_model/email_register_viewmodel.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/utils/logger.dart';
+import 'package:frontend/ui/core/ui/error.dart' as error_widget;
+import 'package:frontend/exceptions/format.dart';
 
 const emailId = 'email';
 final emailRegex = RegExp(r'.+\@.+'); // lax af
+
+String? emailInputValidator(String? v) {
+  if (v == null || v.isEmpty) {
+    return 'Email must not be empty';
+  }
+
+  if (emailRegex.matchAsPrefix(v) == null) {
+    return 'Invalid email';
+  }
+
+  if (!v.endsWith('.edu')) {
+    return 'Email must end in .edu';
+  }
+
+  return null;
+}
 
 class EmailRegisterScreen extends StatefulWidget {
   const EmailRegisterScreen({super.key, required this.viewModel});
@@ -56,8 +74,7 @@ class _SignupForm extends State<SignupForm> {
 
   @override
   Widget build(BuildContext context) {
-    final result = widget.viewModel.addEmail.result;
-    switch (result) {
+    switch (widget.viewModel.addEmail.result) {
       case Ok<void>():
         context.go(
           '/signup/verify?email='
@@ -66,7 +83,6 @@ class _SignupForm extends State<SignupForm> {
       default:
         break;
     }
-    widget.viewModel.addEmail.clearResult();
 
     return ShadCard(
       width: 400,
@@ -80,31 +96,18 @@ class _SignupForm extends State<SignupForm> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(
+              ShadInputFormField(
+                placeholder: Text('w.clayton@ufl.edu'),
                 controller: emailController,
-                decoration: InputDecoration(
-                  errorText: _errMsg,
-                ),
                 enabled: !widget.viewModel.addEmail.running,
                 keyboardType: TextInputType.emailAddress,
-                validator: (v) {
-                  if (v == null || v.isEmpty) {
-                    return 'Email must not be empty';
-                  }
-
-                  if (emailRegex.matchAsPrefix(v) == null) {
-                    return 'Invalid email';
-                  }
-
-                  if (!v.endsWith('.edu')) {
-                    return 'Email must end in .edu';
-                  }
-
-                  return null;
-                },
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
+              const SizedBox(height: 8),
+              error_widget.Error(
+                message: _errMsg ?? '',
+              ),
+              const SizedBox(height: 8),
+              ShadButton(
                 onPressed: () async {
                   // Reset error message
                   setState(() {
@@ -119,7 +122,7 @@ class _SignupForm extends State<SignupForm> {
                       .execute(emailController.text);
                   if (result is Error<void>) {
                     setState(() {
-                      _errMsg = result.error.toString();
+                      _errMsg = formatExceptionMsg(result.error);
                     });
                   }
                 },

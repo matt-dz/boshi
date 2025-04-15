@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -11,7 +12,6 @@ import 'main.dart';
 /// Uses local data.
 void main() {
   Logger.level = Level.all;
-
   usePathUrlStrategy();
   runApp(MultiProvider(providers: providersLocal, child: const MainApp()));
 }

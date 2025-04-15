@@ -174,7 +174,7 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	}
 	if !ok {
 		log.ErrorContext(r.Context(), "Key already exists, not setting.", slog.String("key", key))
-		http.Error(w, "Verification code already set", http.StatusConflict)
+		http.Error(w, "Verification code already set. Request again in 10 minutes.", http.StatusTooManyRequests)
 		return
 	}
 

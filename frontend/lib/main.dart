@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:frontend/ui/post/widgets/post_screen.dart';
 

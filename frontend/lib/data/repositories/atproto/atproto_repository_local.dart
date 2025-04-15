@@ -3,9 +3,11 @@ import 'package:frontend/data/services/local/local_data_service.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/utils/result.dart';
 import './atproto_repository.dart';
-import 'package:frontend/shared/exceptions/oauth_unauthorized.dart';
+import 'package:frontend/shared/exceptions/oauth_unauthorized_exception.dart';
 import 'package:atproto/atproto.dart' as atp;
 import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
+import 'package:frontend/shared/exceptions/verification_code_already_set_exception.dart';
+import 'package:frontend/utils/result.dart';
 
 import 'package:frontend/utils/logger.dart';
 
@@ -105,7 +107,13 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
       return Result.error(OAuthUnauthorized('Not authorized to verify email'));
     }
 
-    return _localDataService.addVerificationEmail(email, userDid);
+    final result = await _localDataService.addVerificationEmail(email, userDid);
+    if (result is Error<void> &&
+        result.error is VerificationCodeAlreadySetException) {
+      logger.d('Verification code already set. Ignoring error.');
+      return Result.ok(null);
+    }
+    return result;
   }
 
   @override
@@ -126,7 +134,11 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
       return Result.error(OAuthUnauthorized('Not authorized to verify email'));
     }
 
-    return _localDataService.confirmVerificationCode(email, code, userDid);
+    return await _localDataService.confirmVerificationCode(
+      email,
+      code,
+      userDid,
+    );
   }
 
   @override
