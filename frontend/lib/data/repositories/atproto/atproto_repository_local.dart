@@ -116,6 +116,6 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
 
   @override
   Future<Result<User>> getUser(String did) async {
-    return _localDataService.getUser();
+    return _localDataService.getUser(did);
   }
 }

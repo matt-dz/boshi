@@ -19,8 +19,7 @@ class LocalDataService {
     return Result.ok(mockGetFeedResult);
   }
 
-  Future<Result<User>> getUser() async {
-    logger.d('Retrieving user');
+  Future<Result<User>> getUser(String did) async {
     return Result.ok(
       User(id: '1', school: 'University of Florida'),
     );
