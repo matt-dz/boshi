@@ -62,7 +62,7 @@ class ApiClient {
     logger.d('Sending GET request for User $did');
 
     final Uri requestUri = Uri(scheme: 'https', host: _host, path: 'user/$did');
-    logger.d(requestUri);
+    logger.d('requesturi: ${requestUri.toString()}');
 
     final response = await http.get(requestUri);
 
