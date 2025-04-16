@@ -81,7 +81,7 @@ func main() {
 		),
 	)
 
-	mux.HandleFunc("GET /user/{user_id}/code/expiry",
+	mux.HandleFunc("GET /user/{user_id}/code/ttl",
 		middleware.Chain(
 			endpoints.GetCodeExpiry,
 			middleware.AddCors(),

@@ -7,6 +7,7 @@ import 'package:frontend/utils/result.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend/exceptions/format.dart';
 import 'package:frontend/ui/core/ui/error.dart' as error_widget;
+import 'package:frontend/utils/logger.dart';
 
 const verificationInputId = 'verification-input';
 
@@ -65,7 +66,34 @@ class VerificationForm extends StatefulWidget {
 
 class _VerificationForm extends State<VerificationForm> {
   final _formKey = GlobalKey<ShadFormState>();
+  double? _ttl;
   String? _errMsg;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCodeTTL().then((value) {
+      logger.d(value);
+      _ttl = value;
+    });
+  }
+
+  Future<double> _getCodeTTL() async {
+    final result = await widget.viewModel.getCodeTTL();
+    if (!mounted) {
+      return 0.0;
+    }
+
+    switch (result) {
+      case Ok<double>():
+        logger.d(result.value);
+        return result.value;
+      case Error<double>():
+        print(result.error.toString());
+        context.go('/error');
+        return 0.0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +172,7 @@ class _VerificationForm extends State<VerificationForm> {
               }
             },
           ),
+          Text('Request again in $_ttl seconds'),
         ],
       ),
     );

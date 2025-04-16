@@ -18,7 +18,7 @@ type verificationStatusResponse struct {
 }
 
 type getCodeExpiryResponse struct {
-	Expiry float64 `json:"expiry"`
+	TTL float64 `json:"ttl"`
 }
 
 func GetVerificationStatus(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +101,7 @@ func GetCodeExpiry(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(
 		getCodeExpiryResponse{
-			Expiry: max(duration.Seconds(), 0),
+			TTL: max(duration.Seconds(), 0),
 		},
 	)
 }

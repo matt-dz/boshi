@@ -24,4 +24,8 @@ class EmailVerificationViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<Result<double>> getCodeTTL() async {
+    return await _atProtoRepository.getVerificationCodeExpiration();
+  }
 }

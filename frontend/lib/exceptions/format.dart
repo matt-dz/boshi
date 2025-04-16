@@ -1,5 +1,4 @@
-import 'package:frontend/utils/logger.dart';
-
+/// Regex to remove the prefix from an exception message.
 final exceptionPrefixRegex = RegExp(r'(?:\w*Exception:\s)');
 
 /// Formats an exception message by removing the prefix.

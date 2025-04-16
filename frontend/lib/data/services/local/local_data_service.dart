@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
@@ -21,6 +20,7 @@ import 'package:frontend/data/models/requests/add_email/add_email.dart';
 import 'package:frontend/data/models/requests/verify_code/verify_code.dart';
 import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
 import 'package:frontend/shared/exceptions/verification_code_already_set_exception.dart';
+import 'package:frontend/data/models/responses/verification_code_ttl/verification_code_ttl.dart';
 
 class LocalDataService {
   Result<List<Post>> getFeed() {
@@ -165,8 +165,8 @@ class LocalDataService {
   Future<Result<VerificationStatus>> isUserVerified(
     String userDID,
   ) async {
-    logger.d('Sending request');
     try {
+      logger.d('Sending request');
       final result = await http.get(
         Uri.parse(
           '${EnvironmentConfig.backendBaseURL}/user/$userDID/verification-status',
@@ -184,6 +184,30 @@ class LocalDataService {
       return Result.error(e);
     } catch (e) {
       logger.e('Failed to verify user. error=$e');
+      return Result.error(Exception(e));
+    }
+  }
+
+  Future<Result<VerificationCodeTTL>> getVerificationCodeExpiration(
+    String userDID,
+  ) async {
+    try {
+      logger.d('Sending request');
+      final result = await http.get(
+        Uri.parse('${EnvironmentConfig.backendBaseURL}/user/$userDID/code/ttl'),
+      );
+
+      if (result.statusCode >= 400) {
+        throw HttpException(result.body);
+      }
+
+      logger.d('Successfully retrieved ttl');
+      return Result.ok(VerificationCodeTTL.fromJson(jsonDecode(result.body)));
+    } on Exception catch (e) {
+      logger.e('Request failed. error=$e');
+      return Result.error(e);
+    } catch (e) {
+      logger.e('Request failed. error=$e');
       return Result.error(Exception(e));
     }
   }

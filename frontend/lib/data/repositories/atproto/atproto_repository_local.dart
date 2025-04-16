@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
 import 'package:frontend/shared/models/post/post.dart';
@@ -8,9 +7,8 @@ import 'package:frontend/shared/exceptions/oauth_unauthorized_exception.dart';
 import 'package:atproto/atproto.dart' as atp;
 import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
 import 'package:frontend/shared/exceptions/verification_code_already_set_exception.dart';
-import 'package:frontend/utils/result.dart';
-
 import 'package:frontend/utils/logger.dart';
+import 'package:frontend/data/models/responses/verification_code_ttl/verification_code_ttl.dart';
 
 class AtProtoRepositoryLocal extends AtProtoRepository {
   AtProtoRepositoryLocal({
@@ -90,7 +88,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   @override
   Future<Result<void>> createPost(Post post) async {
     if (!authorized) {
-      return Result.error(OAuthUnauthorized('Not authorized to create a post'));
+      return Result.error(OAuthUnauthorized());
     }
     return await _localDataService.createPost(atProto!, post);
   }
@@ -98,7 +96,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   @override
   Future<Result<void>> addVerificationEmail(String email) async {
     if (!authorized) {
-      return Result.error(OAuthUnauthorized('Not authorized to verify email'));
+      return Result.error(OAuthUnauthorized());
     }
 
     logger.d('Retrieving user DID');
@@ -123,9 +121,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     String code,
   ) async {
     if (!authorized) {
-      return Result.error(
-        OAuthUnauthorized('Not authorized to confirm verification code'),
-      );
+      return Result.error(OAuthUnauthorized());
     }
 
     logger.d('Retrieving user DID');
@@ -145,9 +141,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   @override
   Future<Result<bool>> isUserVerified() async {
     if (!authorized) {
-      return Result.error(
-        OAuthUnauthorized('Not authorized'),
-      );
+      return Result.error(OAuthUnauthorized());
     }
 
     logger.d('Retrieving user DID');
@@ -167,7 +161,25 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   }
 
   @override
-  Future<Result<Double>> getVerificationCodeExpiration(String email) {
-    throw UnimplementedError('Not implemented');
+  Future<Result<double>> getVerificationCodeExpiration() async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorized());
+    }
+
+    logger.d('Retrieving user DID');
+    final userDid = atProto!.oAuthSession?.sub;
+    if (userDid == null) {
+      logger.e('User DID is null');
+      return Result.error(OAuthUnauthorized());
+    }
+
+    final ttlResult =
+        await _localDataService.getVerificationCodeExpiration(userDid);
+    switch (ttlResult) {
+      case Ok<VerificationCodeTTL>():
+        return Result.ok(ttlResult.value.ttl);
+      case Error<VerificationCodeTTL>():
+        return Result.error(ttlResult.error);
+    }
   }
 }
