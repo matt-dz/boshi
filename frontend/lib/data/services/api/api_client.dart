@@ -61,8 +61,10 @@ class ApiClient {
   Future<Result<User>> getUser(String did) async {
     logger.d('Sending GET request for User $did');
 
-    final Uri requestUri = Uri(scheme: 'https', host: _host, path: 'user/$did');
-    logger.d('requesturi: ${requestUri.toString()}');
+    logger.d(_host);
+
+    final Uri requestUri =
+        Uri(scheme: 'https', host: _host, pathSegments: ['user', did]);
 
     final response = await http.get(requestUri);
 
