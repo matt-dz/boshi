@@ -64,12 +64,20 @@ class ApiClient {
     final response = await http.get(
       Uri(scheme: 'https', host: _host, path: 'user/$did'),
     );
-    logger.f(response);
 
-    // final response = await http.get(Uri.parse(_host));
-    return Result.ok(
-      User(id: '1', school: 'University of Florida'),
-    );
+    if (response.statusCode != 200) {
+      logger.e('Failed to get user: $response');
+      return Result.error(
+        Exception('Failed to get user'),
+      );
+    }
+
+    try {
+      final User result = User.fromJson(json.decode(response.body));
+      return Result.ok(result);
+    } catch (error) {
+      return Result.error(Exception('Failed to parse user with error $error'));
+    }
   }
 
   Future<Result<Post>> getPost(String id) async {

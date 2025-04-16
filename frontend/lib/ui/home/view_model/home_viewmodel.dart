@@ -48,7 +48,6 @@ class HomeViewModel extends ChangeNotifier {
           logger.d('Retrieved feed');
         case Error<List<Post>>():
           logger.e('Error loading feed: ${feedResult.error}');
-          return feedResult;
       }
       logger.d('Retrieving user ');
       final userResult =
