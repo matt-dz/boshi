@@ -60,10 +60,11 @@ class ApiClient {
   // TODO: Implement the getUser method
   Future<Result<User>> getUser(String did) async {
     logger.d('Sending GET request for User $did');
-    logger.d(_host);
-    final response = await http.get(
-      Uri(scheme: 'https', host: _host, path: 'user/$did'),
-    );
+
+    final Uri requestUri = Uri(scheme: 'https', host: _host, path: 'user/$did');
+    logger.d(requestUri);
+
+    final response = await http.get(requestUri);
 
     if (response.statusCode != 200) {
       logger.e('Failed to get user: $response');
@@ -73,6 +74,7 @@ class ApiClient {
     }
 
     try {
+      logger.d(response.body);
       final User result = User.fromJson(json.decode(response.body));
       return Result.ok(result);
     } catch (error) {
