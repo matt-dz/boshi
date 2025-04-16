@@ -3,7 +3,6 @@ import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/shared/exceptions/not_authorized_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
-import 'package:frontend/shared/oauth/oauth.dart';
 import 'package:frontend/shared/util/convert_feed_to_domain_posts.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/data/services/api/api_client.dart';

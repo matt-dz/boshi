@@ -44,8 +44,6 @@ class ApiClient {
     final xrpcResponse =
         await bskyServer.feed.getFeed(generatorUri: generatorUri);
 
-    logger.d(xrpcResponse.data);
-
     if (xrpcResponse.status == HttpStatus.ok) {
       return Result.ok(xrpcResponse.data);
     } else {
@@ -64,8 +62,6 @@ class ApiClient {
     final Uri hostUri = Uri.parse(_host);
     final Uri requestUri = hostUri.replace(pathSegments: ['user', did]);
 
-    logger.d(requestUri);
-
     final response = await http.get(requestUri);
 
     if (response.statusCode != 200) {
@@ -76,7 +72,6 @@ class ApiClient {
     }
 
     try {
-      logger.d(response.body);
       final User result = User.fromJson(json.decode(response.body));
       return Result.ok(result);
     } catch (error) {

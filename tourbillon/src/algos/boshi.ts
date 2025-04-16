@@ -12,7 +12,7 @@ export const handler = async (
 ) => {
   let builder = ctx.db
     .selectFrom('post')
-    .selectAll()
+    .select(['uri'])
     .orderBy('indexed_at', 'desc')
     .limit(params.limit)
 
