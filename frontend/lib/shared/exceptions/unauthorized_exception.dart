@@ -1,6 +1,6 @@
-class NotAuthorizedException implements Exception {
+class UnauthorizedException implements Exception {
   final String method;
-  NotAuthorizedException(this.method);
+  UnauthorizedException(this.method);
 
   @override
   String toString() => 'NotAuthorizedException: Not authorized to use $method';

@@ -8,4 +8,8 @@ class EnvironmentConfig {
     'PROD',
     defaultValue: false,
   );
+  static const feedGenUri = String.fromEnvironment(
+    'FEED_GEN_URI',
+    defaultValue: '',
+  );
 }
