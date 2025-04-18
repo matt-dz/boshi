@@ -9,6 +9,13 @@ SET email = EXCLUDED.email
 WHERE emails.verified_at IS NULL
 RETURNING *;
 
+-- name: UpsertSchool :one
+INSERT INTO emails (user_id, school)
+VALUES ($1, $2)
+ON CONFLICT (user_id) DO UPDATE
+SET school = EXCLUDED.school
+RETURNING *;
+
 
 -- name: VerifyEmail :one
 WITH matched AS (
@@ -30,6 +37,6 @@ SELECT
     END AS status;
 
 -- name: GetUser :one
-SELECT (school, verified_at)
+SELECT (school, email, verified_at)
 FROM emails
 WHERE emails.user_id = $1;

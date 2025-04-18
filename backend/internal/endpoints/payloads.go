@@ -17,13 +17,20 @@ type clientMetadata struct {
 	DpopBoundAccessTokens   bool     `json:"dpop_bound_access_tokens"`
 }
 
-type getUserPayload struct {
-	UserID string `json:"user_id"`
-}
-
 type getUserResponse struct {
 	School     string             `json:"school"`
 	VerifiedAt pgtype.Timestamptz `json:"verified_at"`
+}
+
+type UniversityDomainResponse struct {
+	Domains []UniversityDomain
+}
+
+type UniversityDomain struct {
+	AlphaCode   string `json:"alpha_two_code"`
+	Name       	string `json:"name"`
+	Domains 		[]string `json:"domains"`
+	WebPages 		[]string `json:"web_pages"`
 }
 
 type emailListPayload struct {

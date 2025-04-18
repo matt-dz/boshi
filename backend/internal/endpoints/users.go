@@ -5,12 +5,39 @@ import (
 	"boshi-backend/internal/sqlc"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"log/slog"
+	"time"
 
 	"net/http"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+func ResolveSchoolFromEmail(email string) (string, error) {
+	domain, err := parseEmail(email)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := http.Get(fmt.Sprintf("http://universities.hipolabs.com/search?domain=%s", domain))
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var result UniversityDomainResponse
+	if err := json.Unmarshal(body, &result); err != nil {
+		return "", err
+	}
+
+	return result.Domains[0].Name, nil
+}
 
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -33,7 +60,7 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Assert the interface{} to the expected tuple (school, verified_at)
+	// Assert the interface{} to the expected tuple (school, email, verified_at)
 	result, ok := userResponse.([]any)
 	if !ok {
 		log.ErrorContext(r.Context(), "Unexpected result from DB")
@@ -42,14 +69,52 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Map the result to the User struct
-	var userResponseStruct getUserResponse
-	if len(result) >= 2 {
-		// Assert and assign values
+	userResponseStruct := getUserResponse{
+		School: "Unknown School",
+		VerifiedAt: pgtype.Timestamptz{Time: time.Unix(0, 0)},
+	}
+
+	if len(result) >= 3 {
 		if school, ok := result[0].(string); ok {
+			if school == pgtype.Empty.String() {
+				log.DebugContext(r.Context(), "School empty - resolving school from email")
+				if email, ok := result[1].(string); ok {
+					resolvedSchool, err := ResolveSchoolFromEmail(email)
+					if err != nil {
+						log.ErrorContext(r.Context(), "Failed to resolve school", slog.Any("error", err))
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+					
+					_, err = sqlcDb.UpsertSchool(ctx, 
+						sqlc.UpsertSchoolParams{
+							UserID: userID, 
+							School: pgtype.Text{
+								String: school, 
+								Valid: true,
+							},
+						},
+					)
+
+					if err != nil {
+						log.ErrorContext(r.Context(), "Failed to upsert school", slog.Any("error", err))
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+					
+					school = resolvedSchool
+				} else {
+					log.WarnContext(r.Context(), "Failed to deduce email from db response")
+				}
+			}
 			userResponseStruct.School = school
+		} else {
+			log.WarnContext(r.Context(), "Failed to deduce school from db response")
 		}
-		if verifiedAt, ok := result[1].(pgtype.Timestamptz); ok {
+		if verifiedAt, ok := result[2].(pgtype.Timestamptz); ok {
 			userResponseStruct.VerifiedAt = verifiedAt
+		} else {
+			log.WarnContext(r.Context(), "Failed to deduce verified timestamp from db response")
 		}
 	}
 
