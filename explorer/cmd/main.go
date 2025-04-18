@@ -3,17 +3,22 @@ package main
 import (
 	"boshi-explorer/internal/database"
 	"boshi-explorer/internal/logger"
+	"boshi-explorer/internal/payloads"
 	"boshi-explorer/internal/sqlc"
 	"context"
+	"encoding/json"
 	"fmt"
 	"math"
 
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/bluesky-social/indigo/api/atproto"
+	"github.com/bluesky-social/indigo/atproto/identity"
+	"github.com/bluesky-social/indigo/atproto/syntax"
 	"github.com/bluesky-social/indigo/events"
 	"github.com/bluesky-social/indigo/events/schedulers/sequential"
 	"github.com/gorilla/websocket"
@@ -47,57 +52,115 @@ func init() {
 }
 
 func runExplorer(workScheduler *sequential.Scheduler) {
-		for {
-			var firehoseConnection *websocket.Conn = nil
-			var err error
+	for {
+		var firehoseConnection *websocket.Conn = nil
+		var err error
 
-			log.Debug("Connecting to firehose", "uri", uri)
+		log.Debug("Connecting to firehose", "uri", uri)
 
-			for i := range retries {
-				firehoseConnection, _, err = websocket.DefaultDialer.Dial(uri, http.Header{})
-				if err != nil {
-					delay := time.Duration(math.Pow(2, float64(i))) * baseDelay
-					log.Error("WebSocket retry", "attempt", i+1, "waiting", delay, "error", err)
-					time.Sleep(delay)
-					continue
-				} else {
-					break
-				}
-			}
-
-			if firehoseConnection == nil {
-				log.Error("Failed to establish a connection -- killing explorer.")
+		for i := range retries {
+			firehoseConnection, _, err = websocket.DefaultDialer.Dial(uri, http.Header{})
+			if err != nil {
+				delay := time.Duration(math.Pow(2, float64(i))) * baseDelay
+				log.Error("WebSocket retry", "attempt", i+1, "waiting", delay, "error", err)
+				time.Sleep(delay)
+				continue
+			} else {
 				break
 			}
+		}
 
-			/* Create event processor and connect it to the firehose */
-			log.Debug("Starting repo stream")
+		if firehoseConnection == nil {
+			log.Error("Failed to establish a connection -- killing explorer.")
+			break
+		}
 
-			err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
-			if err != nil {
-				log.Error("Failed while handling firehose stream", "error", err.Error())
-			}
+		/* Create event processor and connect it to the firehose */
+		log.Debug("Starting repo stream")
+
+		err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
+		if err != nil {
+			log.Error("Failed while handling firehose stream", "error", err.Error())
 		}
 	}
-	
+}
+
+func getRecord(evt *atproto.SyncSubscribeRepos_Commit, op *atproto.SyncSubscribeRepos_RepoOp) (payloads.Record, time.Time, error) {
+	did, err := syntax.ParseDID(evt.Repo)
+	if err != nil {
+		log.ErrorContext(context.Background(), "Failed to parse did", "did", evt.Repo)
+		return payloads.Record{}, time.Now(), err
+	}
+
+	didDoc, err := identity.DefaultDirectory().LookupDID(context.Background(), did)
+	if err != nil {
+		log.ErrorContext(context.Background(), "Failed to lookup did", "did", did.AtIdentifier())
+		return payloads.Record{}, time.Now(), err
+	}
+
+	atprotoPDS := didDoc.Services["#atproto_pds"].URL
+	apiURL := fmt.Sprintf("%s/xrpc/com.atproto.repo.getRecord", atprotoPDS)
+
+	params := url.Values{}
+	params.Add("repo", evt.Repo)
+	params.Add("collection", "app.boshi.feed.post")
+	splitPath := strings.Split(op.Path, "/")
+	params.Add("rkey", splitPath[len(splitPath)-1])
+
+	fullUrl := fmt.Sprintf("%s?%s", apiURL, params.Encode())
+
+	resp, err := http.Get(fullUrl)
+	if err != nil {
+		log.ErrorContext(context.Background(), "Failed to get record", "error", err)
+		return payloads.Record{}, time.Now(), err
+	}
+	defer resp.Body.Close()
+
+	var record payloads.Record
+	if err := json.NewDecoder(resp.Body).Decode(&record); err != nil {
+		log.ErrorContext(context.Background(), "Failed to parse record response", "error", err)
+		return payloads.Record{}, time.Now(), err
+	}
+
+	indexedTime, err := time.Parse("2006-01-02 15:04:05.000", record.Value.Timestamp)
+	if err != nil {
+		log.ErrorContext(context.Background(), "Failed to parse time", "error", err)
+		return record, time.Now(), err
+	}
+
+	return record, indexedTime, err
+}
+
 func main() {
 
 	log.Debug("Connecting to postgres")
 	pool := database.Connect(context.Background())
 	defer pool.Close()
 	queries := sqlc.New(pool)
-	
+
 	repoCallbacks := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
 			for _, op := range evt.Ops {
 				if strings.HasPrefix(op.Path, "app.boshi.feed") {
 					uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
 					log.Info("New Activity @", "uri", uri)
-					queries.CreatePost(context.Background(), sqlc.CreatePostParams{Uri: uri, Cid: op.Cid.String(), AuthorDid: evt.Repo, IndexedAt: pgtype.Timestamptz{
-						Time:  time.Now(),
-						Valid: true,
-					}})
-					log.Info("Post created", "uri", uri)
+
+					record, indexedTime, err := getRecord(evt, op)
+					if err != nil {
+						log.ErrorContext(context.Background(), "Failed to get record", "error", err)
+					}
+
+					post := sqlc.CreatePostParams{
+						Uri:       uri,
+						Cid:       op.Cid.String(),
+						Title:     record.Value.Title,
+						Content:   record.Value.Content,
+						IndexedAt: pgtype.Timestamptz{Time: indexedTime, Valid: true},
+					}
+
+					queries.CreatePost(context.Background(), post)
+
+					log.InfoContext(context.Background(), "Post created", "uri", uri, "post", post)
 				}
 			}
 			return nil
