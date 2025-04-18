@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -170,11 +171,16 @@ class _VerificationForm extends State<VerificationForm> {
               }
             },
           ),
+          SizedBox(height: 8),
           FutureBuilder<double>(
             future: _ttl,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return TTLTimer(ttl: snapshot.data!);
+                return TTLController(
+                  ttl: snapshot.data!,
+                  viewModel: widget.viewModel,
+                  email: widget.email,
+                );
               } else if (snapshot.hasError) {
                 print(snapshot.error);
                 return Text('Unable to retrieve TTL');
@@ -189,15 +195,22 @@ class _VerificationForm extends State<VerificationForm> {
   }
 }
 
-class TTLTimer extends StatefulWidget {
-  const TTLTimer({super.key, required this.ttl});
+class TTLController extends StatefulWidget {
+  const TTLController({
+    super.key,
+    required this.ttl,
+    required this.viewModel,
+    required this.email,
+  });
   final double ttl;
+  final EmailVerificationViewModel viewModel;
+  final String email;
 
   @override
-  State<TTLTimer> createState() => _TTLTimer();
+  State<TTLController> createState() => _TTLController();
 }
 
-class _TTLTimer extends State<TTLTimer> {
+class _TTLController extends State<TTLController> {
   late double _ttl;
 
   @override
@@ -218,13 +231,112 @@ class _TTLTimer extends State<TTLTimer> {
 
   @override
   Widget build(BuildContext context) {
-    if (_ttl <= 0) {
-      return ShadButton(
-        child: Text('Request again'),
-      );
+    return _ttl > 0
+        ? TTLTimer(ttl: _ttl)
+        : CodeRequestButton(viewModel: widget.viewModel, email: widget.email);
+  }
+}
+
+class TTLTimer extends StatelessWidget {
+  const TTLTimer({super.key, required this.ttl});
+
+  final double ttl;
+
+  @override
+  Widget build(BuildContext context) {
+    final minutes = ttl ~/ 60;
+    final seconds = ttl % 60;
+    String minutesMsg = '';
+    String secondsMsg = '';
+
+    if (minutes > 2) {
+      minutesMsg = '$minutes minutes';
+    } else if (minutes == 1) {
+      minutesMsg = '$minutes minute';
     }
 
-    return Text('Request another code in $_ttl seconds');
+    if (seconds != 1) {
+      secondsMsg = '$seconds seconds';
+    } else {
+      secondsMsg = '$seconds second';
+    }
+
+    if (minutesMsg.isNotEmpty) {
+      return Text('Request again in $minutesMsg and $secondsMsg');
+    }
+    return Text('Request again in $secondsMsg');
+  }
+}
+
+class CodeRequestButton extends StatefulWidget {
+  const CodeRequestButton(
+      {super.key, required this.viewModel, required this.email});
+
+  final EmailVerificationViewModel viewModel;
+  final String email;
+
+  @override
+  State<CodeRequestButton> createState() => _CodeRequestButtonState();
+}
+
+class _CodeRequestButtonState extends State<CodeRequestButton> {
+  void _handleResendCode() async {
+    final result = await widget.viewModel.resendCode.execute(widget.email);
+    if (!mounted) {
+      return;
+    }
+
+    switch (result) {
+      case Ok<void>():
+        showDialog<String>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Code sent'),
+            content: const Text('Please check your email for '
+                'the verification code.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      case Error<void>():
+        showDialog<String>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Unable to send code'),
+            content: Text(formatExceptionMsg(result.error)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: _handleResendCode,
+      style: TextButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+      child: Text(
+        'Request again',
+        style: TextStyle(
+          color: Colors.black,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    );
   }
 }
 
