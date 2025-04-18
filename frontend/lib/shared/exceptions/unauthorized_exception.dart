@@ -3,5 +3,6 @@ class UnauthorizedException implements Exception {
   UnauthorizedException(this.method);
 
   @override
-  String toString() => 'NotAuthorizedException: Not authorized to use $method';
+  String toString() =>
+      'UnauthorizedException: User is not authorized to use $method';
 }
