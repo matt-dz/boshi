@@ -33,6 +33,8 @@ func GetVerificationStatus(w http.ResponseWriter, r *http.Request) {
 	verified, err := sqlcDb.VerificationStatus(ctx, userId)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.DebugContext(logCtx, "User not found")
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
 	} else if err != nil {
 		log.ErrorContext(logCtx, "Error getting verification status", slog.Any("error", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -43,7 +45,7 @@ func GetVerificationStatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(
 		verificationStatusResponse{
-			Verified: err == nil && !verified.Time.IsZero(),
+			Verified: !verified.Time.IsZero(),
 		},
 	)
 	if err != nil {
