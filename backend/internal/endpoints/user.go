@@ -67,7 +67,7 @@ func GetCodeExpiry(w http.ResponseWriter, r *http.Request) {
 	email, err := sqlcDb.GetEmail(ctx, userId)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.DebugContext(logCtx, "User not found")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	} else if err != nil {
 		log.ErrorContext(logCtx, "Error getting email", slog.Any("error", err))
@@ -92,8 +92,8 @@ func GetCodeExpiry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if duration == -1 {
-		log.DebugContext(logCtx, "Code expired")
-		http.Error(w, "Code expired", http.StatusGone)
+		log.DebugContext(logCtx, "No expiration")
+		http.Error(w, "No expiration", http.StatusConflict)
 		return
 	}
 
@@ -101,7 +101,7 @@ func GetCodeExpiry(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(
 		getCodeExpiryResponse{
-			TTL: max(duration.Seconds(), 0),
+			TTL: duration.Seconds(),
 		},
 	)
 }
