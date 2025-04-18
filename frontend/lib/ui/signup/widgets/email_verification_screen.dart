@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:frontend/ui/models/verification_code/verification_code.dart';
@@ -66,16 +67,13 @@ class VerificationForm extends StatefulWidget {
 
 class _VerificationForm extends State<VerificationForm> {
   final _formKey = GlobalKey<ShadFormState>();
-  double? _ttl;
+  late Future<double> _ttl;
   String? _errMsg;
 
   @override
   void initState() {
     super.initState();
-    _getCodeTTL().then((value) {
-      logger.d(value);
-      _ttl = value;
-    });
+    _ttl = _getCodeTTL();
   }
 
   Future<double> _getCodeTTL() async {
@@ -172,10 +170,61 @@ class _VerificationForm extends State<VerificationForm> {
               }
             },
           ),
-          Text('Request again in $_ttl seconds'),
+          FutureBuilder<double>(
+            future: _ttl,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return TTLTimer(ttl: snapshot.data!);
+              } else if (snapshot.hasError) {
+                print(snapshot.error);
+                return Text('Unable to retrieve TTL');
+              }
+
+              return const CircularProgressIndicator();
+            },
+          ),
         ],
       ),
     );
+  }
+}
+
+class TTLTimer extends StatefulWidget {
+  const TTLTimer({super.key, required this.ttl});
+  final double ttl;
+
+  @override
+  State<TTLTimer> createState() => _TTLTimer();
+}
+
+class _TTLTimer extends State<TTLTimer> {
+  late double _ttl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ttl = widget.ttl;
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_ttl == 0) {
+        timer.cancel();
+        return;
+      }
+
+      setState(() {
+        _ttl--;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_ttl <= 0) {
+      return ShadButton(
+        child: Text('Request again'),
+      );
+    }
+
+    return Text('Request another code in $_ttl seconds');
   }
 }
 

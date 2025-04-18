@@ -34,7 +34,7 @@ func GetVerificationStatus(w http.ResponseWriter, r *http.Request) {
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.DebugContext(logCtx, "User not found")
 	} else if err != nil {
-		log.ErrorContext(logCtx, "Error getting verification status")
+		log.ErrorContext(logCtx, "Error getting verification status", slog.Any("error", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
