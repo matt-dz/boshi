@@ -1,5 +1,6 @@
 import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
+import 'package:frontend/shared/exceptions/user_not_found_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/utils/result.dart';
 import './atproto_repository.dart';
@@ -96,14 +97,14 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   @override
   Future<Result<void>> addVerificationEmail(String email) async {
     if (!authorized) {
-      return Result.error(OAuthUnauthorized());
+      return Result.error(OAuthUnauthorized('addVerificationEmail'));
     }
 
     logger.d('Retrieving user DID');
     final userDid = atProto!.oAuthSession?.sub;
     if (userDid == null) {
       logger.e('User DID is null');
-      return Result.error(OAuthUnauthorized('Not authorized to verify email'));
+      return Result.error(OAuthUnauthorized('addVerificationEmail'));
     }
 
     final result = await _localDataService.addVerificationEmail(email, userDid);
@@ -128,7 +129,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     final userDid = atProto!.oAuthSession?.sub;
     if (userDid == null) {
       logger.e('User DID is null');
-      return Result.error(OAuthUnauthorized('Not authorized to verify email'));
+      return Result.error(OAuthUnauthorized('confirmVerificationCode'));
     }
 
     return await _localDataService.confirmVerificationCode(
@@ -148,7 +149,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     final userDid = atProto!.oAuthSession?.sub;
     if (userDid == null) {
       logger.e('User DID is null');
-      return Result.error(OAuthUnauthorized('Not authorized to verify email'));
+      return Result.error(OAuthUnauthorized('isUserVerified'));
     }
 
     final result = await _localDataService.isUserVerified(userDid);
@@ -156,6 +157,9 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
       case Ok<VerificationStatus>():
         return Result.ok(result.value.verified);
       case Error<VerificationStatus>():
+        if (result.error is UserNotFoundException) {
+          return Result.ok(false); // User not found, they aren't verified
+        }
         return Result.error(result.error);
     }
   }

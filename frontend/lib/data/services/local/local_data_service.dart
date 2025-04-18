@@ -175,6 +175,12 @@ class LocalDataService {
         ),
       );
 
+      final body = result.body.trim();
+
+      if (result.statusCode == 404 && body == 'User not found') {
+        return Result.error(UserNotFoundException());
+      }
+
       if (result.statusCode >= 400) {
         throw HttpException(result.body);
       }

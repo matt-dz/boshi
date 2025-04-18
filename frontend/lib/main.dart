@@ -77,6 +77,7 @@ class MainApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/signup',
+          redirect: signupRouteGuard,
           builder: (context, state) => EmailRegisterScreen(
             viewModel: EmailRegisterViewModel(
               atProtoRepository: context.read<AtProtoRepository>(),

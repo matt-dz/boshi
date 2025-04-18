@@ -70,7 +70,6 @@ FutureOr<String?> rootRouteGuard(
 ) async {
   final atProto = context.read<AtProtoRepository>();
   final verified = await atProto.isUserVerified();
-  logger.d(verified);
   switch (verified) {
     case Ok<bool>():
       if (!verified.value) {
@@ -91,6 +90,24 @@ FutureOr<String?> verifyEmailRouteGuard(
 ) async {
   if (state.uri.queryParameters['email'] == null) {
     return '/signup';
+  }
+  return null;
+}
+
+FutureOr<String?> signupRouteGuard(
+  BuildContext context,
+  GoRouterState state,
+) async {
+  final atProto = context.read<AtProtoRepository>();
+  final verified = await atProto.isUserVerified();
+  switch (verified) {
+    case Ok<bool>():
+      if (verified.value) {
+        return '/';
+      }
+    case Error<bool>():
+      print(verified.error.toString());
+      return '/login';
   }
   return null;
 }
