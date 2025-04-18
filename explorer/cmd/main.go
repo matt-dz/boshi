@@ -26,8 +26,8 @@ var log = logger.GetLogger()
 var uri string
 var firehoseIdentifier string
 
-var retries = 5
-var baseDelay = 100 * time.Millisecond
+const retries = 5
+const baseDelay = 100 * time.Millisecond
 
 func init() {
 	err := godotenv.Load()
@@ -47,12 +47,6 @@ func init() {
 }
 
 func runExplorer(workScheduler *sequential.Scheduler) {
-		defer func() {
-			if r := recover(); r != nil {
-				log.Error("Recovered from panic: ", r)
-			}
-		}()
-
 		for {
 			var firehoseConnection *websocket.Conn = nil
 			var err error
@@ -63,7 +57,7 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 				firehoseConnection, _, err = websocket.DefaultDialer.Dial(uri, http.Header{})
 				if err != nil {
 					delay := time.Duration(math.Pow(2, float64(i))) * baseDelay
-					log.Error("WebSocket retry", "attempt", i+1, "waiting", delay)
+					log.Error("WebSocket retry", "attempt", i+1, "waiting", delay, "error", err)
 					time.Sleep(delay)
 					continue
 				} else {
