@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -9,7 +8,8 @@ import 'package:frontend/utils/result.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend/exceptions/format.dart';
 import 'package:frontend/ui/core/ui/error.dart' as error_widget;
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/shared/exceptions/code_not_found_exception.dart';
+import 'package:frontend/shared/exceptions/user_not_found_exception.dart';
 
 const verificationInputId = 'verification-input';
 
@@ -39,10 +39,23 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             child: ListenableBuilder(
               listenable: widget.viewModel,
               builder: (context, state) {
-                return VerificationForm(
-                  viewModel: widget.viewModel,
-                  email: widget.email,
-                );
+                if (widget.viewModel.load.completed) {
+                  return VerificationForm(
+                    viewModel: widget.viewModel,
+                    email: widget.email,
+                  );
+                } else if (widget.viewModel.load.error) {
+                  final err = widget.viewModel.load.result! as Error;
+                  switch (err.error) {
+                    case UserNotFoundException():
+                    case CodeNotFoundException():
+                      context.go('/signup');
+                    default:
+                      print(err.error);
+                      return Center(child: Text('Unable to load screen'));
+                  }
+                }
+                return Center(child: CircularProgressIndicator());
               },
             ),
           ),
@@ -68,31 +81,7 @@ class VerificationForm extends StatefulWidget {
 
 class _VerificationForm extends State<VerificationForm> {
   final _formKey = GlobalKey<ShadFormState>();
-  late Future<double> _ttl;
   String? _errMsg;
-
-  @override
-  void initState() {
-    super.initState();
-    _ttl = _getCodeTTL();
-  }
-
-  Future<double> _getCodeTTL() async {
-    final result = await widget.viewModel.getCodeTTL();
-    if (!mounted) {
-      return 0.0;
-    }
-
-    switch (result) {
-      case Ok<double>():
-        logger.d(result.value);
-        return result.value;
-      case Error<double>():
-        print(result.error.toString());
-        context.go('/error');
-        return 0.0;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,22 +161,10 @@ class _VerificationForm extends State<VerificationForm> {
             },
           ),
           SizedBox(height: 8),
-          FutureBuilder<double>(
-            future: _ttl,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return TTLController(
-                  ttl: snapshot.data!,
-                  viewModel: widget.viewModel,
-                  email: widget.email,
-                );
-              } else if (snapshot.hasError) {
-                print(snapshot.error);
-                return Text('Unable to retrieve TTL');
-              }
-
-              return const CircularProgressIndicator();
-            },
+          TTLController(
+            ttl: (widget.viewModel.load.result! as Ok).value,
+            viewModel: widget.viewModel,
+            email: widget.email,
           ),
         ],
       ),
@@ -269,8 +246,11 @@ class TTLTimer extends StatelessWidget {
 }
 
 class CodeRequestButton extends StatefulWidget {
-  const CodeRequestButton(
-      {super.key, required this.viewModel, required this.email});
+  const CodeRequestButton({
+    super.key,
+    required this.viewModel,
+    required this.email,
+  });
 
   final EmailVerificationViewModel viewModel;
   final String email;

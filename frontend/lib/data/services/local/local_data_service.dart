@@ -20,6 +20,8 @@ import 'package:frontend/data/models/requests/add_email/add_email.dart';
 import 'package:frontend/data/models/requests/verify_code/verify_code.dart';
 import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
 import 'package:frontend/shared/exceptions/verification_code_already_set_exception.dart';
+import 'package:frontend/shared/exceptions/code_not_found_exception.dart';
+import 'package:frontend/shared/exceptions/user_not_found_exception.dart';
 import 'package:frontend/data/models/responses/verification_code_ttl/verification_code_ttl.dart';
 
 class LocalDataService {
@@ -188,7 +190,7 @@ class LocalDataService {
     }
   }
 
-  Future<Result<VerificationCodeTTL>> getVerificationCodeExpiration(
+  Future<Result<VerificationCodeTTL>> getVerificationCodeTTL(
     String userDID,
   ) async {
     try {
@@ -197,8 +199,17 @@ class LocalDataService {
         Uri.parse('${EnvironmentConfig.backendBaseURL}/user/$userDID/code/ttl'),
       );
 
+      final body = result.body.trim();
+
+      if (result.statusCode == 404) {
+        if (body == 'User not found') {
+          throw UserNotFoundException();
+        } else if (body == 'Code not found') {
+          throw CodeNotFoundException();
+        }
+      }
       if (result.statusCode >= 400) {
-        throw HttpException(result.body);
+        throw HttpException(body);
       }
 
       logger.d('Successfully retrieved ttl');

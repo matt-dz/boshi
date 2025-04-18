@@ -8,13 +8,23 @@ class EmailVerificationViewModel extends ChangeNotifier {
   EmailVerificationViewModel({
     required AtProtoRepository atProtoRepository,
   }) : _atProtoRepository = atProtoRepository {
+    load = Command0(_load)..execute();
     verifyCode = Command1<void, VerificationCode>(_verifyCode);
     resendCode = Command1<void, String>(_resendCode);
   }
 
   final AtProtoRepository _atProtoRepository;
-  late Command1<void, VerificationCode> verifyCode;
-  late Command1<void, String> resendCode;
+  late final Command0 load;
+  late final Command1<void, VerificationCode> verifyCode;
+  late final Command1<void, String> resendCode;
+
+  Future<Result<void>> _load() async {
+    try {
+      return await _atProtoRepository.getVerificationCodeTTL();
+    } finally {
+      notifyListeners();
+    }
+  }
 
   Future<Result<void>> _verifyCode(VerificationCode code) async {
     try {
@@ -36,6 +46,6 @@ class EmailVerificationViewModel extends ChangeNotifier {
   }
 
   Future<Result<double>> getCodeTTL() async {
-    return await _atProtoRepository.getVerificationCodeExpiration();
+    return await _atProtoRepository.getVerificationCodeTTL();
   }
 }

@@ -161,7 +161,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   }
 
   @override
-  Future<Result<double>> getVerificationCodeExpiration() async {
+  Future<Result<double>> getVerificationCodeTTL() async {
     if (!authorized) {
       return Result.error(OAuthUnauthorized());
     }
@@ -173,8 +173,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
       return Result.error(OAuthUnauthorized());
     }
 
-    final ttlResult =
-        await _localDataService.getVerificationCodeExpiration(userDid);
+    final ttlResult = await _localDataService.getVerificationCodeTTL(userDid);
     switch (ttlResult) {
       case Ok<VerificationCodeTTL>():
         return Result.ok(ttlResult.value.ttl);

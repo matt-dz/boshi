@@ -32,5 +32,5 @@ abstract class AtProtoRepository extends ChangeNotifier {
   Future<Result<void>> addVerificationEmail(String email);
   Future<Result<void>> confirmVerificationCode(String email, String code);
   Future<Result<bool>> isUserVerified();
-  Future<Result<double>> getVerificationCodeExpiration();
+  Future<Result<double>> getVerificationCodeTTL();
 }

@@ -96,7 +96,7 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
   }
 
   @override
-  Future<Result<double>> getVerificationCodeExpiration() {
+  Future<Result<double>> getVerificationCodeTTL() {
     throw UnimplementedError();
   }
 }
