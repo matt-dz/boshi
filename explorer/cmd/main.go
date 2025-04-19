@@ -126,8 +126,12 @@ func main() {
 							IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
 						}
 						
-						queries.CreatePost(context.Background(), storedPost)
-						log.Info("Post created", slog.Any("post", storedPost))
+						returnedPost, err := queries.CreatePost(context.Background(), storedPost)
+						if err != nil {
+							log.Error("Failed to store post", slog.Any("error", err))
+						} else {
+							log.Info("Post created", slog.Any("post", returnedPost))
+						}
 					}
 
 				}
