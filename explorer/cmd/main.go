@@ -92,11 +92,11 @@ func HandleStoringPost(
 	op *atproto.SyncSubscribeRepos_RepoOp,
 	cid cid.Cid,
 	queries *sqlc.Queries,
-) {
+) (error) {
 	timeStamp, err := time.Parse(time.RFC3339, feedPost.CreatedAt)
 	if err != nil {
 		log.Error("Failed to parse time from post")
-		return
+		return nil
 	}
 
 	uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
@@ -111,15 +111,17 @@ func HandleStoringPost(
 	returnedPost, err := queries.CreatePost(context.Background(), storedPost)
 	if err != nil {
 		log.Error("Failed to store post", slog.Any("error", err))
+		return nil
 	} else {
 		log.Info("Post created", slog.Any("post", returnedPost))
 	}
+	return nil
 }
 
 func UnmarshalAndStorePost(
 	evt *atproto.SyncSubscribeRepos_Commit,
 	queries *sqlc.Queries,
-) {
+) (error) {
 	blocks := evt.Blocks
 	r, err := repo.ReadRepoFromCar(context.Background(), bytes.NewReader(blocks))
 	if err != nil {
@@ -134,13 +136,18 @@ func UnmarshalAndStorePost(
 			}
 
 			var feedPost bsky.FeedPost
-			feedPost.UnmarshalCBOR(bytes.NewReader(*post))
+			err = feedPost.UnmarshalCBOR(bytes.NewReader(*post))
+			if err != nil {
+				log.Error("Failed to unmarshal feed post")
+				continue
+			}
 
 			if len(feedPost.Tags) != 0 && slices.Contains(feedPost.Tags, "boshi.post") {
-				HandleStoringPost(feedPost, evt, op, cid, queries)
+				return HandleStoringPost(feedPost, evt, op, cid, queries)
 			}
 		}
 	}
+	return nil
 }
 
 
@@ -153,8 +160,7 @@ func main() {
 
 	repoCallbacks := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
-			go UnmarshalAndStorePost(evt, queries)
-			return nil
+			return UnmarshalAndStorePost(evt, queries)
 		},
 	}
 
