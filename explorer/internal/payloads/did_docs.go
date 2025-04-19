@@ -10,13 +10,15 @@ type DIDDocument struct {
 	Service []Service `json:"service"`
 }
 
+type Value struct {
+	Type      string `json:"$type"`
+	Title     string `json:"title"`
+	Content   string `json:"content"`
+	Timestamp string `json:"timestamp"`
+}
+
 type Record struct {
 	URI   string `json:"uri"`
 	CID   string `json:"cid"`
-	Value struct {
-		Type      string `json:"$type"`
-		Title     string `json:"title"`
-		Content   string `json:"content"`
-		Timestamp string `json:"timestamp"`
-	} `json:"value"`
+	Value Value  `json:"value"`
 }
