@@ -22,6 +22,7 @@ import (
 	"github.com/bluesky-social/indigo/events/schedulers/sequential"
 	"github.com/bluesky-social/indigo/repo"
 	"github.com/gorilla/websocket"
+	"github.com/ipfs/go-cid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/joho/godotenv"
 )
@@ -85,6 +86,66 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 	}
 }
 
+func HandleStoringPost(
+	feedPost bsky.FeedPost,
+	evt *atproto.SyncSubscribeRepos_Commit,
+	op *atproto.SyncSubscribeRepos_RepoOp,
+	cid cid.Cid,
+	queries *sqlc.Queries,
+) {
+	timeStamp, err := time.Parse(time.RFC3339, feedPost.CreatedAt)
+	if err != nil {
+		log.Error("Failed to parse time from post")
+		return
+	}
+
+	uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
+
+	storedPost := sqlc.CreatePostParams{
+		Uri:       uri,
+		Cid:       cid.String(),
+		AuthorDid: evt.Repo,
+		IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
+	}
+
+	returnedPost, err := queries.CreatePost(context.Background(), storedPost)
+	if err != nil {
+		log.Error("Failed to store post", slog.Any("error", err))
+	} else {
+		log.Info("Post created", slog.Any("post", returnedPost))
+	}
+}
+
+func UnmarshalAndStorePost(
+	evt *atproto.SyncSubscribeRepos_Commit,
+	queries *sqlc.Queries,
+) {
+	blocks := evt.Blocks
+	r, err := repo.ReadRepoFromCar(context.Background(), bytes.NewReader(blocks))
+	if err != nil {
+		log.Error("Failed to get repo from blocks")
+	}
+
+	for _, op := range evt.Ops {
+		if strings.HasPrefix(op.Path, "app.bsky.feed.post") {
+			cid, post, err := r.GetRecordBytes(context.Background(), op.Path)
+			if err != nil {
+				continue
+			}
+			
+			log.Info("smth", slog.Any("post", post))
+
+			var feedPost bsky.FeedPost
+			feedPost.UnmarshalCBOR(bytes.NewReader(*post))
+
+			if len(feedPost.Tags) != 0 && slices.Contains(feedPost.Tags, "boshi.post") {
+				HandleStoringPost(feedPost, evt, op, cid, queries)
+			}
+		}
+	}
+}
+
+
 func main() {
 
 	log.Debug("Connecting to postgres")
@@ -94,48 +155,7 @@ func main() {
 
 	repoCallbacks := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
-			blocks := evt.Blocks
-			r, err := repo.ReadRepoFromCar(context.Background(), bytes.NewReader(blocks))
-			if err != nil {
-				log.Error("Failed to get repo from blocks")
-			}
-
-			for _, op := range evt.Ops {
-				if strings.HasPrefix(op.Path, "app.bsky.feed.post") {
-					cid, post, err := r.GetRecordBytes(context.Background(), op.Path)
-					if err != nil {
-						continue
-					}
-
-					var feedPost bsky.FeedPost
-					feedPost.UnmarshalCBOR(bytes.NewReader(*post))
-					
-					if len(feedPost.Tags) != 0 && slices.Contains(feedPost.Tags, "boshi.post") {
-						timeStamp, err := time.Parse(time.RFC3339, feedPost.CreatedAt)
-						if err != nil {
-							log.Error("Failed to parse time from post")
-							break
-						}
-
-						uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
-
-						storedPost := sqlc.CreatePostParams{
-							Uri:       uri,
-							Cid:       cid.String(),
-							AuthorDid: evt.Repo,
-							IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
-						}
-						
-						returnedPost, err := queries.CreatePost(context.Background(), storedPost)
-						if err != nil {
-							log.Error("Failed to store post", slog.Any("error", err))
-						} else {
-							log.Info("Post created", slog.Any("post", returnedPost))
-						}
-					}
-
-				}
-			}
+			go UnmarshalAndStorePost(evt, queries)
 			return nil
 		},
 	}
