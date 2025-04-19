@@ -92,13 +92,8 @@ class _VerificationForm extends State<VerificationForm> {
 
   @override
   Widget build(BuildContext context) {
-    switch (widget.viewModel.verifyCode.result) {
-      case Ok<void>():
-        context.go('/');
-      default:
-        break;
-    }
-
+    final formEnabled = !(widget.viewModel.verifyCode.running ||
+        widget.viewModel.verifyCode.completed);
     return ShadForm(
       key: _formKey,
       child: Column(
@@ -106,6 +101,7 @@ class _VerificationForm extends State<VerificationForm> {
         mainAxisSize: MainAxisSize.min,
         children: [
           ShadInputOTPFormField(
+            enabled: formEnabled,
             id: verificationInputId,
             maxLength: 6,
             label: const Text('Verification Code'),
@@ -137,7 +133,7 @@ class _VerificationForm extends State<VerificationForm> {
           ),
           SizedBox(height: 8),
           ShadButton(
-            enabled: !widget.viewModel.verifyCode.running,
+            enabled: formEnabled,
             width: double.infinity,
             child: Text('Enter'),
             onPressed: () async {

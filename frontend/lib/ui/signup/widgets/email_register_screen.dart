@@ -79,7 +79,6 @@ class _SignupForm extends State<SignupForm> {
     });
 
     if (!_formKey.currentState!.validate()) {
-      logger.d('here');
       return;
     }
 
@@ -106,6 +105,8 @@ class _SignupForm extends State<SignupForm> {
 
   @override
   Widget build(BuildContext context) {
+    final formEnabled = !(widget.viewModel.addEmail.running ||
+        widget.viewModel.addEmail.completed);
     return ShadCard(
       width: 400,
       title: const Text('Enter University Email'),
@@ -121,7 +122,7 @@ class _SignupForm extends State<SignupForm> {
               ShadInputFormField(
                 placeholder: Text('w.clayton@ufl.edu'),
                 controller: emailController,
-                enabled: !widget.viewModel.addEmail.running,
+                enabled: formEnabled,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 8),
@@ -130,7 +131,7 @@ class _SignupForm extends State<SignupForm> {
               ),
               const SizedBox(height: 8),
               ShadButton(
-                enabled: !widget.viewModel.addEmail.running,
+                enabled: formEnabled,
                 onPressed: _onSignup,
                 child: const Text('Enter'),
               ),

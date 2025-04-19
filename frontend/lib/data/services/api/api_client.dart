@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:convert';
-import 'dart:js_interop';
 import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
