@@ -55,7 +55,8 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
 
   const res = await builder.execute()
 
-  console.log(res)
+  console.log('Result length:', res.length)
+  console.log('Result', res)
 
   const agent = new Agent('https://public.api.bsky.app')
   const profiles = await agent.getProfiles({
@@ -81,7 +82,7 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
     }
   })
 
-  console.log(feed)
+  console.log('Feed', feed)
 
   return {
     feed,
