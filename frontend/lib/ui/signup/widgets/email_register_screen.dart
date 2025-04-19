@@ -130,6 +130,7 @@ class _SignupForm extends State<SignupForm> {
               ),
               const SizedBox(height: 8),
               ShadButton(
+                enabled: !widget.viewModel.addEmail.running,
                 onPressed: _onSignup,
                 child: const Text('Enter'),
               ),

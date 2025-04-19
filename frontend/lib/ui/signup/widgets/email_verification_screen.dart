@@ -34,40 +34,40 @@ class EmailVerificationScreen extends StatefulWidget {
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: ShadCard(
-            width: 400,
-            child: ListenableBuilder(
-              listenable: widget.viewModel,
-              builder: (context, state) {
-                logger.d('refreshed');
-                if (widget.viewModel.load.completed) {
-                  return VerificationForm(
-                    viewModel: widget.viewModel,
-                    email: widget.email,
-                  );
-                } else if (widget.viewModel.load.error) {
-                  final err = widget.viewModel.load.result! as Error;
-                  switch (err.error) {
-                    case UserNotFoundException():
-                    case CodeNotFoundException():
-                      context.go('/signup');
-                    default:
-                      print(err.error);
-                      return ErrorScreen(
-                        message: formatExceptionMsg(err.error),
-                        onRefresh: widget.viewModel.reload,
-                      );
-                  }
-                }
-                return Center(child: CircularProgressIndicator());
-              },
+    return ListenableBuilder(
+      listenable: widget.viewModel,
+      builder: (context, state) {
+        logger.d('refreshed');
+        if (widget.viewModel.load.error) {
+          final err = widget.viewModel.load.result! as Error;
+          switch (err.error) {
+            case UserNotFoundException():
+            case CodeNotFoundException():
+              context.go('/signup');
+            default:
+              print(err.error);
+              return ErrorScreen(
+                message: formatExceptionMsg(err.error),
+                onRefresh: widget.viewModel.reload,
+              );
+          }
+        }
+        return Scaffold(
+          body: SafeArea(
+            child: Center(
+              child: widget.viewModel.load.completed
+                  ? ShadCard(
+                      width: 400,
+                      child: VerificationForm(
+                        viewModel: widget.viewModel,
+                        email: widget.email,
+                      ),
+                    )
+                  : CircularProgressIndicator(),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
