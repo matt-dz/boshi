@@ -98,7 +98,7 @@ class ApiClient {
       tags: List.from(['boshi.post']),
       facets: [
         bsky.Facet(
-          index: bsky.ByteSlice(byteStart: 0, byteEnd: post.title.length + 1),
+          index: bsky.ByteSlice(byteStart: 0, byteEnd: post.title.length),
           features: [bsky.FacetFeature.tag(data: bsky.FacetTag(tag: 'boshi'))],
         ),
       ],
