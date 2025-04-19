@@ -16,10 +16,6 @@ export const handler = async (
     .orderBy('indexed_at', 'desc')
     .limit(params.limit)
 
-  if (params.cursor) {
-    const timeStr = new Date(parseInt(params.cursor, 10))
-    builder = builder.where('post.indexed_at', '<', timeStr)
-  }
   const res = await builder.execute()
 
   const feed = res.map((row) => ({
@@ -34,7 +30,7 @@ export const handler = async (
 export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
   let builder = ctx.db
     .selectFrom('post')
-    .innerJoin('email', 'post.author_did', 'email.user_id')
+    .innerJoin('emails', 'post.author_did', 'emails.user_id')
     .select([
       'post.author_did',
       'post.cid',
@@ -42,15 +38,11 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
       'post.title',
       'post.content',
       'post.indexed_at',
-      'email.school as school',
+      'emails.school as school',
     ])
     .orderBy('post.indexed_at', 'desc')
     .limit(params.limit)
 
-  if (params.cursor) {
-    const timeStr = new Date(parseInt(params.cursor, 10))
-    builder = builder.where('post.indexed_at', '<', timeStr)
-  }
   const res = await builder.execute()
 
   const agent = new Agent('https://public.api.bsky.app')
