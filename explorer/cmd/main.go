@@ -3,26 +3,21 @@ package main
 import (
 	"boshi-explorer/internal/database"
 	"boshi-explorer/internal/logger"
-	"boshi-explorer/internal/payloads"
 	"boshi-explorer/internal/sqlc"
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"math"
 	"slices"
 
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/api/bsky"
-	"github.com/bluesky-social/indigo/atproto/identity"
-	"github.com/bluesky-social/indigo/atproto/syntax"
 	"github.com/bluesky-social/indigo/events"
 	"github.com/bluesky-social/indigo/events/schedulers/sequential"
 	"github.com/bluesky-social/indigo/repo"
@@ -90,72 +85,25 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 	}
 }
 
-func getRecord(evt *atproto.SyncSubscribeRepos_Commit, op *atproto.SyncSubscribeRepos_RepoOp) (payloads.Record, time.Time, error) {
-	did, err := syntax.ParseDID(evt.Repo)
-	if err != nil {
-		log.Error("Failed to parse did", "did", evt.Repo)
-		return payloads.Record{}, time.Time{}, err
-	}
-
-	didDoc, err := identity.DefaultDirectory().LookupDID(context.Background(), did)
-	if err != nil {
-		log.Error("Failed to lookup did", "did", did.AtIdentifier())
-		return payloads.Record{}, time.Time{}, err
-	}
-
-	apiURL := fmt.Sprintf("%s/xrpc/com.atproto.repo.getRecord", didDoc.PDSEndpoint())
-
-	params := url.Values{}
-	params.Add("repo", evt.Repo)
-	params.Add("collection", "app.boshi.feed.post")
-	splitPath := strings.Split(op.Path, "/")
-	params.Add("rkey", splitPath[len(splitPath)-1])
-
-	fullUrl := fmt.Sprintf("%s?%s", apiURL, params.Encode())
-
-	resp, err := http.Get(fullUrl)
-	if err != nil {
-		log.Error("Failed to get record", slog.Any("error", err))
-		return payloads.Record{}, time.Time{}, err
-	}
-	defer resp.Body.Close()
-
-	var record payloads.Record
-	if err := json.NewDecoder(resp.Body).Decode(&record); err != nil {
-		log.Error("Failed to parse record response", slog.Any("error", err))
-		return payloads.Record{}, time.Time{}, err
-	}
-
-	indexedTime, err := time.Parse("2006-01-02 15:04:05.000", record.Value.Timestamp)
-	if err != nil {
-		log.Error("Failed to parse time", slog.Any("error", err))
-		return record, time.Time{}, err
-	}
-
-	return record, indexedTime, err
-}
-
 func main() {
 
 	log.Debug("Connecting to postgres")
 	pool := database.Connect(context.Background())
 	defer pool.Close()
-	_ = sqlc.New(pool)
+	queries := sqlc.New(pool)
 
 	repoCallbacks := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
 			blocks := evt.Blocks
-
 			r, err := repo.ReadRepoFromCar(context.Background(), bytes.NewReader(blocks))
 			if err != nil {
-				log.Error("Failed repo")
+				log.Error("Failed to get repo from blocks")
 			}
 
 			for _, op := range evt.Ops {
 				if strings.HasPrefix(op.Path, "app.bsky.feed.post") {
 					cid, post, err := r.GetRecordBytes(context.Background(), op.Path)
 					if err != nil {
-						log.Error("Failed to get record", "error", err.Error())
 						continue
 					}
 
@@ -163,22 +111,23 @@ func main() {
 					feedPost.UnmarshalCBOR(bytes.NewReader(*post))
 					
 					if len(feedPost.Tags) != 0 && slices.Contains(feedPost.Tags, "boshi.post") {
-						fmt.Printf("%+v\n", feedPost)
 						timeStamp, err := time.Parse(time.RFC3339, feedPost.CreatedAt)
 						if err != nil {
 							log.Error("Failed to parse time from post")
 							break
 						}
 
-						_ = sqlc.CreatePostParams{
+						uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
+
+						storedPost := sqlc.CreatePostParams{
 							Uri:       uri,
 							Cid:       cid.String(),
 							AuthorDid: evt.Repo,
 							IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
 						}
 						
-						// queries.CreatePost(context.Background(), storedPost)
-						log.Info("Post created", slog.Any("post", post))
+						queries.CreatePost(context.Background(), storedPost)
+						log.Info("Post created", slog.Any("post", storedPost))
 					}
 
 				}
