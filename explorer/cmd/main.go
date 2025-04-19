@@ -5,11 +5,13 @@ import (
 	"boshi-explorer/internal/logger"
 	"boshi-explorer/internal/payloads"
 	"boshi-explorer/internal/sqlc"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"math"
+	"slices"
 
 	"net/http"
 	"net/url"
@@ -18,10 +20,12 @@ import (
 	"time"
 
 	"github.com/bluesky-social/indigo/api/atproto"
+	"github.com/bluesky-social/indigo/api/bsky"
 	"github.com/bluesky-social/indigo/atproto/identity"
 	"github.com/bluesky-social/indigo/atproto/syntax"
 	"github.com/bluesky-social/indigo/events"
 	"github.com/bluesky-social/indigo/events/schedulers/sequential"
+	"github.com/bluesky-social/indigo/repo"
 	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/joho/godotenv"
@@ -136,32 +140,47 @@ func main() {
 	log.Debug("Connecting to postgres")
 	pool := database.Connect(context.Background())
 	defer pool.Close()
-	queries := sqlc.New(pool)
+	_ = sqlc.New(pool)
 
 	repoCallbacks := &events.RepoStreamCallbacks{
 		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
+			blocks := evt.Blocks
+
+			r, err := repo.ReadRepoFromCar(context.Background(), bytes.NewReader(blocks))
+			if err != nil {
+				log.Error("Failed repo")
+			}
+
 			for _, op := range evt.Ops {
-				if strings.HasPrefix(op.Path, "app.boshi.feed") {
-					uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
-					log.Info("New Activity @", slog.String("uri", uri))
-
-					record, indexedTime, err := getRecord(evt, op)
+				if strings.HasPrefix(op.Path, "app.bsky.feed.post") {
+					cid, post, err := r.GetRecordBytes(context.Background(), op.Path)
 					if err != nil {
-						log.Error("Failed to get record", slog.Any("error", err))
+						log.Error("Failed to get record", "error", err.Error())
+						continue
 					}
 
-					post := sqlc.CreatePostParams{
-						Uri:       uri,
-						Cid:       op.Cid.String(),
-						AuthorDid: evt.Repo,
-						Title:     record.Value.Title,
-						Content:   record.Value.Content,
-						IndexedAt: pgtype.Timestamptz{Time: indexedTime, Valid: true},
+					var feedPost bsky.FeedPost
+					feedPost.UnmarshalCBOR(bytes.NewReader(*post))
+					
+					if len(feedPost.Tags) != 0 && slices.Contains(feedPost.Tags, "boshi.post") {
+						fmt.Printf("%+v\n", feedPost)
+						timeStamp, err := time.Parse(time.RFC3339, feedPost.CreatedAt)
+						if err != nil {
+							log.Error("Failed to parse time from post")
+							break
+						}
+
+						_ = sqlc.CreatePostParams{
+							Uri:       uri,
+							Cid:       cid.String(),
+							AuthorDid: evt.Repo,
+							IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
+						}
+						
+						// queries.CreatePost(context.Background(), storedPost)
+						log.Info("Post created", slog.Any("post", post))
 					}
 
-					queries.CreatePost(context.Background(), post)
-
-					log.Info("Post created", slog.Any("post", post))
 				}
 			}
 			return nil

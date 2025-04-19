@@ -89,18 +89,12 @@ class ApiClient {
   }
 
   Future<Result<void>> createPost(
-    ATProto session,
+    bsky.Bluesky bsky,
     post_request.Post post,
   ) async {
     logger.d('Creating post');
-    final xrpcResponse = await session.repo.createRecord(
-      collection: NSID.create('feed.boshi.app', 'post'),
-      record: {
-        'title': post.title,
-        'content': post.content,
-        'timestamp': DateTime.now().toString(),
-      },
-    );
+    final xrpcResponse = await bsky.feed.post(
+        text: '${post.title}:${post.content}', tags: List.from(['boshi.post']));
 
     if (xrpcResponse.status == HttpStatus.ok) {
       return Result.ok(null);

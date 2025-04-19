@@ -1,3 +1,4 @@
+import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/foundation.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
@@ -19,6 +20,7 @@ abstract class AtProtoRepository extends ChangeNotifier {
   final Uri _clientId;
   late OAuthContext oAuthContext;
   atp.ATProto? atProto;
+  bsky.Bluesky? bluesky;
 
   late OAuthClientMetadata? clientMetadata;
   late OAuthClient? oAuthClient;

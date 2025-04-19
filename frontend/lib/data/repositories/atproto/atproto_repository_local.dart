@@ -63,6 +63,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
       final session =
           await _localDataService.generateSession(oAuthClient!, callback);
       atProto = atp.ATProto.fromOAuthSession(session);
+      bluesky = bsky.Bluesky.fromOAuthSession(session);
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
@@ -78,6 +79,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
       final (_, newAtproto) =
           await _localDataService.refreshSession(oAuthClient!);
       atProto = newAtproto;
+      bluesky = bsky.Bluesky.fromOAuthSession(newAtproto.oAuthSession!);
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
@@ -91,7 +93,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     if (!authorized) {
       return Result.error(UnauthorizedException('createPost'));
     }
-    return await _localDataService.createPost(atProto!, post);
+    return await _localDataService.createPost(bluesky!, post);
   }
 
   @override
