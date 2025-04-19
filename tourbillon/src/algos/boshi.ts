@@ -61,7 +61,7 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
 
   const agent = new Agent('https://public.api.bsky.app')
   const profiles = await agent.getProfiles({
-    actors: res.map((row) => row.author_did),
+    actors: [...new Set(res.map((row) => row.author_did))],
   })
 
   const feed = res.map((row) => {
