@@ -89,12 +89,20 @@ class ApiClient {
   }
 
   Future<Result<void>> createPost(
-    bsky.Bluesky bsky,
+    bsky.Bluesky bluesky,
     post_request.Post post,
   ) async {
     logger.d('Creating post');
-    final xrpcResponse = await bsky.feed.post(
-        text: '${post.title}:${post.content}', tags: List.from(['boshi.post']));
+    final xrpcResponse = await bluesky.feed.post(
+      text: '${post.title}\n${post.content}',
+      tags: List.from(['boshi.post']),
+      facets: [
+        bsky.Facet(
+          index: bsky.ByteSlice(byteStart: 0, byteEnd: post.title.length + 1),
+          features: [bsky.FacetFeature.tag(data: bsky.FacetTag(tag: 'boshi'))],
+        ),
+      ],
+    );
 
     if (xrpcResponse.status == HttpStatus.ok) {
       return Result.ok(null);
