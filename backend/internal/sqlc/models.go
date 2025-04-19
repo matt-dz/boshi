@@ -59,6 +59,7 @@ type Email struct {
 	Email      string
 	CreatedAt  pgtype.Timestamptz
 	VerifiedAt pgtype.Timestamptz
+	School     pgtype.Text
 }
 
 type MailList struct {

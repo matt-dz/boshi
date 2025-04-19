@@ -37,7 +37,7 @@ VALUES ($1, $2)
 ON CONFLICT (user_id) DO UPDATE
 SET email = EXCLUDED.email
 WHERE emails.verified_at IS NULL
-RETURNING user_id, email, created_at, verified_at
+RETURNING user_id, email, created_at, verified_at, school
 `
 
 type UpsertEmailParams struct {
@@ -53,6 +53,7 @@ func (q *Queries) UpsertEmail(ctx context.Context, arg UpsertEmailParams) (Email
 		&i.Email,
 		&i.CreatedAt,
 		&i.VerifiedAt,
+		&i.School,
 	)
 	return i, err
 }
@@ -70,7 +71,7 @@ func (q *Queries) VerificationStatus(ctx context.Context, userID string) (pgtype
 
 const verifyEmail = `-- name: VerifyEmail :one
 WITH matched AS (
-    SELECT user_id, email, created_at, verified_at
+    SELECT user_id, email, created_at, verified_at, school
     FROM emails
     WHERE emails.user_id = $1 AND emails.email = $2
 ),
@@ -78,7 +79,7 @@ updated AS (
     UPDATE emails
     SET verified_at = NOW()
     WHERE (user_id, email) IN (SELECT matched.user_id, matched.email FROM matched WHERE matched.verified_at IS NULL)
-    RETURNING user_id, email, created_at, verified_at
+    RETURNING user_id, email, created_at, verified_at, school
 )
 SELECT
     CASE

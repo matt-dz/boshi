@@ -43,6 +43,7 @@ CREATE TABLE emails (
     email VARCHAR NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
     verified_at TIMESTAMPTZ,
+    school VARCHAR,
     PRIMARY KEY (user_id),
     UNIQUE (email)
 );
