@@ -3,10 +3,10 @@ import events from 'events'
 import express from 'express'
 import { DidResolver, MemoryCache } from '@atproto/identity'
 import { createServer } from './lexicon'
+import skeletonFeedGeneration from './methods/skeleton-feed-generation'
 import feedGeneration from './methods/feed-generation'
 import describeGenerator from './methods/describe-generator'
-import { createDb, Database, migrateToLatest } from './db'
-import { FirehoseSubscription } from './subscription'
+import { createDb, Database } from './db'
 import { AppContext, Config } from './config'
 import wellKnown from './well-known'
 
@@ -14,25 +14,17 @@ export class FeedGenerator {
   public app: express.Application
   public server?: http.Server
   public db: Database
-  public firehose: FirehoseSubscription
   public cfg: Config
 
-  constructor(
-    app: express.Application,
-    db: Database,
-    firehose: FirehoseSubscription,
-    cfg: Config,
-  ) {
+  constructor(app: express.Application, db: Database, cfg: Config) {
     this.app = app
     this.db = db
-    this.firehose = firehose
     this.cfg = cfg
   }
 
   static create(cfg: Config) {
     const app = express()
     const db = createDb(cfg.postgres)
-    const firehose = new FirehoseSubscription(db, cfg.subscriptionEndpoint)
 
     const didCache = new MemoryCache()
     const didResolver = new DidResolver({
@@ -53,16 +45,16 @@ export class FeedGenerator {
       didResolver,
       cfg,
     }
+    skeletonFeedGeneration(server, ctx)
     feedGeneration(server, ctx)
     describeGenerator(server, ctx)
     app.use(server.xrpc.router)
     app.use(wellKnown(ctx))
 
-    return new FeedGenerator(app, db, firehose, cfg)
+    return new FeedGenerator(app, db, cfg)
   }
 
   async start(): Promise<http.Server> {
-    await migrateToLatest(this.db)
     this.server = this.app.listen(this.cfg.port, this.cfg.listenhost)
     await events.once(this.server, 'listening')
     return this.server

@@ -15,11 +15,6 @@ class FeedRepositoryLocal implements FeedRepository {
   final LocalDataService _localDataService;
 
   @override
-  Future<Result<List<post_domain_model.Post>>> getFeed() async {
-    return _localDataService.getFeed();
-  }
-
-  @override
   Future<Result<post_domain_model.Post>> updateReactionCount(
     ReactionPayload reactionPayload,
   ) async {

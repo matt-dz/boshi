@@ -1,13 +1,13 @@
 import { InvalidRequestError } from '@atproto/xrpc-server'
 import { Server } from '../lexicon'
 import { AppContext } from '../config'
-import { feedAlgos } from '../algos'
+import { feedGenAlgos } from '../algos'
 import { AtUri } from '@atproto/syntax'
 
 export default function (server: Server, ctx: AppContext) {
-  server.app.bsky.feed.getFeed(async ({ params }) => {
+  server.app.bsky.feed.getFeedSkeleton(async ({ params }) => {
     const feedUri = new AtUri(params.feed)
-    const algo = feedAlgos[feedUri.rkey]
+    const algo = feedGenAlgos[feedUri.rkey]
     if (
       feedUri.hostname !== ctx.cfg.publisherDid ||
       feedUri.collection !== 'app.bsky.feed.generator' ||
