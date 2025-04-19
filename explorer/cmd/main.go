@@ -5,22 +5,19 @@ import (
 	"boshi-explorer/internal/logger"
 	"boshi-explorer/internal/sqlc"
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
-	"slices"
-
 	"os"
+	"slices"
 	"time"
-
-	"encoding/json"
-
-	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/joho/godotenv"
 
 	apibsky "github.com/bluesky-social/indigo/api/bsky"
 	"github.com/bluesky-social/jetstream/pkg/client"
 	"github.com/bluesky-social/jetstream/pkg/client/schedulers/sequential"
 	"github.com/bluesky-social/jetstream/pkg/models"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/joho/godotenv"
 )
 
 var log = logger.GetLogger()
@@ -45,58 +42,24 @@ func init() {
 	}
 }
 
-func StorePost(
-	ctx context.Context,
-	event *models.Event,
-	post apibsky.FeedPost,
-) error {
-	timeStamp, err := time.Parse(time.RFC3339, post.CreatedAt)
-	if err != nil {
-		log.Error("Failed to parse time from post")
-		return err
-	}
-
-	uri := fmt.Sprintf("at://%s/%s/%s", event.Did, event.Commit.Collection, event.Commit.RKey)
-
-	postToStore := sqlc.CreatePostParams{
-		Uri:       uri,
-		Cid:       event.Commit.CID,
-		AuthorDid: event.Did,
-		IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
-	}
-
-	returnedPost, err := database.UseQueries(ctx).CreatePost(ctx, postToStore)
-	if err != nil {
-		log.Error("Failed to store post", slog.Any("error", err))
-		return err
-	}
-	log.Info("Post created", slog.Any("post", returnedPost))
-	return nil
-}
-
 func main() {
 	ctx := context.Background()
-	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level:     slog.LevelInfo,
-		AddSource: true,
-	})))
-	logger := slog.Default()
 	
 	_ = database.UseQueries(ctx)
 	defer database.Close()
 
 	config := client.DefaultClientConfig()
 	config.WantedCollections = []string{"app.bsky.feed.post"}
-	config.WebsocketURL = socketUri
+	config.WebsocketURL = "wss://jetstream2.us-east.bsky.network/subscribe"
 	config.Compress = true
 
 	h := &handler{
 		seenSeqs: make(map[int64]struct{}),
 	}
 
-	scheduler := sequential.NewScheduler(firehoseIdentifier, logger, h.HandleEvent)
+	scheduler := sequential.NewScheduler(firehoseIdentifier, log, h.HandleEvent)
 
-	c, err := client.NewClient(config, logger, scheduler)
+	c, err := client.NewClient(config, log, scheduler)
 	if err != nil {
 		log.Error("failed to create client", slog.Any("error", err))
 	}
@@ -130,5 +93,34 @@ func (h *handler) HandleEvent(ctx context.Context, event *models.Event) error {
 		}
 	}
 
+	return nil
+}
+
+func StorePost(
+	ctx context.Context,
+	event *models.Event,
+	post apibsky.FeedPost,
+) error {
+	timeStamp, err := time.Parse(time.RFC3339, post.CreatedAt)
+	if err != nil {
+		log.Error("Failed to parse time from post")
+		return err
+	}
+
+	uri := fmt.Sprintf("at://%s/%s/%s", event.Did, event.Commit.Collection, event.Commit.RKey)
+
+	postToStore := sqlc.CreatePostParams{
+		Uri:       uri,
+		Cid:       event.Commit.CID,
+		AuthorDid: event.Did,
+		IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
+	}
+
+	returnedPost, err := database.UseQueries(ctx).CreatePost(ctx, postToStore)
+	if err != nil {
+		log.Error("Failed to store post", slog.Any("error", err))
+		return err
+	}
+	log.Info("Post created", slog.Any("post", returnedPost))
 	return nil
 }
