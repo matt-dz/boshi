@@ -132,8 +132,6 @@ func UnmarshalAndStorePost(
 			if err != nil {
 				continue
 			}
-			
-			log.Info("smth", slog.Any("post", post))
 
 			var feedPost bsky.FeedPost
 			feedPost.UnmarshalCBOR(bytes.NewReader(*post))
