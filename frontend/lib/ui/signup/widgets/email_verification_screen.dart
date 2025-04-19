@@ -137,6 +137,7 @@ class _VerificationForm extends State<VerificationForm> {
           ),
           SizedBox(height: 8),
           ShadButton(
+            enabled: !widget.viewModel.load.running,
             width: double.infinity,
             child: Text('Enter'),
             onPressed: () async {
@@ -319,7 +320,7 @@ class _RequestCodeButtonState extends State<RequestCodeButton> {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: _handleResendCode,
+      onPressed: widget.viewModel.load.running ? null : _handleResendCode,
       style: TextButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
