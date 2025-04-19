@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"math"
 
 	"net/http"
@@ -62,7 +63,7 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 			firehoseConnection, _, err = websocket.DefaultDialer.Dial(uri, http.Header{})
 			if err != nil {
 				delay := time.Duration(math.Pow(2, float64(i))) * baseDelay
-				log.Error("WebSocket retry", "attempt", i+1, "waiting", delay, "error", err)
+				log.Error("WebSocket retry", "attempt", i+1, "waiting", delay, slog.Any("error", err))
 				time.Sleep(delay)
 				continue
 			} else {
@@ -80,7 +81,7 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 
 		err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
 		if err != nil {
-			log.Error("Failed while handling firehose stream", "error", err.Error())
+			log.Error("Failed while handling firehose stream", slog.Any("error", err))
 		}
 	}
 }
@@ -88,13 +89,13 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 func getRecord(evt *atproto.SyncSubscribeRepos_Commit, op *atproto.SyncSubscribeRepos_RepoOp) (payloads.Record, time.Time, error) {
 	did, err := syntax.ParseDID(evt.Repo)
 	if err != nil {
-		log.ErrorContext(context.Background(), "Failed to parse did", "did", evt.Repo)
+		log.Error("Failed to parse did", "did", evt.Repo)
 		return payloads.Record{}, time.Now(), err
 	}
 
 	didDoc, err := identity.DefaultDirectory().LookupDID(context.Background(), did)
 	if err != nil {
-		log.ErrorContext(context.Background(), "Failed to lookup did", "did", did.AtIdentifier())
+		log.Error("Failed to lookup did", "did", did.AtIdentifier())
 		return payloads.Record{}, time.Now(), err
 	}
 
@@ -111,20 +112,20 @@ func getRecord(evt *atproto.SyncSubscribeRepos_Commit, op *atproto.SyncSubscribe
 
 	resp, err := http.Get(fullUrl)
 	if err != nil {
-		log.ErrorContext(context.Background(), "Failed to get record", "error", err)
+		log.Error("Failed to get record", slog.Any("error", err))
 		return payloads.Record{}, time.Now(), err
 	}
 	defer resp.Body.Close()
 
 	var record payloads.Record
 	if err := json.NewDecoder(resp.Body).Decode(&record); err != nil {
-		log.ErrorContext(context.Background(), "Failed to parse record response", "error", err)
+		log.Error("Failed to parse record response", slog.Any("error", err))
 		return payloads.Record{}, time.Now(), err
 	}
 
 	indexedTime, err := time.Parse("2006-01-02 15:04:05.000", record.Value.Timestamp)
 	if err != nil {
-		log.ErrorContext(context.Background(), "Failed to parse time", "error", err)
+		log.Error("Failed to parse time", slog.Any("error", err))
 		return record, time.Now(), err
 	}
 
@@ -147,7 +148,7 @@ func main() {
 
 					record, indexedTime, err := getRecord(evt, op)
 					if err != nil {
-						log.ErrorContext(context.Background(), "Failed to get record", "error", err)
+						log.Error("Failed to get record", slog.Any("error", err))
 					}
 
 					post := sqlc.CreatePostParams{
@@ -160,7 +161,7 @@ func main() {
 
 					queries.CreatePost(context.Background(), post)
 
-					log.InfoContext(context.Background(), "Post created", "uri", uri, "post", post)
+					log.Info("Post created", "uri", uri, "post", post)
 				}
 			}
 			return nil
