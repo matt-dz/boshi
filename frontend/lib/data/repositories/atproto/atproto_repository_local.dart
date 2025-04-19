@@ -2,7 +2,6 @@ import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:atproto/atproto_oauth.dart';
 import 'package:frontend/data/services/local/local_data_service.dart';
 import 'package:frontend/shared/exceptions/user_not_found_exception.dart';
-import 'package:frontend/shared/exceptions/unauthorized_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
 import 'package:frontend/internal/feed/feed.dart';
@@ -193,7 +192,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   @override
   Future<Result<List<domain_models.Post>>> getFeed() async {
     if (!authorized) {
-      return Result.error(UnauthorizedException('getFeed'));
+      return Result.error(OAuthUnauthorized());
     }
     final bskyFeed = _localDataService.getFeed();
 

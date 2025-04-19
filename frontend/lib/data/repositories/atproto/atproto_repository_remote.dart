@@ -1,5 +1,4 @@
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:frontend/shared/exceptions/unauthorized_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
 import 'package:frontend/internal/feed/feed.dart';
@@ -81,7 +80,7 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
   @override
   Future<Result<void>> createPost(Post post) async {
     if (!authorized) {
-      return Result.error(UnauthorizedException('createPost'));
+      return Result.error(OAuthException('createPost'));
     }
     return await _apiClient.createPost(atProto!, post);
   }
@@ -89,7 +88,7 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
   @override
   Future<Result<List<domain_models.Post>>> getFeed() async {
     if (!authorized) {
-      return Result.error(UnauthorizedException('getFeed'));
+      return Result.error(OAuthException('getFeed'));
     }
     final bskyFeed = await _apiClient.getFeed(atProto!.oAuthSession!);
 
