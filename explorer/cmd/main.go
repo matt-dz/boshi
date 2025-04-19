@@ -99,9 +99,9 @@ func getRecord(evt *atproto.SyncSubscribeRepos_Commit, op *atproto.SyncSubscribe
 		return payloads.Record{}, time.Now(), err
 	}
 
-	log.Debug("helpme", slog.Any("doc", didDoc))
+	log.Info("Retrieved Doc", slog.Any("doc", didDoc))
 
-	atprotoPDS := didDoc.Services["#atproto_pds"].URL
+	atprotoPDS := didDoc.PDSEndpoint()
 	apiURL := fmt.Sprintf("%s/xrpc/com.atproto.repo.getRecord", atprotoPDS)
 
 	params := url.Values{}
