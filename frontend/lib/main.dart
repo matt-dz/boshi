@@ -52,6 +52,7 @@ class MainApp extends StatelessWidget {
             viewModel: HomeViewModel(
               feedRepository: context.read<FeedRepository>(),
               userRepository: context.read<UserRepository>(),
+              atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),
         ),

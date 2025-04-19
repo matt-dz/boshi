@@ -1,6 +1,7 @@
 import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
+import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/domain/models/post/post.dart';
@@ -17,8 +18,8 @@ import 'package:frontend/data/models/responses/verification_code_ttl/verificatio
 import 'package:frontend/shared/atproto/atproto.dart' as atproto_shared;
 
 class LocalDataService {
-  Result<List<Post>> getFeed() {
-    return Result.ok(mockFeed);
+  Result<bsky.Feed> getFeed() {
+    return Result.ok(mockGetFeedResult);
   }
 
   Future<Result<User>> getUser() async {

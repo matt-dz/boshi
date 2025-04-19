@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:frontend/shared/models/post/post.dart';
+import 'package:frontend/domain/models/post/post.dart' as domain_models;
 import 'package:frontend/utils/result.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
@@ -29,8 +30,12 @@ abstract class AtProtoRepository extends ChangeNotifier {
   Future<Result<void>> generateSession(String callback);
   Future<Result<void>> refreshSession();
   Future<Result<void>> createPost(Post post);
+<<<<<<< HEAD
   Future<Result<void>> addVerificationEmail(String email);
   Future<Result<void>> confirmVerificationCode(String email, String code);
   Future<Result<bool>> isUserVerified();
   Future<Result<double>> getVerificationCodeTTL();
+=======
+  Future<Result<List<domain_models.Post>>> getFeed();
+>>>>>>> cc7ab073f72dc269cd5e4b0596129ced25d243d6
 }
