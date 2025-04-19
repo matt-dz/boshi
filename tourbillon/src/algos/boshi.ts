@@ -67,8 +67,6 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
       (profile) => profile.did === row.author_did,
     )[0]
 
-    console.log(author)
-
     return {
       post: {
         uri: row.uri,
