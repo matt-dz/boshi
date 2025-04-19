@@ -4,36 +4,29 @@ import (
 	"boshi-explorer/internal/database"
 	"boshi-explorer/internal/logger"
 	"boshi-explorer/internal/sqlc"
-	"bytes"
 	"context"
 	"fmt"
 	"log/slog"
-	"math"
 	"slices"
 
-	"net/http"
 	"os"
-	"strings"
 	"time"
 
-	"github.com/bluesky-social/indigo/api/atproto"
-	"github.com/bluesky-social/indigo/api/bsky"
-	"github.com/bluesky-social/indigo/events"
-	"github.com/bluesky-social/indigo/events/schedulers/parallel"
-	"github.com/bluesky-social/indigo/repo"
-	"github.com/gorilla/websocket"
-	"github.com/ipfs/go-cid"
+	"encoding/json"
+
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/joho/godotenv"
+
+	apibsky "github.com/bluesky-social/indigo/api/bsky"
+	"github.com/bluesky-social/jetstream/pkg/client"
+	"github.com/bluesky-social/jetstream/pkg/client/schedulers/sequential"
+	"github.com/bluesky-social/jetstream/pkg/models"
 )
 
 var log = logger.GetLogger()
 
-var uri string
+var socketUri string
 var firehoseIdentifier string
-
-const retries = 5
-const baseDelay = 100 * time.Millisecond
 
 func init() {
 	err := godotenv.Load()
@@ -41,8 +34,8 @@ func init() {
 		log.Info("Failed to load env -- defaulting to environment")
 	}
 
-	uri = os.Getenv("SOCKET_URI")
-	if uri == "" {
+	socketUri = os.Getenv("SOCKET_URI")
+	if socketUri == "" {
 		panic("Expected SOCKET_URI to be set")
 	}
 
@@ -52,63 +45,27 @@ func init() {
 	}
 }
 
-func runExplorer(workScheduler *parallel.Scheduler) {
-	for {
-		var firehoseConnection *websocket.Conn = nil
-		var err error
-
-		log.Debug("Connecting to firehose", "uri", uri)
-
-		for i := range retries {
-			firehoseConnection, _, err = websocket.DefaultDialer.Dial(uri, http.Header{})
-			if err != nil {
-				delay := time.Duration(math.Pow(2, float64(i))) * baseDelay
-				log.Error("WebSocket retry", slog.Int("attempt", i+1), slog.Any("waiting", delay), slog.Any("error", err))
-				time.Sleep(delay)
-				continue
-			} else {
-				break
-			}
-		}
-
-		if firehoseConnection == nil {
-			log.Error("Failed to establish a connection -- killing explorer.")
-			break
-		}
-
-		/* Create event processor and connect it to the firehose */
-		log.Debug("Starting repo stream")
-
-		err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
-		if err != nil {
-			log.Error("Failed while handling firehose stream", slog.Any("error", err))
-		}
-	}
-}
-
-func HandleStoringPost(
-	feedPost bsky.FeedPost,
-	evt *atproto.SyncSubscribeRepos_Commit,
-	op *atproto.SyncSubscribeRepos_RepoOp,
-	cid cid.Cid,
-	queries *sqlc.Queries,
+func StorePost(
+	ctx context.Context,
+	event *models.Event,
+	post apibsky.FeedPost,
 ) error {
-	timeStamp, err := time.Parse(time.RFC3339, feedPost.CreatedAt)
+	timeStamp, err := time.Parse(time.RFC3339, post.CreatedAt)
 	if err != nil {
 		log.Error("Failed to parse time from post")
 		return err
 	}
 
-	uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
+	uri := fmt.Sprintf("at://%s/%s/%s", event.Did, event.Commit.Collection, event.Commit.RKey)
 
-	storedPost := sqlc.CreatePostParams{
+	postToStore := sqlc.CreatePostParams{
 		Uri:       uri,
-		Cid:       cid.String(),
-		AuthorDid: evt.Repo,
+		Cid:       event.Commit.CID,
+		AuthorDid: event.Did,
 		IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
 	}
 
-	returnedPost, err := queries.CreatePost(context.Background(), storedPost)
+	returnedPost, err := database.UseQueries(ctx).CreatePost(ctx, postToStore)
 	if err != nil {
 		log.Error("Failed to store post", slog.Any("error", err))
 		return err
@@ -117,51 +74,61 @@ func HandleStoringPost(
 	return nil
 }
 
-func UnmarshalAndStorePost(
-	evt *atproto.SyncSubscribeRepos_Commit,
-	queries *sqlc.Queries,
-) error {
-	blocks := evt.Blocks
-	r, err := repo.ReadRepoFromCar(context.Background(), bytes.NewReader(blocks))
+func main() {
+	ctx := context.Background()
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level:     slog.LevelInfo,
+		AddSource: true,
+	})))
+	logger := slog.Default()
+	
+	_ = database.UseQueries(ctx)
+	defer database.Close()
+
+	config := client.DefaultClientConfig()
+	config.WantedCollections = []string{"app.bsky.feed.post"}
+	config.WebsocketURL = socketUri
+	config.Compress = true
+
+	h := &handler{
+		seenSeqs: make(map[int64]struct{}),
+	}
+
+	scheduler := sequential.NewScheduler(firehoseIdentifier, logger, h.HandleEvent)
+
+	c, err := client.NewClient(config, logger, scheduler)
 	if err != nil {
-		log.Error("Failed to get repo from blocks")
+		log.Error("failed to create client", slog.Any("error", err))
 	}
 
-	for _, op := range evt.Ops {
-		if strings.HasPrefix(op.Path, "app.bsky.feed.post") {
-			cid, post, err := r.GetRecordBytes(context.Background(), op.Path)
-			if err != nil {
-				continue
-			}
+	cursor := time.Now().Add(5 * -time.Minute).UnixMicro()
 
-			var feedPost bsky.FeedPost
-			err = feedPost.UnmarshalCBOR(bytes.NewReader(*post))
-			if err != nil {
-				log.Error("Failed to unmarshal feed post")
-				continue
-			}
-
-			if len(feedPost.Tags) != 0 && slices.Contains(feedPost.Tags, "boshi.post") {
-				return HandleStoringPost(feedPost, evt, op, cid, queries)
-			}
-		}
+	if err := c.ConnectAndRead(ctx, &cursor); err != nil {
+		log.Error("failed to connect:", slog.Any("error", err))
 	}
-	return nil
+
+	log.Info("shutdown")
 }
 
-func main() {
+type handler struct {
+	seenSeqs  map[int64]struct{}
+	highwater int64
+}
 
-	log.Debug("Connecting to postgres")
-	pool := database.Connect(context.Background())
-	defer pool.Close()
-	queries := sqlc.New(pool)
-
-	repoCallbacks := &events.RepoStreamCallbacks{
-		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
-			return UnmarshalAndStorePost(evt, queries)
-		},
+func (h *handler) HandleEvent(ctx context.Context, event *models.Event) error {
+	// Unmarshal the record if there is one
+	if event.Commit != nil && (event.Commit.Operation == models.CommitOperationCreate || event.Commit.Operation == models.CommitOperationUpdate) {
+		switch event.Commit.Collection {
+			case "app.bsky.feed.post":
+				var post apibsky.FeedPost
+				if err := json.Unmarshal(event.Commit.Record, &post); err != nil {
+					return fmt.Errorf("failed to unmarshal post: %w", err)
+				}
+				if len(post.Tags) != 0 && slices.Contains(post.Tags, "boshi.post") {
+					StorePost(ctx, event, post)
+				}
+		}
 	}
 
-	workScheduler := parallel.NewScheduler(10, 100, firehoseIdentifier, repoCallbacks.EventHandler)
-	runExplorer(workScheduler)
+	return nil
 }
