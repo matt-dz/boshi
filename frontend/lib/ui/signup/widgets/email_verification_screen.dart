@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/shared/exceptions/already_verified_exception.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -10,6 +11,8 @@ import 'package:frontend/exceptions/format.dart';
 import 'package:frontend/ui/core/ui/error.dart' as error_widget;
 import 'package:frontend/shared/exceptions/code_not_found_exception.dart';
 import 'package:frontend/shared/exceptions/user_not_found_exception.dart';
+import 'package:frontend/ui/core/ui/error_screen.dart';
+import 'package:frontend/utils/logger.dart';
 
 const verificationInputId = 'verification-input';
 
@@ -39,6 +42,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             child: ListenableBuilder(
               listenable: widget.viewModel,
               builder: (context, state) {
+                logger.d('refreshed');
                 if (widget.viewModel.load.completed) {
                   return VerificationForm(
                     viewModel: widget.viewModel,
@@ -52,7 +56,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       context.go('/signup');
                     default:
                       print(err.error);
-                      return Center(child: Text('Unable to load screen'));
+                      return ErrorScreen(
+                        message: formatExceptionMsg(err.error),
+                        onRefresh: widget.viewModel.reload,
+                      );
                   }
                 }
                 return Center(child: CircularProgressIndicator());
@@ -152,10 +159,20 @@ class _VerificationForm extends State<VerificationForm> {
                   ),
                 );
 
-                if (result is Error<void>) {
-                  setState(() {
-                    _errMsg = formatExceptionMsg(result.error);
-                  });
+                if (!context.mounted) {
+                  return;
+                }
+
+                switch (result) {
+                  case Error():
+                    if (result.error is AlreadyVerifiedException) {
+                      context.go('/');
+                    }
+                    setState(() {
+                      _errMsg = formatExceptionMsg(result.error);
+                    });
+                  default:
+                    break;
                 }
               }
             },
@@ -195,7 +212,7 @@ class _TTLController extends State<TTLController> {
     super.initState();
     _ttl = widget.ttl;
     Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_ttl == 0) {
+      if (_ttl <= 0) {
         timer.cancel();
         return;
       }
@@ -210,7 +227,7 @@ class _TTLController extends State<TTLController> {
   Widget build(BuildContext context) {
     return _ttl > 0
         ? TTLTimer(ttl: _ttl)
-        : CodeRequestButton(viewModel: widget.viewModel, email: widget.email);
+        : RequestCodeButton(viewModel: widget.viewModel, email: widget.email);
   }
 }
 
@@ -245,8 +262,8 @@ class TTLTimer extends StatelessWidget {
   }
 }
 
-class CodeRequestButton extends StatefulWidget {
-  const CodeRequestButton({
+class RequestCodeButton extends StatefulWidget {
+  const RequestCodeButton({
     super.key,
     required this.viewModel,
     required this.email,
@@ -256,10 +273,10 @@ class CodeRequestButton extends StatefulWidget {
   final String email;
 
   @override
-  State<CodeRequestButton> createState() => _CodeRequestButtonState();
+  State<RequestCodeButton> createState() => _RequestCodeButtonState();
 }
 
-class _CodeRequestButtonState extends State<CodeRequestButton> {
+class _RequestCodeButtonState extends State<RequestCodeButton> {
   void _handleResendCode() async {
     final result = await widget.viewModel.resendCode.execute(widget.email);
     if (!mounted) {

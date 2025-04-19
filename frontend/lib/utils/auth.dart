@@ -6,12 +6,6 @@ import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:frontend/utils/logger.dart';
 import 'package:frontend/utils/result.dart';
 
-/// Route guard for general local redirects. A session will
-/// be refreshed if the user is not authorized. If refreshing fails,
-/// a new session will be generated as it is assumed that the
-/// user is navigating from the oauth authorization request.
-/// If refreshing and generation fails, the user is not authorized
-/// and redirected to the login page.
 FutureOr<String?> localRouteGuard(
   BuildContext context,
   GoRouterState state,
@@ -40,9 +34,6 @@ FutureOr<String?> localRouteGuard(
   return '/login';
 }
 
-/// General redirect logic for production environment. If the user
-/// is not authorized and is attempting to navigate to a protected route,
-/// they will be redirected to the login page.
 FutureOr<String?> prodRouteGuard(
   BuildContext context,
   GoRouterState state,
@@ -62,8 +53,6 @@ FutureOr<String?> prodRouteGuard(
   return null;
 }
 
-/// If a user has not verified their email address, they are redirected
-/// to the signup page.
 FutureOr<String?> rootRouteGuard(
   BuildContext context,
   GoRouterState state,
@@ -82,8 +71,6 @@ FutureOr<String?> rootRouteGuard(
   return null;
 }
 
-/// If email is not a query parameter, they are
-/// redirected to the signup page.
 FutureOr<String?> verifyEmailRouteGuard(
   BuildContext context,
   GoRouterState state,

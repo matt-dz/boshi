@@ -97,14 +97,14 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
   @override
   Future<Result<void>> addVerificationEmail(String email) async {
     if (!authorized) {
-      return Result.error(OAuthUnauthorized('addVerificationEmail'));
+      return Result.error(OAuthUnauthorized());
     }
 
     logger.d('Retrieving user DID');
     final userDid = atProto!.oAuthSession?.sub;
     if (userDid == null) {
       logger.e('User DID is null');
-      return Result.error(OAuthUnauthorized('addVerificationEmail'));
+      return Result.error(OAuthUnauthorized());
     }
 
     final result = await _localDataService.addVerificationEmail(email, userDid);
@@ -129,7 +129,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     final userDid = atProto!.oAuthSession?.sub;
     if (userDid == null) {
       logger.e('User DID is null');
-      return Result.error(OAuthUnauthorized('confirmVerificationCode'));
+      return Result.error(OAuthUnauthorized());
     }
 
     return await _localDataService.confirmVerificationCode(
@@ -149,7 +149,7 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     final userDid = atProto!.oAuthSession?.sub;
     if (userDid == null) {
       logger.e('User DID is null');
-      return Result.error(OAuthUnauthorized('isUserVerified'));
+      return Result.error(OAuthUnauthorized());
     }
 
     final result = await _localDataService.isUserVerified(userDid);

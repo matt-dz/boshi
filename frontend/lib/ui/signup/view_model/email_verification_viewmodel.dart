@@ -18,6 +18,11 @@ class EmailVerificationViewModel extends ChangeNotifier {
   late final Command1<void, VerificationCode> verifyCode;
   late final Command1<void, String> resendCode;
 
+  void reload() {
+    load = Command0(_load)..execute();
+    notifyListeners();
+  }
+
   Future<Result<void>> _load() async {
     try {
       return await _atProtoRepository.getVerificationCodeTTL();
@@ -40,14 +45,10 @@ class EmailVerificationViewModel extends ChangeNotifier {
   Future<Result<void>> _resendCode(String email) async {
     try {
       final result = await _atProtoRepository.addVerificationEmail(email);
-      load = Command0(_load)..execute();
+      reload();
       return result;
     } finally {
       notifyListeners();
     }
-  }
-
-  Future<Result<double>> getCodeTTL() async {
-    return await _atProtoRepository.getVerificationCodeTTL();
   }
 }

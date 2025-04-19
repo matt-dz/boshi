@@ -174,7 +174,7 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	}
 	if !ok {
 		log.ErrorContext(r.Context(), "Key already exists, not setting.", slog.String("key", key))
-		http.Error(w, "Verification code already set. Request again in 10 minutes.", http.StatusTooManyRequests)
+		http.Error(w, "Verification code already set", http.StatusTooManyRequests)
 		return
 	}
 
@@ -213,8 +213,8 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 
 	// Validate user id
 	if !DIDRegex.MatchString(payload.UserID) {
-		log.ErrorContext(r.Context(), "user_id not a valid DID", slog.String("did", payload.UserID))
-		http.Error(w, "user_id not a valid DID", http.StatusBadRequest)
+		log.ErrorContext(r.Context(), "Invalid DID", slog.String("did", payload.UserID))
+		http.Error(w, "Invalid DID", http.StatusBadRequest)
 		return
 	}
 
@@ -279,7 +279,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	code, err := redisClient.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
 		log.ErrorContext(r.Context(), "Key not found", slog.String("key", key))
-		http.Error(w, "No code found, try requesting a new one", http.StatusConflict)
+		http.Error(w, "Code not found", http.StatusConflict)
 		return
 	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to GET key", slog.Any("error", err))

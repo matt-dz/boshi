@@ -72,18 +72,40 @@ class _SignupForm extends State<SignupForm> {
   String? _errMsg;
   final emailController = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    switch (widget.viewModel.addEmail.result) {
-      case Ok<void>():
-        context.go(
-          '/signup/verify?email='
-          '${Uri.encodeComponent(emailController.text)}',
-        );
-      default:
-        break;
+  void _onSignup() async {
+    // Reset error message
+    setState(() {
+      _errMsg = null;
+    });
+
+    if (!_formKey.currentState!.validate()) {
+      logger.d('here');
+      return;
     }
 
+    // Add email
+    final result =
+        await widget.viewModel.addEmail.execute(emailController.text);
+    if (!mounted) {
+      return;
+    }
+
+    if (result is Error<void>) {
+      setState(() {
+        _errMsg = formatExceptionMsg(result.error);
+      });
+      return;
+    }
+
+    // Navigate to verification screen
+    context.go(
+      '/signup/verify?email='
+      '${Uri.encodeComponent(emailController.text)}',
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ShadCard(
       width: 400,
       title: const Text('Enter University Email'),
@@ -108,24 +130,7 @@ class _SignupForm extends State<SignupForm> {
               ),
               const SizedBox(height: 8),
               ShadButton(
-                onPressed: () async {
-                  // Reset error message
-                  setState(() {
-                    _errMsg = null;
-                  });
-
-                  if (!_formKey.currentState!.validate()) {
-                    logger.d('here');
-                    return;
-                  }
-                  final result = await widget.viewModel.addEmail
-                      .execute(emailController.text);
-                  if (result is Error<void>) {
-                    setState(() {
-                      _errMsg = formatExceptionMsg(result.error);
-                    });
-                  }
-                },
+                onPressed: _onSignup,
                 child: const Text('Enter'),
               ),
             ],

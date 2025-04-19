@@ -45,6 +45,7 @@ class MainApp extends StatelessWidget {
       routes: [
         GoRoute(
           path: '/',
+          name: 'home',
           redirect: rootRouteGuard,
           builder: (context, state) => HomeScreen(
             title: 'Boshi',

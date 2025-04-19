@@ -1,5 +1,5 @@
 /// Regex to remove the prefix from an exception message.
-final exceptionPrefixRegex = RegExp(r'(?:\w*Exception:\s)');
+final exceptionPrefixRegex = RegExp(r'(\w*(Exception|Error):\s)');
 
 /// Formats an exception message by removing the prefix.
 String formatExceptionMsg(Exception exception) {

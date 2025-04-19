@@ -11,7 +11,7 @@ class EmailRegisterViewModel extends ChangeNotifier {
   }
 
   final AtProtoRepository _atProtoRepository;
-  late Command1<void, String> addEmail;
+  late final Command1<void, String> addEmail;
 
   Future<Result<void>> _addEmail(String email) async {
     try {
