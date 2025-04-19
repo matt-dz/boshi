@@ -63,7 +63,7 @@ func runExplorer(workScheduler *sequential.Scheduler) {
 			firehoseConnection, _, err = websocket.DefaultDialer.Dial(uri, http.Header{})
 			if err != nil {
 				delay := time.Duration(math.Pow(2, float64(i))) * baseDelay
-				log.Error("WebSocket retry", "attempt", i+1, "waiting", delay, slog.Any("error", err))
+				log.Error("WebSocket retry", slog.Int("attempt", i+1), slog.Any("waiting", delay), slog.Any("error", err))
 				time.Sleep(delay)
 				continue
 			} else {
@@ -144,7 +144,7 @@ func main() {
 			for _, op := range evt.Ops {
 				if strings.HasPrefix(op.Path, "app.boshi.feed") {
 					uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
-					log.Info("New Activity @", "uri", uri)
+					log.Info("New Activity @", slog.String("uri", uri))
 
 					record, indexedTime, err := getRecord(evt, op)
 					if err != nil {
@@ -161,7 +161,7 @@ func main() {
 
 					queries.CreatePost(context.Background(), post)
 
-					log.Info("Post created", "uri", uri, "post", post)
+					log.Info("Post created", slog.String("uri", uri), slog.Any("post", post))
 				}
 			}
 			return nil
