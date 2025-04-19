@@ -3,8 +3,6 @@ CREATE TABLE post (
     cid VARCHAR NOT NULL,
     author_did VARCHAR NOT NULL,
     indexed_at TIMESTAMPTZ NOT NULL,
-    title VARCHAR(511) NOT NULL,
-    content VARCHAR(8191) NOT NULL,
     PRIMARY KEY (uri)
 );
 
