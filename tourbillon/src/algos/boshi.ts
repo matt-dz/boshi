@@ -53,6 +53,8 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
     .orderBy('indexed_at', 'desc')
     .limit(params.limit)
 
+  console.log('what?')
+
   const res = await builder.execute()
 
   console.log('Result length:', res.length)
