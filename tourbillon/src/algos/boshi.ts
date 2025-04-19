@@ -59,6 +59,8 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
   }
   const res = await builder.execute()
 
+  console.log(res)
+
   const agent = new Agent('https://public.api.bsky.app')
   const profiles = await agent.getProfiles({
     actors: [...new Set(res.map((row) => row.author_did))],
@@ -68,6 +70,8 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
     const author = profiles.data.profiles.filter(
       (profile) => profile.did === row.author_did,
     )[0]
+
+    console.log(author)
 
     return {
       post: {
@@ -82,6 +86,8 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
       },
     }
   })
+
+  console.log(feed)
 
   return {
     feed,
