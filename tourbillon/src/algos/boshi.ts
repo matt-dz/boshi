@@ -53,10 +53,6 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
     .orderBy('indexed_at', 'desc')
     .limit(params.limit)
 
-  if (params.cursor) {
-    const timeStr = new Date(parseInt(params.cursor, 10))
-    builder = builder.where('post.indexed_at', '<', timeStr)
-  }
   const res = await builder.execute()
 
   console.log(res)
