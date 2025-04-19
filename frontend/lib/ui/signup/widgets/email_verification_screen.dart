@@ -108,7 +108,8 @@ class _VerificationForm extends State<VerificationForm> {
             inputFormatters: const [
               _VerificationInputFormatter(),
             ],
-            description: const Text('Enter your verification code.'),
+            description: const Text('Enter your verification code. '
+                'Be sure to check your junk folder.'),
             children: const [
               ShadInputOTPGroup(
                 children: [

@@ -111,7 +111,7 @@ class _SignupForm extends State<SignupForm> {
       width: 400,
       title: const Text('Enter University Email'),
       description: const Text('We use your university email '
-          'to verify your student status. We will never sell your data.'),
+          'to verify your student status. Be sure to check your junk folder.'),
       child: Padding(
         padding: const EdgeInsets.only(top: 16),
         child: Form(
