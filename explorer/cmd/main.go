@@ -90,19 +90,16 @@ func getRecord(evt *atproto.SyncSubscribeRepos_Commit, op *atproto.SyncSubscribe
 	did, err := syntax.ParseDID(evt.Repo)
 	if err != nil {
 		log.Error("Failed to parse did", "did", evt.Repo)
-		return payloads.Record{}, time.Now(), err
+		return payloads.Record{}, time.Time{}, err
 	}
 
 	didDoc, err := identity.DefaultDirectory().LookupDID(context.Background(), did)
 	if err != nil {
 		log.Error("Failed to lookup did", "did", did.AtIdentifier())
-		return payloads.Record{}, time.Now(), err
+		return payloads.Record{}, time.Time{}, err
 	}
 
-	log.Info("Retrieved Doc", slog.Any("doc", didDoc))
-
-	atprotoPDS := didDoc.PDSEndpoint()
-	apiURL := fmt.Sprintf("%s/xrpc/com.atproto.repo.getRecord", atprotoPDS)
+	apiURL := fmt.Sprintf("%s/xrpc/com.atproto.repo.getRecord", didDoc.PDSEndpoint())
 
 	params := url.Values{}
 	params.Add("repo", evt.Repo)
@@ -115,20 +112,20 @@ func getRecord(evt *atproto.SyncSubscribeRepos_Commit, op *atproto.SyncSubscribe
 	resp, err := http.Get(fullUrl)
 	if err != nil {
 		log.Error("Failed to get record", slog.Any("error", err))
-		return payloads.Record{}, time.Now(), err
+		return payloads.Record{}, time.Time{}, err
 	}
 	defer resp.Body.Close()
 
 	var record payloads.Record
 	if err := json.NewDecoder(resp.Body).Decode(&record); err != nil {
 		log.Error("Failed to parse record response", slog.Any("error", err))
-		return payloads.Record{}, time.Now(), err
+		return payloads.Record{}, time.Time{}, err
 	}
 
 	indexedTime, err := time.Parse("2006-01-02 15:04:05.000", record.Value.Timestamp)
 	if err != nil {
 		log.Error("Failed to parse time", slog.Any("error", err))
-		return record, time.Now(), err
+		return record, time.Time{}, err
 	}
 
 	return record, indexedTime, err
@@ -164,7 +161,7 @@ func main() {
 
 					queries.CreatePost(context.Background(), post)
 
-					log.Info("Post created", slog.String("uri", uri), slog.Any("post", post))
+					log.Info("Post created", slog.Any("post", post))
 				}
 			}
 			return nil
