@@ -99,6 +99,8 @@ func getRecord(evt *atproto.SyncSubscribeRepos_Commit, op *atproto.SyncSubscribe
 		return payloads.Record{}, time.Now(), err
 	}
 
+	log.Debug("helpme", slog.Any("doc", didDoc))
+
 	atprotoPDS := didDoc.Services["#atproto_pds"].URL
 	apiURL := fmt.Sprintf("%s/xrpc/com.atproto.repo.getRecord", atprotoPDS)
 
@@ -154,6 +156,7 @@ func main() {
 					post := sqlc.CreatePostParams{
 						Uri:       uri,
 						Cid:       op.Cid.String(),
+						AuthorDid: evt.Repo,
 						Title:     record.Value.Title,
 						Content:   record.Value.Content,
 						IndexedAt: pgtype.Timestamptz{Time: indexedTime, Valid: true},
