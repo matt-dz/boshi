@@ -207,21 +207,28 @@ class TTLController extends StatefulWidget {
 
 class _TTLController extends State<TTLController> {
   late double _ttl;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _ttl = widget.ttl;
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_ttl <= 0) {
         timer.cancel();
         return;
       }
 
       setState(() {
-        _ttl--;
+        _ttl = _ttl - 1;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -244,7 +251,7 @@ class TTLTimer extends StatelessWidget {
     String minutesMsg = '';
     String secondsMsg = '';
 
-    if (minutes > 2) {
+    if (minutes >= 2) {
       minutesMsg = '$minutes minutes';
     } else if (minutes == 1) {
       minutesMsg = '$minutes minute';
