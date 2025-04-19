@@ -9,7 +9,7 @@ class EnvironmentConfig {
     defaultValue: false,
   );
   static const feedGenUri = String.fromEnvironment(
-    'FEED_GEN_URI',
+    'FEED_GENERATOR_URI',
     defaultValue: '',
   );
 }
