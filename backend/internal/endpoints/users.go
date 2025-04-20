@@ -31,7 +31,7 @@ func GetUsersByID(w http.ResponseWriter, r *http.Request) {
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.ErrorContext(r.Context(), "No row returned - no users found")
-		http.Error(w, "User does not exist", http.StatusNotFound)
+		http.Error(w, "No users found", http.StatusNotFound)
 		return
 	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to get users", slog.Any("error", err))
