@@ -8,7 +8,7 @@ import '../view_model/email_verification_viewmodel.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend/exceptions/format.dart';
-import 'package:frontend/ui/core/ui/error.dart' as error_widget;
+import 'package:frontend/ui/core/ui/error_controller.dart';
 import 'package:frontend/shared/exceptions/code_not_found_exception.dart';
 import 'package:frontend/shared/exceptions/user_not_found_exception.dart';
 import 'package:frontend/ui/core/ui/error_screen.dart';
@@ -104,13 +104,38 @@ class _VerificationForm extends State<VerificationForm> {
             enabled: formEnabled,
             id: verificationInputId,
             maxLength: 6,
-            label: const Text('Verification Code'),
+            label: const Center(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text(
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                  'Verification Code',
+                ),
+              ),
+            ),
             inputFormatters: const [
               _VerificationInputFormatter(),
             ],
-            description: const Text('Enter your verification code. '
-                'Be sure to check your junk folder.'),
+            description: Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      'Code sent to ${widget.email}.\n'
+                      'Be sure to check your spam folder.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             children: const [
+              Spacer(),
               ShadInputOTPGroup(
                 children: [
                   ShadInputOTPSlot(),
@@ -126,25 +151,21 @@ class _VerificationForm extends State<VerificationForm> {
                   ShadInputOTPSlot(),
                 ],
               ),
+              Spacer(),
             ],
           ),
           SizedBox(height: 8),
-          error_widget.Error(
-            message: _errMsg ?? '',
-          ),
+          ErrorController(message: _errMsg),
           SizedBox(height: 8),
           ShadButton(
             enabled: formEnabled,
             width: double.infinity,
             child: Text('Enter'),
             onPressed: () async {
-              setState(() {
-                _errMsg = null;
-              });
               if (_formKey.currentState!.saveAndValidate()) {
-                final String code =
+                final String? code =
                     _formKey.currentState!.value[verificationInputId];
-                if (code.contains(' ')) {
+                if (code == null || code.contains(' ')) {
                   setState(() {
                     _errMsg = 'Must fill all fields of code';
                   });
@@ -169,8 +190,10 @@ class _VerificationForm extends State<VerificationForm> {
                     setState(() {
                       _errMsg = formatExceptionMsg(result.error);
                     });
-                  default:
-                    break;
+                    return;
+                  case Ok():
+                    context.go('/');
+                    return;
                 }
               }
             },

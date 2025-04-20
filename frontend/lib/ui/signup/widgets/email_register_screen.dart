@@ -3,8 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import '../view_model/email_register_viewmodel.dart';
 import 'package:frontend/utils/result.dart';
-import 'package:frontend/utils/logger.dart';
-import 'package:frontend/ui/core/ui/error.dart' as error_widget;
+import 'package:frontend/ui/core/ui/error_controller.dart';
 import 'package:frontend/exceptions/format.dart';
 
 const emailId = 'email';
@@ -111,7 +110,7 @@ class _SignupForm extends State<SignupForm> {
       width: 400,
       title: const Text('Enter University Email'),
       description: const Text('We use your university email '
-          'to verify your student status. Be sure to check your junk folder.'),
+          'to verify your student status. Be sure to check your spam folder.'),
       child: Padding(
         padding: const EdgeInsets.only(top: 16),
         child: Form(
@@ -126,9 +125,7 @@ class _SignupForm extends State<SignupForm> {
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 8),
-              error_widget.Error(
-                message: _errMsg ?? '',
-              ),
+              ErrorController(message: _errMsg),
               const SizedBox(height: 8),
               ShadButton(
                 enabled: formEnabled,
