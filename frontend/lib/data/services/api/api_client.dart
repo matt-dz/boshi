@@ -6,13 +6,9 @@ import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/internal/config/environment.dart';
 import 'package:frontend/internal/exceptions/missing_env.dart';
-import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/shared/models/report/report.dart' as boshi_report;
-import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/data/models/requests/reply/reply.dart'
-    as reply_request;
 import 'package:frontend/shared/models/post/post.dart' as post_request;
 import 'package:http/http.dart' as http;
 import 'package:frontend/data/models/requests/add_email/add_email.dart';
@@ -84,23 +80,6 @@ class ApiClient {
     return Result.ok(
       User(id: '1', username: 'anonymous1', school: 'University of Florida'),
     );
-  }
-
-  Future<Result<Post>> getPost(String id) async {
-    logger.d('Retrieving post');
-    return Result.ok(mockFeed[0]);
-  }
-
-  Future<Result<Post>> updateReactionCount(
-    ReactionPayload reactionPayload,
-  ) async {
-    logger.d('Updating reaction count');
-    return Result.ok(mockFeed[0]);
-  }
-
-  Future<Result<Post>> addReply(reply_request.Reply reply) async {
-    logger.d('Adding reply');
-    return Result.ok(mockFeed[0]);
   }
 
   Future<Result<void>> reportPost(boshi_report.Report report) async {

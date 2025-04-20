@@ -24,8 +24,8 @@ mixin _$Post {
   User get author => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
-  List<Reaction> get reactions => throw _privateConstructorUsedError;
-  List<Reply> get comments => throw _privateConstructorUsedError;
+  int get karma => throw _privateConstructorUsedError;
+  int get numReplies => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
 
   /// Serializes this Post to a JSON map.
@@ -47,8 +47,8 @@ abstract class $PostCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      List<Reaction> reactions,
-      List<Reply> comments,
+      int karma,
+      int numReplies,
       String title});
 
   $UserCopyWith<$Res> get author;
@@ -73,8 +73,8 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
-    Object? reactions = null,
-    Object? comments = null,
+    Object? karma = null,
+    Object? numReplies = null,
     Object? title = null,
   }) {
     return _then(_value.copyWith(
@@ -94,14 +94,14 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      reactions: null == reactions
-          ? _value.reactions
-          : reactions // ignore: cast_nullable_to_non_nullable
-              as List<Reaction>,
-      comments: null == comments
-          ? _value.comments
-          : comments // ignore: cast_nullable_to_non_nullable
-              as List<Reply>,
+      karma: null == karma
+          ? _value.karma
+          : karma // ignore: cast_nullable_to_non_nullable
+              as int,
+      numReplies: null == numReplies
+          ? _value.numReplies
+          : numReplies // ignore: cast_nullable_to_non_nullable
+              as int,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -132,8 +132,8 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      List<Reaction> reactions,
-      List<Reply> comments,
+      int karma,
+      int numReplies,
       String title});
 
   @override
@@ -156,8 +156,8 @@ class __$$PostImplCopyWithImpl<$Res>
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
-    Object? reactions = null,
-    Object? comments = null,
+    Object? karma = null,
+    Object? numReplies = null,
     Object? title = null,
   }) {
     return _then(_$PostImpl(
@@ -177,14 +177,14 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      reactions: null == reactions
-          ? _value._reactions
-          : reactions // ignore: cast_nullable_to_non_nullable
-              as List<Reaction>,
-      comments: null == comments
-          ? _value._comments
-          : comments // ignore: cast_nullable_to_non_nullable
-              as List<Reply>,
+      karma: null == karma
+          ? _value.karma
+          : karma // ignore: cast_nullable_to_non_nullable
+              as int,
+      numReplies: null == numReplies
+          ? _value.numReplies
+          : numReplies // ignore: cast_nullable_to_non_nullable
+              as int,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -201,11 +201,9 @@ class _$PostImpl implements _Post {
       required this.author,
       required this.content,
       required this.timestamp,
-      required final List<Reaction> reactions,
-      required final List<Reply> comments,
-      required this.title})
-      : _reactions = reactions,
-        _comments = comments;
+      required this.karma,
+      required this.numReplies,
+      required this.title});
 
   factory _$PostImpl.fromJson(Map<String, dynamic> json) =>
       _$$PostImplFromJson(json);
@@ -218,28 +216,16 @@ class _$PostImpl implements _Post {
   final String content;
   @override
   final DateTime timestamp;
-  final List<Reaction> _reactions;
   @override
-  List<Reaction> get reactions {
-    if (_reactions is EqualUnmodifiableListView) return _reactions;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_reactions);
-  }
-
-  final List<Reply> _comments;
+  final int karma;
   @override
-  List<Reply> get comments {
-    if (_comments is EqualUnmodifiableListView) return _comments;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_comments);
-  }
-
+  final int numReplies;
   @override
   final String title;
 
   @override
   String toString() {
-    return 'Post(id: $id, author: $author, content: $content, timestamp: $timestamp, reactions: $reactions, comments: $comments, title: $title)';
+    return 'Post(id: $id, author: $author, content: $content, timestamp: $timestamp, karma: $karma, numReplies: $numReplies, title: $title)';
   }
 
   @override
@@ -252,23 +238,16 @@ class _$PostImpl implements _Post {
             (identical(other.content, content) || other.content == content) &&
             (identical(other.timestamp, timestamp) ||
                 other.timestamp == timestamp) &&
-            const DeepCollectionEquality()
-                .equals(other._reactions, _reactions) &&
-            const DeepCollectionEquality().equals(other._comments, _comments) &&
+            (identical(other.karma, karma) || other.karma == karma) &&
+            (identical(other.numReplies, numReplies) ||
+                other.numReplies == numReplies) &&
             (identical(other.title, title) || other.title == title));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      author,
-      content,
-      timestamp,
-      const DeepCollectionEquality().hash(_reactions),
-      const DeepCollectionEquality().hash(_comments),
-      title);
+      runtimeType, id, author, content, timestamp, karma, numReplies, title);
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.
@@ -292,8 +271,8 @@ abstract class _Post implements Post {
       required final User author,
       required final String content,
       required final DateTime timestamp,
-      required final List<Reaction> reactions,
-      required final List<Reply> comments,
+      required final int karma,
+      required final int numReplies,
       required final String title}) = _$PostImpl;
 
   factory _Post.fromJson(Map<String, dynamic> json) = _$PostImpl.fromJson;
@@ -307,9 +286,9 @@ abstract class _Post implements Post {
   @override
   DateTime get timestamp;
   @override
-  List<Reaction> get reactions;
+  int get karma;
   @override
-  List<Reply> get comments;
+  int get numReplies;
   @override
   String get title;
 

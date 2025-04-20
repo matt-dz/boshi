@@ -6,6 +6,7 @@ import 'package:frontend/domain/models/content_item/content_item.dart';
 import 'package:frontend/domain/models/reaction/reaction.dart';
 
 import 'package:frontend/internal/logger/logger.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
@@ -78,27 +79,6 @@ class ReactionWrapper extends StatelessWidget {
         ),
         onPressed: onPressed,
         child: child,
-      ),
-    );
-  }
-}
-
-class ReactionEmote extends StatelessWidget {
-  const ReactionEmote({
-    super.key,
-    required this.reaction,
-  });
-
-  final Reaction reaction;
-
-  @override
-  Widget build(BuildContext context) {
-    return ReactionWrapper(
-      onPressed: () {
-        logger.d('${reaction.emote} pressed!');
-      },
-      child: Text(
-        '${reaction.emote} ${reaction.count}',
       ),
     );
   }
@@ -211,30 +191,76 @@ class AddReactionButton extends StatelessWidget {
   }
 }
 
+class KarmaButton extends StatelessWidget {
+  const KarmaButton({super.key, required this.likes});
+  final int likes;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(left: 4, right: 4),
+      child: Row(
+        spacing: 4,
+        children: [
+          Icon(
+            LucideIcons.heart,
+            size: 20,
+          ),
+          Text(
+            '$likes',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ReplyButton extends StatelessWidget {
+  const ReplyButton({super.key, required this.numReplies});
+  final int numReplies;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(left: 4, right: 4),
+      child: Row(
+        spacing: 4,
+        children: [
+          Icon(
+            LucideIcons.messageCircle,
+            size: 20,
+          ),
+          Text(
+            '$numReplies',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class ContentItemFooter extends StatelessWidget {
-  const ContentItemFooter({
-    super.key,
-    required this.post,
-  });
+  const ContentItemFooter({super.key, required this.post});
 
   final ContentItem post;
 
   @override
-  Widget build(BuildContext build) {
-    final reactions = post.reactions.map(
-      (reaction) => ReactionEmote(reaction: reaction),
-    );
-
-    return Padding(
-      padding: EdgeInsets.only(top: 8),
-      child: Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          ...reactions,
-          AddReactionButton(),
-        ],
-      ),
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 8,
+      children: [
+        KarmaButton(likes: post.likes),
+        ReplyButton(numReplies: post.numReplies),
+      ],
     );
   }
 }
@@ -275,22 +301,14 @@ class ContentItemWidget extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          spacing: 8,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 8,
           children: [
-            Flexible(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ContentItemHeader(post: post),
-                  Text(post.content),
-                  ContentItemFooter(post: post),
-                ],
-              ),
-            ),
-            Sidebar(),
+            ContentItemHeader(post: post),
+            Text(post.content),
+            ContentItemFooter(post: post),
           ],
         ),
       ),

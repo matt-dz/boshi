@@ -2,7 +2,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/domain/models/content_item/content_item.dart';
 import 'package:frontend/domain/models/reply/reply.dart';
-import 'package:frontend/domain/models/reaction/reaction.dart';
 
 part 'post.freezed.dart';
 part 'post.g.dart';
@@ -14,8 +13,8 @@ abstract class Post with _$Post implements ContentItem {
     required User author,
     required String content,
     required DateTime timestamp,
-    required List<Reaction> reactions,
-    required List<Reply> comments,
+    required int karma,
+    required int numReplies,
     required String title,
   }) = _Post;
 

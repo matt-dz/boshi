@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/domain/models/content_item/content_item.dart';
-import 'package:frontend/domain/models/reaction/reaction.dart';
 
 part 'reply.freezed.dart';
 part 'reply.g.dart';
@@ -13,8 +12,8 @@ abstract class Reply with _$Reply implements ContentItem {
     required User author,
     required String content,
     required DateTime timestamp,
-    required List<Reaction> reactions,
-    required List<Reply> comments,
+    required int karma,
+    required int numReplies,
     required String replyToId,
   }) = _Reply;
 

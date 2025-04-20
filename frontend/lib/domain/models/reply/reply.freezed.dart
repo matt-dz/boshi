@@ -24,8 +24,8 @@ mixin _$Reply {
   User get author => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
-  List<Reaction> get reactions => throw _privateConstructorUsedError;
-  List<Reply> get comments => throw _privateConstructorUsedError;
+  int get karma => throw _privateConstructorUsedError;
+  int get numReplies => throw _privateConstructorUsedError;
   String get replyToId => throw _privateConstructorUsedError;
 
   /// Serializes this Reply to a JSON map.
@@ -47,8 +47,8 @@ abstract class $ReplyCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      List<Reaction> reactions,
-      List<Reply> comments,
+      int karma,
+      int numReplies,
       String replyToId});
 
   $UserCopyWith<$Res> get author;
@@ -73,8 +73,8 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
-    Object? reactions = null,
-    Object? comments = null,
+    Object? karma = null,
+    Object? numReplies = null,
     Object? replyToId = null,
   }) {
     return _then(_value.copyWith(
@@ -94,14 +94,14 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      reactions: null == reactions
-          ? _value.reactions
-          : reactions // ignore: cast_nullable_to_non_nullable
-              as List<Reaction>,
-      comments: null == comments
-          ? _value.comments
-          : comments // ignore: cast_nullable_to_non_nullable
-              as List<Reply>,
+      karma: null == karma
+          ? _value.karma
+          : karma // ignore: cast_nullable_to_non_nullable
+              as int,
+      numReplies: null == numReplies
+          ? _value.numReplies
+          : numReplies // ignore: cast_nullable_to_non_nullable
+              as int,
       replyToId: null == replyToId
           ? _value.replyToId
           : replyToId // ignore: cast_nullable_to_non_nullable
@@ -132,8 +132,8 @@ abstract class _$$ReplyImplCopyWith<$Res> implements $ReplyCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      List<Reaction> reactions,
-      List<Reply> comments,
+      int karma,
+      int numReplies,
       String replyToId});
 
   @override
@@ -157,8 +157,8 @@ class __$$ReplyImplCopyWithImpl<$Res>
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
-    Object? reactions = null,
-    Object? comments = null,
+    Object? karma = null,
+    Object? numReplies = null,
     Object? replyToId = null,
   }) {
     return _then(_$ReplyImpl(
@@ -178,14 +178,14 @@ class __$$ReplyImplCopyWithImpl<$Res>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      reactions: null == reactions
-          ? _value._reactions
-          : reactions // ignore: cast_nullable_to_non_nullable
-              as List<Reaction>,
-      comments: null == comments
-          ? _value._comments
-          : comments // ignore: cast_nullable_to_non_nullable
-              as List<Reply>,
+      karma: null == karma
+          ? _value.karma
+          : karma // ignore: cast_nullable_to_non_nullable
+              as int,
+      numReplies: null == numReplies
+          ? _value.numReplies
+          : numReplies // ignore: cast_nullable_to_non_nullable
+              as int,
       replyToId: null == replyToId
           ? _value.replyToId
           : replyToId // ignore: cast_nullable_to_non_nullable
@@ -202,11 +202,9 @@ class _$ReplyImpl implements _Reply {
       required this.author,
       required this.content,
       required this.timestamp,
-      required final List<Reaction> reactions,
-      required final List<Reply> comments,
-      required this.replyToId})
-      : _reactions = reactions,
-        _comments = comments;
+      required this.karma,
+      required this.numReplies,
+      required this.replyToId});
 
   factory _$ReplyImpl.fromJson(Map<String, dynamic> json) =>
       _$$ReplyImplFromJson(json);
@@ -219,28 +217,16 @@ class _$ReplyImpl implements _Reply {
   final String content;
   @override
   final DateTime timestamp;
-  final List<Reaction> _reactions;
   @override
-  List<Reaction> get reactions {
-    if (_reactions is EqualUnmodifiableListView) return _reactions;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_reactions);
-  }
-
-  final List<Reply> _comments;
+  final int karma;
   @override
-  List<Reply> get comments {
-    if (_comments is EqualUnmodifiableListView) return _comments;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_comments);
-  }
-
+  final int numReplies;
   @override
   final String replyToId;
 
   @override
   String toString() {
-    return 'Reply(id: $id, author: $author, content: $content, timestamp: $timestamp, reactions: $reactions, comments: $comments, replyToId: $replyToId)';
+    return 'Reply(id: $id, author: $author, content: $content, timestamp: $timestamp, karma: $karma, numReplies: $numReplies, replyToId: $replyToId)';
   }
 
   @override
@@ -253,24 +239,17 @@ class _$ReplyImpl implements _Reply {
             (identical(other.content, content) || other.content == content) &&
             (identical(other.timestamp, timestamp) ||
                 other.timestamp == timestamp) &&
-            const DeepCollectionEquality()
-                .equals(other._reactions, _reactions) &&
-            const DeepCollectionEquality().equals(other._comments, _comments) &&
+            (identical(other.karma, karma) || other.karma == karma) &&
+            (identical(other.numReplies, numReplies) ||
+                other.numReplies == numReplies) &&
             (identical(other.replyToId, replyToId) ||
                 other.replyToId == replyToId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      author,
-      content,
-      timestamp,
-      const DeepCollectionEquality().hash(_reactions),
-      const DeepCollectionEquality().hash(_comments),
-      replyToId);
+  int get hashCode => Object.hash(runtimeType, id, author, content, timestamp,
+      karma, numReplies, replyToId);
 
   /// Create a copy of Reply
   /// with the given fields replaced by the non-null parameter values.
@@ -294,8 +273,8 @@ abstract class _Reply implements Reply {
       required final User author,
       required final String content,
       required final DateTime timestamp,
-      required final List<Reaction> reactions,
-      required final List<Reply> comments,
+      required final int karma,
+      required final int numReplies,
       required final String replyToId}) = _$ReplyImpl;
 
   factory _Reply.fromJson(Map<String, dynamic> json) = _$ReplyImpl.fromJson;
@@ -309,9 +288,9 @@ abstract class _Reply implements Reply {
   @override
   DateTime get timestamp;
   @override
-  List<Reaction> get reactions;
+  int get karma;
   @override
-  List<Reply> get comments;
+  int get numReplies;
   @override
   String get replyToId;
 

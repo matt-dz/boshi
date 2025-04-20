@@ -1,20 +1,19 @@
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/domain/models/reaction/reaction.dart';
 
 abstract class ContentItem {
   const ContentItem({
     required this.id,
     required this.timestamp,
     required this.author,
-    required this.reactions,
+    required this.likes,
     required this.content,
-    required this.comments,
+    required this.numReplies,
   });
 
   final String id;
   final DateTime timestamp;
   final User author;
-  final List<Reaction> reactions;
-  final List<ContentItem> comments;
+  final int likes;
+  final int numReplies;
   final String content;
 }
