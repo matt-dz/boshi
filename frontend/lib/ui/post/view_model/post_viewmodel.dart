@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/shared/exceptions/not_authorized_exception.dart';
+import 'package:frontend/internal/exceptions/oauth_unauthorized_exception.dart';
 
 import 'package:frontend/shared/models/post/post.dart';
 
-import 'package:frontend/utils/result.dart';
-import 'package:frontend/utils/command.dart';
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/result/result.dart';
+import 'package:frontend/internal/command/command.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 /// ViewModel for the Feed page
 class PostViewModel extends ChangeNotifier {
@@ -44,7 +44,7 @@ class PostViewModel extends ChangeNotifier {
         }
         return userResult;
       }
-      return Result.error(NotAuthorizedException('GetUser'));
+      return Result.error(OAuthUnauthorizedException('GetUser'));
     } finally {
       notifyListeners();
     }

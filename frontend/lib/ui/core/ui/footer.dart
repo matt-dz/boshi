@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 class Footer extends StatelessWidget {
   const Footer({super.key});

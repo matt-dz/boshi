@@ -24,8 +24,6 @@ export type Post = {
   cid: string
   author_did: string
   indexed_at: Date
-  title: string
-  content: string
 }
 
 export type Reaction = {

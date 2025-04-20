@@ -1,8 +1,8 @@
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/utils/result.dart';
+import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/ui/models/verification_code/verification_code.dart';
-import 'package:frontend/utils/command.dart';
+import 'package:frontend/internal/command/command.dart';
 
 class EmailVerificationViewModel extends ChangeNotifier {
   EmailVerificationViewModel({

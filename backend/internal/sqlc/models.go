@@ -72,8 +72,6 @@ type Post struct {
 	Cid       string
 	AuthorDid string
 	IndexedAt pgtype.Timestamptz
-	Title     string
-	Content   string
 }
 
 type Reaction struct {

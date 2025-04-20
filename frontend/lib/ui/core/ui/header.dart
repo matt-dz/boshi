@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 class Header extends StatelessWidget {
   const Header({super.key, required this.title});

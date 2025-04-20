@@ -4,10 +4,10 @@ import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:frontend/config/environment.dart';
-import 'package:frontend/shared/exceptions/missing_env.dart';
+import 'package:frontend/internal/config/environment.dart';
+import 'package:frontend/internal/exceptions/missing_env.dart';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
-import 'package:frontend/utils/result.dart';
+import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/shared/models/report/report.dart' as boshi_report;
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
@@ -15,24 +15,42 @@ import 'package:frontend/data/models/requests/reply/reply.dart'
     as reply_request;
 import 'package:frontend/shared/models/post/post.dart' as post_request;
 import 'package:http/http.dart' as http;
-import 'package:frontend/shared/oauth/oauth.dart' as oauth_shared;
+import 'package:frontend/data/models/requests/add_email/add_email.dart';
+import 'package:frontend/data/models/requests/verify_code/verify_code.dart';
+import 'package:frontend/internal/exceptions/verification_code_already_set_exception.dart';
+import 'package:frontend/internal/exceptions/code_not_found_exception.dart';
+import 'package:frontend/internal/exceptions/already_verified_exception.dart';
+import 'package:frontend/internal/exceptions/user_not_found_exception.dart';
 import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
 import 'package:frontend/data/models/responses/verification_code_ttl/verification_code_ttl.dart';
 import 'package:frontend/shared/models/mock_data/feed/feed.dart';
-import 'package:frontend/shared/atproto/atproto.dart' as atproto_shared;
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+Future<void> _setSessionVars(
+  OAuthSession session,
+  SharedPreferencesAsync? prefs,
+) async {
+  prefs ??= SharedPreferencesAsync();
+  await prefs.setString(
+    'session-vars',
+    json.encode({
+      'accessToken': session.accessToken,
+      'refreshToken': session.refreshToken,
+      'tokenType': session.tokenType,
+      'scope': session.scope,
+      'expiresAt': session.expiresAt.toString(),
+      'sub': session.sub,
+      r'$dPoPNonce': session.$dPoPNonce,
+      r'$publicKey': session.$publicKey,
+      r'$privateKey': session.$privateKey,
+    }),
+  );
+}
 
 class ApiClient {
-  ApiClient({String? host, HttpClient Function()? clientFactory})
-      : _host = host ?? 'localhost',
-        _clientFactory = clientFactory ?? HttpClient.new;
-
-  final String _host;
-  final HttpClient Function() _clientFactory;
-
-  Future<Result<bsky.Feed>> getFeed(OAuthSession session) async {
+  Future<Result<bsky.Feed>> getFeed(bsky.Bluesky bluesky) async {
     logger.d('Getting Feed');
-    final bskyServer = bsky.Bluesky.fromOAuthSession(session);
     if (EnvironmentConfig.feedGenUri == '') {
       return Result.error(
         MissingEnvException('FEED_GENERATOR_URI'),
@@ -41,8 +59,7 @@ class ApiClient {
 
     final generatorUri = AtUri.parse(EnvironmentConfig.feedGenUri);
 
-    final xrpcResponse =
-        await bskyServer.feed.getFeed(generatorUri: generatorUri);
+    final xrpcResponse = await bluesky.feed.getFeed(generatorUri: generatorUri);
 
     logger.d(xrpcResponse.data);
 
@@ -60,7 +77,7 @@ class ApiClient {
   Future<Result<User>> getUser(String did) async {
     logger.d('Sending GET request for User $did');
 
-    final Uri hostUri = Uri.parse(_host);
+    final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
     final Uri requestUri = hostUri.replace(pathSegments: ['user', did]);
 
     final response = await http.get(requestUri);
@@ -104,17 +121,19 @@ class ApiClient {
   }
 
   Future<Result<void>> createPost(
-    ATProto session,
+    bsky.Bluesky bluesky,
     post_request.Post post,
   ) async {
     logger.d('Creating post');
-    final xrpcResponse = await session.repo.createRecord(
-      collection: NSID.create('feed.boshi.app', 'post'),
-      record: {
-        'title': post.title,
-        'content': post.content,
-        'timestamp': post.indexedAt,
-      },
+    final xrpcResponse = await bluesky.feed.post(
+      text: '${post.title}\n${post.content}',
+      tags: List.from(['boshi.post']),
+      facets: [
+        bsky.Facet(
+          index: bsky.ByteSlice(byteStart: 0, byteEnd: post.title.length),
+          features: [bsky.FacetFeature.tag(data: bsky.FacetTag(tag: 'boshi'))],
+        ),
+      ],
     );
 
     if (xrpcResponse.status == HttpStatus.ok) {
@@ -133,10 +152,10 @@ class ApiClient {
   Future<OAuthClientMetadata> getOAuthClientMetadata(
     String clientId,
   ) async {
-    logger.d('Sending GET request for OAuth client metadata');
+    logger.d('Sending request');
     final response = await http.get(Uri.parse(clientId));
 
-    if (response.statusCode != 200) {
+    if (response.statusCode > 299) {
       logger.e('Failed to get client metadata: $response');
       throw OAuthException(
         'Failed to get client metadata: ${response.statusCode}',
@@ -151,25 +170,128 @@ class ApiClient {
     OAuthClient client,
     String identity,
   ) async {
-    return oauth_shared.getOAuthAuthorizationURI(client, identity);
+    logger.d('Retrieving shared preferences instance');
+    final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+
+    logger.d('Initiating OAuth authorization request');
+    final (uri, context) = await client.authorize(identity);
+
+    logger.d('Setting OAuth variables');
+    await prefs.setString('oauth-code-verifier', context.codeVerifier);
+    await prefs.setString('oauth-state', context.state);
+    await prefs.setString('oauth-dpop-nonce', context.dpopNonce);
+
+    return (uri, context);
   }
 
   Future<OAuthSession> generateSession(
     OAuthClient client,
     String callback,
   ) async {
-    return oauth_shared.generateSession(client, callback);
+    logger.d('Retrieving shared preferences instance');
+    final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+
+    logger.d('Retrieving OAuth variables from storage');
+    final codeVerifier = await prefs.getString('oauth-code-verifier');
+    final state = await prefs.getString('oauth-state');
+    final dpopNonce = await prefs.getString('oauth-dpop-nonce');
+
+    if (codeVerifier == null || state == null || dpopNonce == null) {
+      logger.e('OAuth variables not set');
+      throw ArgumentError('Context not set');
+    }
+
+    final context = OAuthContext(
+      codeVerifier: codeVerifier,
+      state: state,
+      dpopNonce: dpopNonce,
+    );
+
+    logger.d('Handling OAuth callback');
+    final session = await client.callback(Uri.base.toString(), context);
+
+    logger.d('Setting session variables');
+
+    /// TODO: Implement JSON as a separate class
+    await prefs.setString(
+      'session-vars',
+      json.encode({
+        'accessToken': session.accessToken,
+        'refreshToken': session.refreshToken,
+        'tokenType': session.tokenType,
+        'scope': session.scope,
+        'expiresAt': session.expiresAt.toString(),
+        'sub': session.sub,
+        r'$dPoPNonce': session.$dPoPNonce,
+        r'$publicKey': session.$publicKey,
+        r'$privateKey': session.$privateKey,
+      }),
+    );
+
+    return session;
   }
 
   Future<(OAuthSession, ATProto)> refreshSession(OAuthClient client) async {
-    return oauth_shared.refreshSession(client);
+    logger.d('Retrieving shared preferences instance');
+    final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+
+    logger.d('Retrieving OAuth session variables from shared preferences');
+    final sessionVars = await prefs.getString('session-vars');
+    if (sessionVars == null) {
+      throw ArgumentError('No session stored');
+    }
+
+    logger.d('Decoding OAuth session variables');
+    final Map<String, dynamic> sessionMap = json.decode(sessionVars);
+    final session = OAuthSession(
+      accessToken: sessionMap['accessToken'],
+      refreshToken: sessionMap['refreshToken'],
+      tokenType: sessionMap['tokenType'],
+      scope: sessionMap['scope'],
+      expiresAt: DateTime.parse(sessionMap['expiresAt']),
+      sub: sessionMap['sub'],
+      $dPoPNonce: sessionMap[r'$dPoPNonce'],
+      $publicKey: sessionMap[r'$publicKey'],
+      $privateKey: sessionMap[r'$privateKey'],
+    );
+
+    logger.d('Refreshing OAuth session');
+    final refreshedSession = await client.refresh(session);
+
+    logger.d('Setting session variables');
+    await _setSessionVars(refreshedSession, prefs);
+
+    return (refreshedSession, ATProto.fromOAuthSession(refreshedSession));
   }
 
   Future<Result<void>> addVerificationEmail(
     String email,
     String authorDID,
   ) async {
-    return await atproto_shared.addVerificationEmail(email, authorDID);
+    try {
+      logger.d('Sending request to add verification email');
+      final result = await http.post(
+        Uri.parse('${EnvironmentConfig.backendBaseURL}/email/code'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(AddEmail(userId: authorDID, email: email).toJson()),
+      );
+
+      if (result.statusCode == 429 &&
+          result.body.trim() == 'Verification code already set') {
+        throw VerificationCodeAlreadySetException();
+      } else if (result.statusCode >= 400) {
+        throw HttpException(result.body);
+      }
+      return Result.ok(null);
+    } on Exception catch (e) {
+      logger.e('Failed to add verification email. error=$e');
+      return Result.error(e);
+    } catch (e) {
+      logger.e('Failed to add verification email. error=$e');
+      return Result.error(Exception(e));
+    }
   }
 
   Future<Result<void>> confirmVerificationCode(
@@ -177,18 +299,102 @@ class ApiClient {
     String code,
     String authorDID,
   ) async {
-    return await atproto_shared.confirmVerificationCode(email, code, authorDID);
+    try {
+      logger.d('Sending request');
+      final result = await http.post(
+        Uri.parse('${EnvironmentConfig.backendBaseURL}/email/verify'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          VerifyCode(
+            userId: authorDID,
+            email: email,
+            code: code,
+          ),
+        ),
+      );
+
+      if (result.statusCode == 409 &&
+          result.body.trim() == 'User already verified') {
+        throw AlreadyVerifiedException();
+      }
+      if (result.statusCode >= 400) {
+        throw HttpException(result.body);
+      }
+      logger.d('Successfully confirmed code');
+      return Result.ok(null);
+    } on Exception catch (e) {
+      logger.e('Failed to confirm verification code. error=$e');
+      return Result.error(e);
+    } catch (e) {
+      logger.e('Failed to confirm verification code. error=$e');
+      return Result.error(Exception(e));
+    }
   }
 
   Future<Result<VerificationStatus>> isUserVerified(
     String userDID,
   ) async {
-    return await atproto_shared.isUserVerified(userDID);
+    try {
+      logger.d('Sending request');
+      final result = await http.get(
+        Uri.parse(
+          '${EnvironmentConfig.backendBaseURL}/user/$userDID/verification-status',
+        ),
+      );
+
+      final body = result.body.trim();
+
+      if (result.statusCode == 404 && body == 'User not found') {
+        throw UserNotFoundException();
+      }
+
+      if (result.statusCode >= 400) {
+        throw HttpException(result.body);
+      }
+
+      logger.d('Successfully retrieved status');
+      return Result.ok(VerificationStatus.fromJson(jsonDecode(result.body)));
+    } on Exception catch (e) {
+      logger.e('Failed to verify user. error=$e');
+      return Result.error(e);
+    } catch (e) {
+      logger.e('Failed to verify user. error=$e');
+      return Result.error(Exception(e));
+    }
   }
 
   Future<Result<VerificationCodeTTL>> getVerificationCodeTTL(
     String userDID,
   ) async {
-    return await atproto_shared.getVerificationCodeTTL(userDID);
+    try {
+      logger.d('Sending request');
+      final result = await http.get(
+        Uri.parse('${EnvironmentConfig.backendBaseURL}/user/$userDID/code/ttl'),
+      );
+
+      final body = result.body.trim();
+
+      if (result.statusCode == 404) {
+        if (body == 'User not found') {
+          throw UserNotFoundException();
+        } else if (body == 'Code not found') {
+          throw CodeNotFoundException();
+        }
+      }
+      if (result.statusCode >= 400) {
+        throw HttpException(body);
+      }
+
+      logger.d('Successfully retrieved ttl');
+      return Result.ok(VerificationCodeTTL.fromJson(jsonDecode(result.body)));
+    } on Exception catch (e) {
+      logger.e('Request failed. error=$e');
+      return Result.error(e);
+    } catch (e) {
+      logger.e('Request failed. error=$e');
+      return Result.error(Exception(e));
+    }
   }
 }
