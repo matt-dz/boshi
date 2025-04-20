@@ -79,7 +79,6 @@ class MainApp extends StatelessWidget {
             title: 'Boshi',
             viewModel: HomeViewModel(
               feedRepository: context.read<FeedRepository>(),
-              userRepository: context.read<UserRepository>(),
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),
