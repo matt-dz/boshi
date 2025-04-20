@@ -102,7 +102,14 @@ class _PostFormState extends State<PostForm> {
               child: Column(
                 children: [
                   Text('Posting as'),
-                  Text(widget.viewModel.user?.school ?? 'School not found'),
+                  ListenableBuilder(
+                    listenable: widget.viewModel,
+                    builder: (context, _) {
+                      return Text(
+                        widget.viewModel.user?.school ?? 'School not found',
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
