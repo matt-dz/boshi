@@ -8,6 +8,10 @@ class EnvironmentConfig {
     'PROD',
     defaultValue: false,
   );
+  static const frontendPort = int.fromEnvironment(
+    'FRONTEND_PORT',
+    defaultValue: 3000,
+  );
   static const feedGenUri = String.fromEnvironment(
     'FEED_GEN_URI',
     defaultValue: '',

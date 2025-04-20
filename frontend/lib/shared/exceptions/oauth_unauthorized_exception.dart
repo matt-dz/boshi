@@ -1,7 +1,7 @@
-class OAuthUnauthorized implements Exception {
+class OAuthUnauthorizedException implements Exception {
   final String message;
 
-  OAuthUnauthorized([
+  OAuthUnauthorizedException([
     this.message = 'Unauthorized.',
   ]);
 
