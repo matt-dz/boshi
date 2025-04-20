@@ -22,6 +22,7 @@ User _$UserFromJson(Map<String, dynamic> json) {
 mixin _$User {
   String get id => throw _privateConstructorUsedError;
   String get school => throw _privateConstructorUsedError;
+  DateTime get verifiedAt => throw _privateConstructorUsedError;
 
   /// Serializes this User to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -37,7 +38,7 @@ abstract class $UserCopyWith<$Res> {
   factory $UserCopyWith(User value, $Res Function(User) then) =
       _$UserCopyWithImpl<$Res, User>;
   @useResult
-  $Res call({String id, String school});
+  $Res call({String id, String school, DateTime verifiedAt});
 }
 
 /// @nodoc
@@ -57,6 +58,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
   $Res call({
     Object? id = null,
     Object? school = null,
+    Object? verifiedAt = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -67,6 +69,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.school
           : school // ignore: cast_nullable_to_non_nullable
               as String,
+      verifiedAt: null == verifiedAt
+          ? _value.verifiedAt
+          : verifiedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ) as $Val);
   }
 }
@@ -78,7 +84,7 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       __$$UserImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String school});
+  $Res call({String id, String school, DateTime verifiedAt});
 }
 
 /// @nodoc
@@ -95,6 +101,7 @@ class __$$UserImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? school = null,
+    Object? verifiedAt = null,
   }) {
     return _then(_$UserImpl(
       id: null == id
@@ -105,6 +112,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.school
           : school // ignore: cast_nullable_to_non_nullable
               as String,
+      verifiedAt: null == verifiedAt
+          ? _value.verifiedAt
+          : verifiedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
@@ -112,7 +123,8 @@ class __$$UserImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$UserImpl implements _User {
-  const _$UserImpl({required this.id, required this.school});
+  const _$UserImpl(
+      {required this.id, required this.school, required this.verifiedAt});
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
@@ -121,10 +133,12 @@ class _$UserImpl implements _User {
   final String id;
   @override
   final String school;
+  @override
+  final DateTime verifiedAt;
 
   @override
   String toString() {
-    return 'User(id: $id, school: $school)';
+    return 'User(id: $id, school: $school, verifiedAt: $verifiedAt)';
   }
 
   @override
@@ -133,12 +147,14 @@ class _$UserImpl implements _User {
         (other.runtimeType == runtimeType &&
             other is _$UserImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.school, school) || other.school == school));
+            (identical(other.school, school) || other.school == school) &&
+            (identical(other.verifiedAt, verifiedAt) ||
+                other.verifiedAt == verifiedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, school);
+  int get hashCode => Object.hash(runtimeType, id, school, verifiedAt);
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -158,7 +174,9 @@ class _$UserImpl implements _User {
 
 abstract class _User implements User {
   const factory _User(
-      {required final String id, required final String school}) = _$UserImpl;
+      {required final String id,
+      required final String school,
+      required final DateTime verifiedAt}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
@@ -166,6 +184,8 @@ abstract class _User implements User {
   String get id;
   @override
   String get school;
+  @override
+  DateTime get verifiedAt;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.

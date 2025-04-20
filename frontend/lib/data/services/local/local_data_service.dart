@@ -24,7 +24,11 @@ class LocalDataService {
 
   Future<Result<User>> getUser(String did) async {
     return Result.ok(
-      User(id: '1', school: 'University of Florida'),
+      User(
+        id: '1',
+        school: 'University of Florida',
+        verifiedAt: DateTime.now(),
+      ),
     );
   }
 

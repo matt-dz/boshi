@@ -32,12 +32,13 @@ func (q *Queries) GetEmail(ctx context.Context, userID string) (string, error) {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT school, verified_at
+SELECT user_id, school, verified_at
 FROM emails
 WHERE emails.user_id = $1
 `
 
 type GetUserRow struct {
+	UserID     string
 	School     pgtype.Text
 	VerifiedAt pgtype.Timestamptz
 }
@@ -45,7 +46,7 @@ type GetUserRow struct {
 func (q *Queries) GetUser(ctx context.Context, userID string) (GetUserRow, error) {
 	row := q.db.QueryRow(ctx, getUser, userID)
 	var i GetUserRow
-	err := row.Scan(&i.School, &i.VerifiedAt)
+	err := row.Scan(&i.UserID, &i.School, &i.VerifiedAt)
 	return i, err
 }
 

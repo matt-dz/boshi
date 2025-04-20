@@ -27,6 +27,7 @@ var mockFeed = [
     author: User(
       id: '1',
       school: 'University of Florida',
+      verifiedAt: DateTime.now(),
     ),
     content: 'Hello, world!',
     timestamp: DateTime.now(),
@@ -43,6 +44,7 @@ var mockFeed = [
     author: User(
       id: '2',
       school: 'Stanford University',
+      verifiedAt: DateTime.now(),
     ),
     content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
@@ -60,6 +62,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
         author: User(
           id: '1',
           school: 'University of Florida',
+          verifiedAt: DateTime.now(),
         ),
         content: 'This is a reply',
         timestamp: DateTime.now(),
@@ -75,6 +78,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
             author: User(
               id: '2',
               school: 'Stanford University',
+              verifiedAt: DateTime.now(),
             ),
             content: 'This is a reply to a reply',
             timestamp: DateTime.now(),
@@ -86,6 +90,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
                 author: User(
                   id: '3',
                   school: 'University of Washington',
+                  verifiedAt: DateTime.now(),
                 ),
                 content: 'This is a reply to a reply to a reply',
                 timestamp: DateTime.now(),
@@ -100,6 +105,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
             author: User(
               id: '4',
               school: 'Princeton University',
+              verifiedAt: DateTime.now(),
             ),
             content: 'This is a reply to a reply',
             timestamp: DateTime.now(),
@@ -111,6 +117,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
                 author: User(
                   id: '3',
                   school: 'University of Washington',
+                  verifiedAt: DateTime.now(),
                 ),
                 content: 'This is a reply to a reply to a reply',
                 timestamp: DateTime.now(),
@@ -130,6 +137,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
     author: User(
       id: '3',
       school: 'University of Washington',
+      verifiedAt: DateTime.now(),
     ),
     content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.''',
@@ -143,6 +151,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
     author: User(
       id: '4',
       school: 'Princeton University',
+      verifiedAt: DateTime.now(),
     ),
     content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit , sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
@@ -156,6 +165,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit , sed do eiusmod tempor 
     author: User(
       id: '5',
       school: 'Harvard University',
+      verifiedAt: DateTime.now(),
     ),
     content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
@@ -169,6 +179,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
     author: User(
       id: '6',
       school: 'University of California, Berkely',
+      verifiedAt: DateTime.now(),
     ),
     content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
@@ -182,6 +193,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
     author: User(
       id: '7',
       school: 'University of Southern California',
+      verifiedAt: DateTime.now(),
     ),
     content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
@@ -195,6 +207,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
     author: User(
       id: '8',
       school: 'University of California, Los Angeles',
+      verifiedAt: DateTime.now(),
     ),
     content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
@@ -208,6 +221,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
     author: User(
       id: '9',
       school: 'University of Pennsylvania',
+      verifiedAt: DateTime.now(),
     ),
     content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
@@ -221,6 +235,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
     author: User(
       id: '10',
       school: 'Massachusetts Institute of Technology',
+      verifiedAt: DateTime.now(),
     ),
     content: '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.''',
