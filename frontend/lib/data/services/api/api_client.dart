@@ -91,7 +91,7 @@ class ApiClient {
       return Result.error(
         Exception('Failed to get user, missing user_ids'),
       );
-    } else if (response.statusCode == 500) {
+    } else if (response.statusCode == 404) {
       return Result.error(UserNotFoundException());
     }
 
@@ -119,7 +119,7 @@ class ApiClient {
       return Result.error(
         Exception('Failed to get user, missing user_ids'),
       );
-    } else if (response.statusCode == 500) {
+    } else if (response.statusCode == 404) {
       return Result.error(UserNotFoundException());
     }
 

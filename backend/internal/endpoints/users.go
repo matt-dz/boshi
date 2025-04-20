@@ -5,9 +5,12 @@ import (
 	"boshi-backend/internal/sqlc"
 	"context"
 	"encoding/json"
+	"errors"
 	"log/slog"
 
 	"net/http"
+
+	"github.com/jackc/pgx/v5"
 )
 
 func GetUsersByID(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +29,11 @@ func GetUsersByID(w http.ResponseWriter, r *http.Request) {
 
 	usersResponse, err := sqlcDb.GetUsers(ctx, userIDs)
 
-	if err != nil {
+	if errors.Is(err, pgx.ErrNoRows) {
+		log.ErrorContext(r.Context(), "No row returned - user does not exist")
+		http.Error(w, "User does not exist", http.StatusNotFound)
+		return
+	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to get users", slog.Any("error", err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -62,7 +69,11 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userResponse, err := sqlcDb.GetUser(ctx, userID)
-	if err != nil {
+	if errors.Is(err, pgx.ErrNoRows) {
+		log.ErrorContext(r.Context(), "No row returned - user does not exist")
+		http.Error(w, "User does not exist", http.StatusNotFound)
+		return
+	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to get user", slog.Any("error", err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
