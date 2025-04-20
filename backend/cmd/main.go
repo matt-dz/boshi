@@ -49,6 +49,22 @@ func main() {
 		),
 	)
 
+	mux.HandleFunc("GET /users",
+		middleware.Chain(
+			endpoints.GetUsersByID,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
+	mux.HandleFunc("GET /user/{user_id}",
+		middleware.Chain(
+			endpoints.GetUserByID,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
 	mux.HandleFunc("POST /email-list",
 		middleware.Chain(
 			endpoints.AddEmailToEmailList,

@@ -60,7 +60,7 @@ class MainApp extends StatelessWidget {
           builder: (context, state) => PostScreen(
             title: 'Boshi',
             viewModel: PostViewModel(
-              atprotoRepository: context.read<AtProtoRepository>(),
+              atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),
         ),

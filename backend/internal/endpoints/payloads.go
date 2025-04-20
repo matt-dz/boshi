@@ -1,5 +1,9 @@
 package endpoints
 
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
 type clientMetadata struct {
 	ClientID                string   `json:"client_id"`
 	ClientName              string   `json:"client_name"`
@@ -11,6 +15,20 @@ type clientMetadata struct {
 	TokenEndpointAuthMethod string   `json:"token_endpoint_auth_method"`
 	ApplicationType         string   `json:"application_type"`
 	DpopBoundAccessTokens   bool     `json:"dpop_bound_access_tokens"`
+}
+
+type getUserPayload struct {
+	UserID string `json:"user_id"`
+}
+
+type getUserResponse struct {
+	UserID     string             `json:"id"`
+	School     pgtype.Text        `json:"school"`
+	VerifiedAt pgtype.Timestamptz `json:"verifiedAt"`
+}
+
+type getUsersResponse struct {
+	Users []getUserResponse `json:"users"`
 }
 
 type emailListPayload struct {
