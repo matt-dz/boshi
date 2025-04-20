@@ -22,30 +22,35 @@ Future<Result<List<Post>>> convertFeedToDomainPosts(
   }
 
   return Result.ok(
-    feed.feed.map((feedView) {
-      final titleEnd = feedView.post.record.facets?[0].index.byteEnd;
+    feed.feed
+        .map((feedView) {
+          final titleEnd = feedView.post.record.facets?[0].index.byteEnd;
 
-      final title = feedView.post.record.text.substring(0, titleEnd);
-      final content = feedView.post.record.text
-          .substring(titleEnd == null ? 0 : titleEnd + 1);
+          final title = feedView.post.record.text.substring(0, titleEnd);
+          final content = feedView.post.record.text
+              .substring(titleEnd == null ? 0 : titleEnd + 1);
+          final user = users.users.where(
+            (user) => user.id == feedView.post.author.did,
+          );
 
-      return Post(
-        id: feedView.post.cid,
-        author: User(
-          id: feedView.post.author.did,
-          school: users.users
-              .firstWhere(
-                (user) => user.id == feedView.post.author.did,
-                orElse: () => User(id: 'unknown', school: 'unknown'),
-              )
-              .school,
-        ),
-        title: title,
-        content: content,
-        timestamp: feedView.post.indexedAt,
-        reactions: List.empty(),
-        comments: List.empty(),
-      );
-    }).toList(),
+          if (user.length != 1) {
+            return null;
+          }
+
+          return Post(
+            id: feedView.post.cid,
+            author: User(
+              id: feedView.post.author.did,
+              school: user.single.school,
+            ),
+            title: title,
+            content: content,
+            timestamp: feedView.post.indexedAt,
+            reactions: List.empty(),
+            comments: List.empty(),
+          );
+        })
+        .whereType<Post>()
+        .toList(),
   );
 }
