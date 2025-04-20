@@ -4,6 +4,8 @@ import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
+import 'package:frontend/config/environment.dart';
+import 'package:frontend/shared/exceptions/missing_env.dart';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 import 'package:frontend/utils/result.dart';
 import 'package:frontend/shared/models/report/report.dart' as boshi_report;
@@ -30,29 +32,27 @@ class ApiClient {
   Future<Result<bsky.Feed>> getFeed(OAuthSession session) async {
     logger.d('Getting Feed');
     final bskyServer = bsky.Bluesky.fromOAuthSession(session);
-
-    final feedGenUri = const String.fromEnvironment('FEED_GENERATOR_URI');
-
-    if (feedGenUri == '') {
+    if (EnvironmentConfig.feedGenUri == '') {
       return Result.error(
-        Exception('Failed to get FEED_GENERATOR_URI env'),
+        MissingEnvException('FEED_GENERATOR_URI'),
       );
     }
 
-    final generatorUri = AtUri.parse(feedGenUri);
+    final generatorUri = AtUri.parse(EnvironmentConfig.feedGenUri);
 
     final xrpcResponse =
         await bskyServer.feed.getFeed(generatorUri: generatorUri);
 
-    if (xrpcResponse.status == HttpStatus.ok) {
-      return Result.ok(xrpcResponse.data);
-    } else {
+    logger.d(xrpcResponse.data);
+
+    if (xrpcResponse.status != HttpStatus.ok) {
       return Result.error(
         Exception(
           'Failed to get feed with status: ${xrpcResponse.status}',
         ),
       );
     }
+    return Result.ok(xrpcResponse.data);
   }
 
   // TODO: Implement the getUser method

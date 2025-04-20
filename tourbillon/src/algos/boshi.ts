@@ -6,6 +6,13 @@ import { Agent } from '@atproto/api'
 // max 15 chars
 export const shortname = 'boshi'
 
+/**
+ * https://docs.bsky.app/docs/api/app-bsky-feed-get-feed-skeleton
+ * Handler for server.app.bsky.feed.getFeedSkeleton method
+ * @constructor
+ * @param {string} ctx - Context
+ * @param {string} params - Params for a Get Feed Skeleton Query request
+ */
 export const handler = async (
   ctx: AppContext,
   params: FeedSkeletonQueryParams,
@@ -27,6 +34,14 @@ export const handler = async (
   }
 }
 
+/**
+ * https://docs.bsky.app/docs/api/app-bsky-feed-get-feed
+ * Handler for server.app.bsky.feed.getFeed method
+ * Also queries for the user profiles of the posts
+ * @constructor
+ * @param {string} ctx - Context
+ * @param {string} params - Params for a Get Feed Query request
+ */
 export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
   let builder = ctx.db
     .selectFrom('post')
@@ -43,11 +58,15 @@ export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
     .orderBy('post.indexed_at', 'desc')
     .limit(params.limit)
 
+  if (params.cursor) {
+    const timeStr = new Date(parseInt(params.cursor, 10))
+    builder = builder.where('post.indexed_at', '<', timeStr)
+  }
   const res = await builder.execute()
 
   const agent = new Agent('https://public.api.bsky.app')
   const profiles = await agent.getProfiles({
-    actors: res.map((row) => row.author_did),
+    actors: [...new Set(res.map((row) => row.author_did))],
   })
 
   const feed = res.map((row) => {

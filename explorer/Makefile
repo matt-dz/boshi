@@ -24,7 +24,7 @@ build:
 
 sqlc:
 	@echo "Generating SQLC..."
-	cd sql && sqlc generate
+	sqlc generate
 
 docker:
 	@echo "Building $(BUILD_NAME)..."

@@ -18,8 +18,10 @@ import 'package:frontend/utils/logger.dart';
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel({
     required FeedRepository feedRepository,
+    required UserRepository userRepository,
     required AtProtoRepository atProtoRepository,
   })  : _feedRepository = feedRepository,
+        _userRepository = userRepository,
         _atProtoRepository = atProtoRepository {
     load = Command0(_load)..execute();
     updateReactionCount = Command1<Post, ReactionPayload>(
@@ -30,6 +32,7 @@ class HomeViewModel extends ChangeNotifier {
   late Command0 load;
   late Command1 updateReactionCount;
   final FeedRepository _feedRepository;
+  final UserRepository _userRepository;
   final AtProtoRepository _atProtoRepository;
 
   User? _user;

@@ -34,6 +34,5 @@ abstract class AtProtoRepository extends ChangeNotifier {
   Future<Result<void>> refreshSession();
   Future<Result<void>> createPost(Post post);
   Future<Result<List<domain_models.Post>>> getFeed();
-
   Future<Result<User>> getUser(String did);
 }
