@@ -1,4 +1,4 @@
-.PHONY: docker docker-push staging types all format
+.PHONY: all run types docker docker-push compose-build docker-network dev format clean
 
 DOCKER_REGISTRY ?= matthew10125
 IMAGE_NAME ?= boshi-frontend
@@ -15,9 +15,19 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
+all: run
+
 run:
-	scripts/start.sh &
-	flutter run -d $(DEVICE_ID) --target $(MAIN_TARGET) --pid-file /tmp/flutter.pid --web-hostname 127.0.0.1 --web-port $(FRONTEND_PORT)
+	# scripts/start.sh &
+	flutter run -d $(DEVICE_ID) \
+	--target $(MAIN_TARGET) \
+	--pid-file /tmp/flutter.pid \
+	--web-hostname 127.0.0.1 \
+	--web-port $(FRONTEND_PORT) \
+	--dart-define=BACKEND_BASE_URL=$(BACKEND_BASE_URL) \
+	--dart-define=FRONTEND_PORT=$(FRONTEND_PORT) \
+	--dart-define=PROD=$(PROD) \
+	--dart-define=FEED_GENERATOR_URI=$(FEED_GENERATOR_URI)
 
 types:
 	dart run build_runner watch -d

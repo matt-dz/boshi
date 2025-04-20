@@ -8,11 +8,14 @@ class Error extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      message,
-      style: TextStyle(
-        color: color ?? Colors.red,
-        fontSize: 14,
+    return SizedBox(
+      width: 350,
+      child: Text(
+        message,
+        style: TextStyle(
+          color: color ?? Colors.red,
+          fontSize: 14,
+        ),
       ),
     );
   }
