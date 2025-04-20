@@ -16,7 +16,7 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   final AtProtoRepository _atProtoRepository;
-  late Command1<Uri, Login> login;
+  late final Command1<Uri, Login> login;
 
   Future<Result<Uri>> _login(Login signinPayload) async {
     final result = await _atProtoRepository.getAuthorizationURI(

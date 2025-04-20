@@ -17,8 +17,8 @@ class PostViewModel extends ChangeNotifier {
     createPost = Command1<void, Post>(_createPost);
   }
 
-  late Command0 load;
-  late Command1<void, Post> createPost;
+  late final Command0 load;
+  late final Command1<void, Post> createPost;
   final AtProtoRepository _atProtoRepository;
 
   User? _user;
@@ -42,7 +42,6 @@ class PostViewModel extends ChangeNotifier {
 
   void reload() {
     load = Command0(_load)..execute();
-    createPost = Command1(_createPost);
     notifyListeners();
   }
 

@@ -87,19 +87,20 @@ class ApiClient {
 
     final response = await http.get(requestUri);
 
-    if (response.statusCode != 200) {
-      logger.e('Failed to get user: $response');
+    if (response.statusCode == 400) {
       return Result.error(
-        Exception('Failed to get user'),
+        Exception('Failed to get user, missing user_ids'),
       );
+    } else if (response.statusCode == 500) {
+      return Result.error(UserNotFoundException());
     }
 
     try {
       final decoded = json.decode(response.body);
       final User result = User.fromJson(decoded);
       return Result.ok(result);
-    } catch (error) {
-      return Result.error(Exception('Failed to parse user with error $error'));
+    } on Exception catch (error) {
+      return Result.error(error);
     }
   }
 
@@ -114,19 +115,20 @@ class ApiClient {
 
     final response = await http.get(requestUri);
 
-    if (response.statusCode != 200) {
-      logger.e('Failed to get user: $response');
+    if (response.statusCode == 400) {
       return Result.error(
-        Exception('Failed to get user'),
+        Exception('Failed to get user, missing user_ids'),
       );
+    } else if (response.statusCode == 500) {
+      return Result.error(UserNotFoundException());
     }
 
     try {
       final decoded = json.decode(response.body);
       final Users result = Users.fromJson(decoded);
       return Result.ok(result);
-    } catch (error) {
-      return Result.error(Exception('Failed to parse user with error $error'));
+    } on Exception catch (error) {
+      return Result.error(error);
     }
   }
 

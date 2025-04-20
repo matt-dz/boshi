@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/domain/models/post/post.dart';
-import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/internal/exceptions/oauth_unauthorized_exception.dart';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 
 import 'package:frontend/internal/result/result.dart';
@@ -23,8 +21,8 @@ class HomeViewModel extends ChangeNotifier {
     );
   }
 
-  late Command0 load;
-  late Command1 updateReactionCount;
+  late final Command0 load;
+  late final Command1 updateReactionCount;
   final AtProtoRepository _atProtoRepository;
 
   List<Post> _posts = [];

@@ -37,7 +37,6 @@ class AtProtoRepository extends ChangeNotifier {
   late OAuthContext oAuthContext;
   atp.ATProto? atProto;
   bsky.Bluesky? bluesky;
-  User? user;
 
   late OAuthClientMetadata? clientMetadata;
   late OAuthClient? oAuthClient;
@@ -237,19 +236,18 @@ class AtProtoRepository extends ChangeNotifier {
 
   Future<Result<User>> getUser() async {
     if (!authorized) {
-      return Result.error(OAuthUnauthorizedException('getUser'));
+      return Result.error(OAuthUnauthorizedException());
     }
 
     final String? userDid = atProto?.oAuthSession?.sub;
 
     if (userDid == null) {
-      return Result.error(OAuthUnauthorizedException('getUser'));
+      return Result.error(OAuthUnauthorizedException());
     }
     final userResult = await _apiClient.getUser(userDid);
 
     switch (userResult) {
       case Ok<User>():
-        user = userResult.value;
         return userResult;
       case Error<User>():
         return userResult;
