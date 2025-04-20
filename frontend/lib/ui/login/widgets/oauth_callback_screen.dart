@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
-import 'package:frontend/utils/result.dart';
+import 'package:frontend/internal/result/result.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 

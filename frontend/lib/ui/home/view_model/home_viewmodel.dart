@@ -7,9 +7,9 @@ import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
 
-import 'package:frontend/utils/result.dart';
-import 'package:frontend/utils/command.dart';
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/result/result.dart';
+import 'package:frontend/internal/command/command.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 /// ViewModel for the Feed page
 class HomeViewModel extends ChangeNotifier {

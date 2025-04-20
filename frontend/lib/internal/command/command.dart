@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'result.dart';
+import '../result/result.dart';
 
-import 'package:frontend/shared/exceptions/command_already_running_exception.dart';
+import 'package:frontend/internal/exceptions/command_already_running_exception.dart';
 
 typedef CommandAction0<T> = Future<Result<T>> Function();
 typedef CommandAction1<T, A> = Future<Result<T>> Function(A);

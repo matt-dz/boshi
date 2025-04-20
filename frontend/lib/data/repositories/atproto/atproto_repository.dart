@@ -1,16 +1,16 @@
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/foundation.dart';
-import 'package:frontend/shared/exceptions/oauth_unauthorized_exception.dart';
-import 'package:frontend/shared/exceptions/verification_code_already_set_exception.dart';
-import 'package:frontend/shared/exceptions/user_not_found_exception.dart';
+import 'package:frontend/internal/exceptions/oauth_unauthorized_exception.dart';
+import 'package:frontend/internal/exceptions/verification_code_already_set_exception.dart';
+import 'package:frontend/internal/exceptions/user_not_found_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
-import 'package:frontend/utils/result.dart';
+import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/feed/feed.dart';
 import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
 import 'package:frontend/data/models/responses/verification_code_ttl/verification_code_ttl.dart';
 import 'package:frontend/data/services/api/api_client.dart';
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/logger/logger.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
 
