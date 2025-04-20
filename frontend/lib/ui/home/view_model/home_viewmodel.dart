@@ -50,6 +50,11 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  void reload() {
+    load = Command0(_load)..execute();
+    notifyListeners();
+  }
+
   Future<Result<Post>> _updateReactionCount(
     ReactionPayload reactionPayload,
   ) async {
