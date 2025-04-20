@@ -49,6 +49,7 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 		if school, ok := result[0].(string); ok {
 			userResponseStruct.School = school
 		}
+		log.Info("VerifiedAt", slog.Any("time", result[1]))
 		if verifiedAtRaw, ok := result[1].(string); ok {
 			log.Info(verifiedAtRaw)
 			verifiedAt, err := time.Parse(time.RFC3339Nano, verifiedAtRaw)
