@@ -54,7 +54,6 @@ class ApiClient {
     if (!EnvironmentConfig.prod) {
       return Result.ok(mockGetFeedResult);
     }
-    final bskyServer = bsky.Bluesky.fromOAuthSession(session);
 
     if (EnvironmentConfig.feedGenUri == '') {
       return Result.error(
