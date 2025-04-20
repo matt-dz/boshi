@@ -73,7 +73,9 @@ class ApiClient {
     }
 
     try {
-      final User result = User.fromJson(json.decode(response.body));
+      final decoded = json.decode(response.body);
+      logger.d(decoded);
+      final User result = User.fromJson(decoded);
       return Result.ok(result);
     } catch (error) {
       return Result.error(Exception('Failed to parse user with error $error'));
