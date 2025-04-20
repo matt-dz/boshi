@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/internal/exceptions/format.dart';
 import 'package:frontend/shared/models/post/post.dart';
+import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
 import 'package:frontend/ui/core/ui/header.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/utils/result.dart';
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/result/result.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 import '../view_model/post_viewmodel.dart';
 
@@ -47,6 +49,16 @@ class _PostFormState extends State<PostForm> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.viewModel.load.running) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (widget.viewModel.load.error) {
+      final result = widget.viewModel.load.result! as Error;
+      return ErrorScreen(
+        message: formatExceptionMsg(result.error),
+        onRefresh: widget.viewModel.reload,
+      );
+    }
+
     return Padding(
       padding: EdgeInsets.only(top: 24, bottom: 16),
       child: ShadCard(
@@ -98,11 +110,19 @@ class _PostFormState extends State<PostForm> {
               ],
             ),
             SizedBox(height: 30),
-            const Center(
+            Center(
               child: Column(
                 children: [
                   Text('Posting as'),
-                  Text('University of Florida | eifmsa'),
+                  ListenableBuilder(
+                    listenable: widget.viewModel,
+                    builder: (context, _) {
+                      final user = widget.viewModel.user;
+                      return Text(
+                        user?.school ?? 'School not found',
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

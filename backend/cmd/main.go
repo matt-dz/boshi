@@ -49,6 +49,14 @@ func main() {
 		),
 	)
 
+	mux.HandleFunc("GET /users",
+		middleware.Chain(
+			endpoints.GetUsersByID,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
 	mux.HandleFunc("GET /user/{user_id}",
 		middleware.Chain(
 			endpoints.GetUserByID,
@@ -76,6 +84,22 @@ func main() {
 	mux.HandleFunc("POST /email/verify",
 		middleware.Chain(
 			endpoints.VerifyEmailCode,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
+	mux.HandleFunc("GET /user/{user_id}/verification-status",
+		middleware.Chain(
+			endpoints.GetVerificationStatus,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
+	mux.HandleFunc("GET /user/{user_id}/code/ttl",
+		middleware.Chain(
+			endpoints.GetCodeExpiry,
 			middleware.AddCors(),
 			middleware.LogRequest(),
 		),

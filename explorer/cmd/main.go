@@ -5,28 +5,34 @@ import (
 	"boshi-explorer/internal/logger"
 	"boshi-explorer/internal/sqlc"
 	"context"
+	"encoding/json"
 	"fmt"
-
-	"net/http"
+	"log/slog"
 	"os"
-	"strings"
+	"slices"
 	"time"
 
-	"github.com/bluesky-social/indigo/api/atproto"
-	"github.com/bluesky-social/indigo/events"
-	"github.com/bluesky-social/indigo/events/schedulers/sequential"
-	"github.com/gorilla/websocket"
+	apibsky "github.com/bluesky-social/indigo/api/bsky"
+	"github.com/bluesky-social/jetstream/pkg/client"
+	"github.com/bluesky-social/jetstream/pkg/client/schedulers/sequential"
+	"github.com/bluesky-social/jetstream/pkg/models"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/joho/godotenv"
 )
 
 var log = logger.GetLogger()
 
-var uri string
+var socketUri string
 var firehoseIdentifier string
 
 func init() {
-	uri = os.Getenv("SOCKET_URI")
-	if uri == "" {
+	err := godotenv.Load()
+	if err != nil {
+		log.Info("Failed to load env -- defaulting to environment")
+	}
+
+	socketUri = os.Getenv("SOCKET_URI")
+	if socketUri == "" {
 		panic("Expected SOCKET_URI to be set")
 	}
 
@@ -36,41 +42,81 @@ func init() {
 	}
 }
 
-func main() {
-	log.Debug("Connecting to firehose", "uri", uri)
-	firehoseConnection, _, err := websocket.DefaultDialer.Dial(uri, http.Header{})
-	if err != nil {
-		panic(err)
-	}
+const (
+	atpPostLexicon = "app.bsky.feed.post"
+	boshiPostTag = "boshi.post"
+)
 
-	log.Debug("Connecting to postgres")
-	pool := database.Connect(context.Background())
-	defer pool.Close()
-	queries := sqlc.New(pool)
-
-	/* Create event processor and connect it to the firehose */
-	log.Debug("Starting repo stream")
-
-	repoCallbacks := &events.RepoStreamCallbacks{
-		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
-			for _, op := range evt.Ops {
-				if strings.HasPrefix(op.Path, "app.boshi.feed") {
-					uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
-					log.Info("New Activity @", "uri", uri)
-					queries.CreatePost(context.Background(), sqlc.CreatePostParams{Uri: uri, Cid: op.Cid.String(), IndexedAt: pgtype.Timestamptz{
-						Time:  time.Now(),
-						Valid: true,
-					}})
-					log.Info("Post created", "uri", uri)
+func handleEvent(ctx context.Context, event *models.Event) error {
+	// Unmarshal the record if there is one
+	if event.Commit != nil && (event.Commit.Operation == models.CommitOperationCreate || event.Commit.Operation == models.CommitOperationUpdate) {
+		switch event.Commit.Collection {
+			case atpPostLexicon:
+				var post apibsky.FeedPost
+				if err := json.Unmarshal(event.Commit.Record, &post); err != nil {
+					return fmt.Errorf("failed to unmarshal post: %w", err)
 				}
-			}
-			return nil
-		},
+				if len(post.Tags) != 0 && slices.Contains(post.Tags, boshiPostTag) {
+					go storePost(ctx, event, post)
+				}
+		}
 	}
 
-	workScheduler := sequential.NewScheduler(firehoseIdentifier, repoCallbacks.EventHandler)
-	err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
+	return nil
+}
+
+func storePost(
+	ctx context.Context,
+	event *models.Event,
+	post apibsky.FeedPost,
+) {
+	timeStamp, err := time.Parse(time.RFC3339, post.CreatedAt)
 	if err != nil {
-		panic(err)
+		log.Error("Failed to parse time from post")
+		return
 	}
+
+	uri := fmt.Sprintf("at://%s/%s/%s", event.Did, event.Commit.Collection, event.Commit.RKey)
+
+	returnedPost, err := database.UseQueries(ctx).CreatePost(ctx, 
+		sqlc.CreatePostParams{
+			Uri:       uri,
+			Cid:       event.Commit.CID,
+			AuthorDid: event.Did,
+			IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
+		},
+	)
+
+	if err != nil {
+		log.Error("Failed to store post", slog.Any("error", err))
+	}
+	log.Info("Post created", slog.Any("post", returnedPost))
+}
+
+func main() {
+	ctx := context.Background()
+	
+	_ = database.UseQueries(ctx)
+	defer database.Close()
+
+	jetstreamConfig := client.DefaultClientConfig()
+	jetstreamConfig.WantedCollections = []string{"app.bsky.feed.post"}
+	jetstreamConfig.WebsocketURL = socketUri
+	jetstreamConfig.Compress = true
+
+	scheduler := sequential.NewScheduler(firehoseIdentifier, log, handleEvent)
+
+	c, err := client.NewClient(jetstreamConfig, log, scheduler)
+	if err != nil {
+		log.Error("failed to create client", slog.Any("error", err))
+		return
+	}
+
+	cursor := time.Now().Add(-5 * time.Minute).UnixMicro()
+
+	if err := c.ConnectAndRead(ctx, &cursor); err != nil {
+		log.Error("failed to connect:", slog.Any("error", err))
+	}
+
+	log.Info("shutdown")
 }

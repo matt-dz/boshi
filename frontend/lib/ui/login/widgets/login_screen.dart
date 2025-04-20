@@ -6,8 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../view_model/login_viewmodel.dart';
 import 'package:frontend/ui/models/login/login.dart';
-import 'package:frontend/utils/result.dart';
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/result/result.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.viewModel});

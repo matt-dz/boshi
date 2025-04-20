@@ -6,6 +6,13 @@ import { Agent } from '@atproto/api'
 // max 15 chars
 export const shortname = 'boshi'
 
+/**
+ * https://docs.bsky.app/docs/api/app-bsky-feed-get-feed-skeleton
+ * Handler for server.app.bsky.feed.getFeedSkeleton method
+ * @constructor
+ * @param {string} ctx - Context
+ * @param {string} params - Params for a Get Feed Skeleton Query request
+ */
 export const handler = async (
   ctx: AppContext,
   params: FeedSkeletonQueryParams,
@@ -16,67 +23,11 @@ export const handler = async (
     .orderBy('indexed_at', 'desc')
     .limit(params.limit)
 
-  if (params.cursor) {
-    const timeStr = new Date(parseInt(params.cursor, 10))
-    builder = builder.where('post.indexed_at', '<', timeStr)
-  }
   const res = await builder.execute()
 
   const feed = res.map((row) => ({
     post: row.uri,
   }))
-
-  return {
-    feed,
-  }
-}
-
-export const feedHandler = async (ctx: AppContext, params: FeedQueryParams) => {
-  let builder = ctx.db
-    .selectFrom('post')
-    .innerJoin('email', 'post.author_did', 'email.user_id')
-    .select([
-      'post.author_did',
-      'post.cid',
-      'post.uri',
-      'post.title',
-      'post.content',
-      'post.indexed_at',
-      'email.school as school',
-    ])
-    .orderBy('post.indexed_at', 'desc')
-    .limit(params.limit)
-
-  if (params.cursor) {
-    const timeStr = new Date(parseInt(params.cursor, 10))
-    builder = builder.where('post.indexed_at', '<', timeStr)
-  }
-  const res = await builder.execute()
-
-  const agent = new Agent('https://public.api.bsky.app')
-  const profiles = await agent.getProfiles({
-    actors: res.map((row) => row.author_did),
-  })
-
-  const feed = res.map((row) => {
-    const author = profiles.data.profiles.filter(
-      (profile) => profile.did === row.author_did,
-    )[0]
-
-    return {
-      post: {
-        uri: row.uri,
-        cid: row.cid,
-        author: author,
-        record: {
-          school: row.school,
-          title: row.title,
-          content: row.content,
-        },
-        indexedAt: row.indexed_at.toISOString(),
-      },
-    }
-  })
 
   return {
     feed,

@@ -1,14 +1,13 @@
-.PHONY: docker docker-push staging types all format
+.PHONY: all run types docker docker-push compose-build docker-network dev format clean
 
 DOCKER_REGISTRY ?= matthew10125
 IMAGE_NAME ?= boshi-frontend
 TAG ?= latest
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 PLATFORM ?= linux/arm64
+MAIN_TARGET = lib/main.dart
 
 DEVICE_ID ?= chrome
-MAIN_STAGING = lib/main_staging.dart
-DEV_STAGING = lib/main_development.dart
 FRONTEND_PORT=3000
 
 ifneq (,$(wildcard ./.env))
@@ -16,12 +15,19 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
-run:
-	scripts/start.sh &
-	flutter run -d ${DEVICE_ID} --target ${DEV_STAGING} --pid-file /tmp/flutter.pid --web-hostname 127.0.0.1 --web-port ${FRONTEND_PORT}
+all: run
 
-staging:
-	flutter run -d ${DEVICE_ID} --target ${MAIN_STAGING}
+run:
+	# scripts/start.sh &
+	flutter run -d $(DEVICE_ID) \
+	--target $(MAIN_TARGET) \
+	--pid-file /tmp/flutter.pid \
+	--web-hostname 127.0.0.1 \
+	--web-port $(FRONTEND_PORT) \
+	--dart-define=BACKEND_BASE_URL=$(BACKEND_BASE_URL) \
+	--dart-define=FRONTEND_PORT=$(FRONTEND_PORT) \
+	--dart-define=PROD=$(PROD) \
+	--dart-define=FEED_GENERATOR_URI=$(FEED_GENERATOR_URI)
 
 types:
 	dart run build_runner watch -d
@@ -31,7 +37,7 @@ docker:
 	docker buildx build \
 	--build-arg NGINX_HOST=$(HOST) \
 	--build-arg BACKEND_BASE_URL=$(BACKEND_BASE_URL) \
-	--build-arg BUILD_TARGET=$(MAIN_STAGING) \
+	--build-arg BUILD_TARGET=$(MAIN_TARGET) \
 	--build-arg CLIENT_METADATA_PATH=$(CLIENT_METADATA_PATH) \
 	--build-arg FEED_GENERATOR_URI=$(FEED_GENERATOR_URI) \
 	--build-arg PROD=$(PROD) \

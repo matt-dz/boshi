@@ -5,14 +5,14 @@ import (
 	"boshi-backend/internal/sqlc"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
-	"time"
 
 	"net/http"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jackc/pgx/v5"
 )
 
 func ResolveSchoolFromEmail(email string) (string, error) {
@@ -39,6 +39,47 @@ func ResolveSchoolFromEmail(email string) (string, error) {
 	return result.Domains[0].Name, nil
 }
 
+func GetUsersByID(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	db := database.GetDb(ctx)
+	sqlcDb := sqlc.New(db)
+
+	log.DebugContext(r.Context(), "Getting users")
+
+	userIDs := r.URL.Query()["user_id"]
+	if len(userIDs) == 0 {
+		log.ErrorContext(r.Context(), "No user ids specified")
+		http.Error(w, "No user ids specified", http.StatusBadRequest)
+		return
+	}
+
+	usersResponse, err := sqlcDb.GetUsers(ctx, userIDs)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		log.ErrorContext(r.Context(), "No row returned - no users found")
+		http.Error(w, "No users found", http.StatusNotFound)
+		return
+	} else if err != nil {
+		log.ErrorContext(r.Context(), "Failed to get users", slog.Any("error", err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var convertedResponse []getUserResponse
+	for _, u := range usersResponse {
+		userResponse := getUserResponse(u)
+		if userResponse.School.Valid {
+			convertedResponse = append(convertedResponse, userResponse)
+		}
+	}
+
+	// Map the result to the User struct
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(getUsersResponse{
+		Users: convertedResponse,
+	})
+}
+
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	db := database.GetDb(ctx)
@@ -54,71 +95,16 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userResponse, err := sqlcDb.GetUser(ctx, userID)
-	if err != nil {
+	if errors.Is(err, pgx.ErrNoRows) {
+		log.ErrorContext(r.Context(), "No row returned - user does not exist")
+		http.Error(w, "User does not exist", http.StatusNotFound)
+		return
+	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to get user", slog.Any("error", err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// Assert the interface{} to the expected tuple (school, email, verified_at)
-	result, ok := userResponse.([]any)
-	if !ok {
-		log.ErrorContext(r.Context(), "Unexpected result from DB")
-		http.Error(w, "Unexpected result from DB", http.StatusInternalServerError)
-		return
-	}
-
 	// Map the result to the User struct
-	userResponseStruct := getUserResponse{
-		School: "Unknown School",
-		VerifiedAt: pgtype.Timestamptz{Time: time.Unix(0, 0)},
-	}
-
-	if len(result) >= 3 {
-		if school, ok := result[0].(string); ok {
-			if school == pgtype.Empty.String() {
-				log.DebugContext(r.Context(), "School empty - resolving school from email")
-				if email, ok := result[1].(string); ok {
-					resolvedSchool, err := ResolveSchoolFromEmail(email)
-					if err != nil {
-						log.ErrorContext(r.Context(), "Failed to resolve school", slog.Any("error", err))
-						http.Error(w, err.Error(), http.StatusInternalServerError)
-						return
-					}
-					
-					_, err = sqlcDb.UpsertSchool(ctx, 
-						sqlc.UpsertSchoolParams{
-							UserID: userID, 
-							School: pgtype.Text{
-								String: school, 
-								Valid: true,
-							},
-						},
-					)
-
-					if err != nil {
-						log.ErrorContext(r.Context(), "Failed to upsert school", slog.Any("error", err))
-						http.Error(w, err.Error(), http.StatusInternalServerError)
-						return
-					}
-					
-					school = resolvedSchool
-				} else {
-					log.WarnContext(r.Context(), "Failed to deduce email from db response")
-				}
-			}
-			userResponseStruct.School = school
-		} else {
-			log.WarnContext(r.Context(), "Failed to deduce school from db response")
-		}
-		if verifiedAt, ok := result[2].(pgtype.Timestamptz); ok {
-			userResponseStruct.VerifiedAt = verifiedAt
-		} else {
-			log.WarnContext(r.Context(), "Failed to deduce verified timestamp from db response")
-		}
-	}
-
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(userResponseStruct)
+	json.NewEncoder(w).Encode(getUserResponse(userResponse))
 }

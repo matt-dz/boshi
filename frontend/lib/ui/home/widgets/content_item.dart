@@ -4,9 +4,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/content_item/content_item.dart';
 import 'package:frontend/domain/models/reaction/reaction.dart';
-import 'package:frontend/utils/content_item.dart';
 
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
@@ -113,6 +112,24 @@ class ContentItemHeader extends StatelessWidget {
 
   final ContentItem post;
 
+  String _timeSincePosting(ContentItem contentItem) {
+    final currentTime = DateTime.now().toUtc();
+    final timeDifference =
+        currentTime.difference(contentItem.timestamp.toUtc());
+
+    if (timeDifference.inDays >= 7) {
+      return '${timeDifference.inDays ~/ 7}w';
+    } else if (timeDifference.inDays >= 1) {
+      return '${timeDifference.inDays}d';
+    } else if (timeDifference.inHours >= 1) {
+      return '${timeDifference.inHours}h';
+    } else if (timeDifference.inMinutes >= 1) {
+      return '${timeDifference.inMinutes}m';
+    } else {
+      return '${timeDifference.inSeconds}s';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -133,7 +150,7 @@ class ContentItemHeader extends StatelessWidget {
                     ),
                   ),
                   TextSpan(
-                    text: '・ ${timeSincePosting(post)}',
+                    text: '・ ${_timeSincePosting(post)}',
                     style: TextStyle(
                       color: Colors.grey.shade700,
                       fontSize: 12,
