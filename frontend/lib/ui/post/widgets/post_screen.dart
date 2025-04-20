@@ -98,11 +98,11 @@ class _PostFormState extends State<PostForm> {
               ],
             ),
             SizedBox(height: 30),
-            const Center(
+            Center(
               child: Column(
                 children: [
                   Text('Posting as'),
-                  Text('University of Florida | eifmsa'),
+                  Text(widget.viewModel.user?.school ?? 'School not found'),
                 ],
               ),
             ),
