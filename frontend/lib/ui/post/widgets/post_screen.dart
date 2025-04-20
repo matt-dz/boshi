@@ -6,8 +6,8 @@ import 'package:frontend/ui/core/ui/header.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/utils/result.dart';
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/result/result.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 import '../view_model/post_viewmodel.dart';
 

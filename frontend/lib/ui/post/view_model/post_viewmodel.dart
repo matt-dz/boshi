@@ -3,9 +3,9 @@ import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/shared/models/post/post.dart';
 
-import 'package:frontend/utils/result.dart';
-import 'package:frontend/utils/command.dart';
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/result/result.dart';
+import 'package:frontend/internal/command/command.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 /// ViewModel for the Feed page
 class PostViewModel extends ChangeNotifier {

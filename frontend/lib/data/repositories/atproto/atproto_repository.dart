@@ -1,15 +1,27 @@
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/foundation.dart';
+import 'package:frontend/internal/exceptions/oauth_unauthorized_exception.dart';
+import 'package:frontend/internal/exceptions/verification_code_already_set_exception.dart';
+import 'package:frontend/internal/exceptions/user_not_found_exception.dart';
 import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
-import 'package:frontend/utils/result.dart';
+import 'package:frontend/internal/result/result.dart';
+import 'package:frontend/internal/feed/feed.dart';
+import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
+import 'package:frontend/data/models/responses/verification_code_ttl/verification_code_ttl.dart';
+import 'package:frontend/data/services/api/api_client.dart';
+import 'package:frontend/internal/logger/logger.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
 
-abstract class AtProtoRepository extends ChangeNotifier {
+class AtProtoRepository extends ChangeNotifier {
   AtProtoRepository({
     required Uri clientId,
-  })  : _clientId = clientId,
+    required ApiClient apiClient,
+    required bool local,
+  })  : _apiClient = apiClient,
+        _clientId = clientId,
+        _local = local,
         clientMetadata = null,
         oAuthClient = null,
         service = 'bsky.social',
@@ -18,6 +30,8 @@ abstract class AtProtoRepository extends ChangeNotifier {
   String service;
   bool initialized;
   final Uri _clientId;
+  final ApiClient _apiClient;
+  final bool _local;
   late OAuthContext oAuthContext;
   atp.ATProto? atProto;
   bsky.Bluesky? bluesky;
@@ -28,9 +42,181 @@ abstract class AtProtoRepository extends ChangeNotifier {
   Uri get clientId => _clientId;
   bool get authorized => atProto != null;
 
-  Future<Result<Uri>> getAuthorizationURI(String identity, String service);
-  Future<Result<void>> generateSession(String callback);
-  Future<Result<void>> refreshSession();
-  Future<Result<void>> createPost(Post post);
-  Future<Result<List<domain_models.Post>>> getFeed();
+  Future<void> _initializeOAuthClient() async {
+    if (_local) {
+      clientMetadata ??= OAuthClientMetadata(
+        clientId: '${clientId.scheme}://${clientId.host}',
+        clientName: 'Boshi',
+        clientUri: clientId.toString(),
+        redirectUris: ['http://127.0.0.1:${clientId.port}'],
+        grantTypes: ['authorization_code', 'refresh_token'],
+        scope: 'atproto',
+        responseTypes: ['code'],
+        applicationType: 'web',
+        tokenEndpointAuthMethod: 'none',
+      );
+      oAuthClient ??= OAuthClient(clientMetadata!, service: service);
+      initialized = true;
+      return;
+    }
+    clientMetadata ??=
+        await _apiClient.getOAuthClientMetadata(clientId.toString());
+    oAuthClient ??= OAuthClient(clientMetadata!, service: service);
+    initialized = true;
+  }
+
+  Future<Result<Uri>> getAuthorizationURI(
+    String identity,
+    String service,
+  ) async {
+    try {
+      this.service = service;
+      await _initializeOAuthClient();
+      final (uri, context) = await _apiClient.getOAuthAuthorizationURI(
+        oAuthClient!,
+        identity,
+      );
+      oAuthContext = context;
+      return Result.ok(uri);
+    } on Exception catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      return Result.error(Exception(e));
+    }
+  }
+
+  Future<Result<void>> generateSession(String callback) async {
+    try {
+      await _initializeOAuthClient();
+      final session = await _apiClient.generateSession(oAuthClient!, callback);
+      atProto = atp.ATProto.fromOAuthSession(session);
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      return Result.error(Exception(e));
+    }
+  }
+
+  Future<Result<void>> refreshSession() async {
+    try {
+      await _initializeOAuthClient();
+      final (_, newAtproto) = await _apiClient.refreshSession(oAuthClient!);
+      atProto = newAtproto;
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      return Result.error(Exception(e));
+    }
+  }
+
+  Future<Result<void>> createPost(Post post) async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException('createPost'));
+    }
+    return await _apiClient.createPost(bluesky!, post);
+  }
+
+  Future<Result<void>> addVerificationEmail(String email) async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+
+    logger.d('Retrieving user DID');
+    final userDid = atProto!.oAuthSession?.sub;
+    if (userDid == null) {
+      logger.e('User DID is null');
+      return Result.error(OAuthUnauthorizedException());
+    }
+
+    final result = await _apiClient.addVerificationEmail(email, userDid);
+    if (result is Error<void> &&
+        result.error is VerificationCodeAlreadySetException) {
+      logger.d('Verification code already set. Ignoring error.');
+      return Result.ok(null);
+    }
+    return result;
+  }
+
+  Future<Result<void>> confirmVerificationCode(
+    String email,
+    String code,
+  ) async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+
+    logger.d('Retrieving user DID');
+    final userDid = atProto!.oAuthSession?.sub;
+    if (userDid == null) {
+      logger.e('User DID is null');
+      return Result.error(OAuthUnauthorizedException());
+    }
+
+    return await _apiClient.confirmVerificationCode(
+      email,
+      code,
+      userDid,
+    );
+  }
+
+  Future<Result<bool>> isUserVerified() async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+
+    logger.d('Retrieving user DID');
+    final userDid = atProto!.oAuthSession?.sub;
+    if (userDid == null) {
+      logger.e('User DID is null');
+      return Result.error(OAuthUnauthorizedException());
+    }
+
+    final result = await _apiClient.isUserVerified(userDid);
+    switch (result) {
+      case Ok<VerificationStatus>():
+        return Result.ok(result.value.verified);
+      case Error<VerificationStatus>():
+        if (result.error is UserNotFoundException) {
+          return Result.ok(false); // User not found, they aren't verified
+        }
+        return Result.error(result.error);
+    }
+  }
+
+  Future<Result<double>> getVerificationCodeTTL() async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+
+    logger.d('Retrieving user DID');
+    final userDid = atProto!.oAuthSession?.sub;
+    if (userDid == null) {
+      logger.e('User DID is null');
+      return Result.error(OAuthUnauthorizedException());
+    }
+
+    final ttlResult = await _apiClient.getVerificationCodeTTL(userDid);
+    switch (ttlResult) {
+      case Ok<VerificationCodeTTL>():
+        return Result.ok(ttlResult.value.ttl);
+      case Error<VerificationCodeTTL>():
+        return Result.error(ttlResult.error);
+    }
+  }
+
+  Future<Result<List<domain_models.Post>>> getFeed() async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+    final bskyFeed = await _apiClient.getFeed(bluesky!);
+
+    switch (bskyFeed) {
+      case Ok<bsky.Feed>():
+        return Result.ok(convertFeedToDomainPosts(bskyFeed.value));
+      case Error<bsky.Feed>():
+        return Result.error(bskyFeed.error);
+    }
+  }
 }

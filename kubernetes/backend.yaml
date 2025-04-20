@@ -35,6 +35,8 @@ spec:
               value: ${SMTP_USERNAME}
             - name: SMTP_PASSWORD
               value: ${SMTP_PASSWORD}
+            - name: SEND_EMAIL
+              value: "true"
           ports:
             - containerPort: 80
 ---

@@ -1,30 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
-import 'package:frontend/ui/post/widgets/post_screen.dart';
+import 'ui/post/view_model/post_viewmodel.dart';
+import 'ui/post/widgets/post_screen.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/ui/login/widgets/login_screen.dart';
-import 'package:frontend/ui/login/widgets/oauth_callback_screen.dart';
-import 'package:frontend/ui/login/view_model/login_viewmodel.dart';
+import 'ui/login/widgets/login_screen.dart';
+import 'ui/login/widgets/oauth_callback_screen.dart';
+import 'ui/login/view_model/login_viewmodel.dart';
 
-import 'package:frontend/ui/home/view_model/home_viewmodel.dart';
-import 'package:frontend/ui/home/widgets/home_screen.dart';
+import 'ui/home/view_model/home_viewmodel.dart';
+import 'ui/home/widgets/home_screen.dart';
+import 'ui/signup/widgets/email_register_screen.dart';
+import 'ui/signup/view_model/email_register_viewmodel.dart';
+import 'ui/signup/widgets/email_verification_screen.dart';
+import 'ui/signup/view_model/email_verification_viewmodel.dart';
 
-import 'package:frontend/data/repositories/feed/feed_repository.dart';
-import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
-import 'package:frontend/utils/result.dart';
-import 'package:frontend/utils/logger.dart';
-import 'package:frontend/config/environment.dart';
-
-import 'main_development.dart' as dev;
+import 'package:logger/logger.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'internal/guards/guards.dart';
+import 'internal/config/environment.dart';
+import 'internal/config/dependencies.dart';
 
 void main() {
-  dev.main();
+  Logger.level = Level.all;
+  usePathUrlStrategy();
+  runApp(MultiProvider(providers: providers, child: const MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -33,53 +37,20 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
-      redirect: (BuildContext context, GoRouterState state) async {
-        final oauth = context.read<AtProtoRepository>();
-        final isLoggingIn = state.uri.path.startsWith('/login');
-        final onOAuthCallback = state.uri.path.startsWith('/oauth/callback');
-
-        if (EnvironmentConfig.prod) {
-          if (!oauth.authorized && !(isLoggingIn || onOAuthCallback)) {
-            final result = await oauth.refreshSession();
-            if (result is Error<void>) {
-              return '/login';
-            }
-          } else if (oauth.authorized && isLoggingIn) {
-            return '/';
-          }
-        } else {
-          if (oauth.authorized) {
-            logger.d('user is authorized');
-            return null;
-          }
-
-          logger.d('user not authorized, refreshing session...');
-          var result = await oauth.refreshSession();
-          if (result is Ok<void>) {
-            logger.d('user is authorized');
-            return null;
-          }
-          logger.e(result);
-          logger.e('Failed to refresh session. Attempting to generate...');
-
-          result = await oauth.generateSession(Uri.base.toString());
-          if (result is Ok<void>) {
-            logger.d('session generated');
-            return null;
-          }
-          logger.e('Failed to generate session: ${result.toString()}');
-          return '/login';
+      redirect: (context, state) async {
+        if (!EnvironmentConfig.prod) {
+          return await localRouteGuard(context, state);
         }
-        return null;
+        return await prodRouteGuard(context, state);
       },
       routes: [
         GoRoute(
           path: '/',
+          name: 'home',
+          redirect: rootRouteGuard,
           builder: (context, state) => HomeScreen(
             title: 'Boshi',
             viewModel: HomeViewModel(
-              feedRepository: context.read<FeedRepository>(),
-              userRepository: context.read<UserRepository>(),
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),
@@ -104,6 +75,27 @@ class MainApp extends StatelessWidget {
         GoRoute(
           path: '/oauth/callback',
           builder: (context, state) => OAuthCallback(),
+        ),
+        GoRoute(
+          path: '/signup',
+          redirect: signupRouteGuard,
+          builder: (context, state) => EmailRegisterScreen(
+            viewModel: EmailRegisterViewModel(
+              atProtoRepository: context.read<AtProtoRepository>(),
+            ),
+          ),
+          routes: [
+            GoRoute(
+              redirect: verifyEmailRouteGuard,
+              path: '/verify',
+              builder: (context, state) => EmailVerificationScreen(
+                viewModel: EmailVerificationViewModel(
+                  atProtoRepository: context.read<AtProtoRepository>(),
+                ),
+                email: state.uri.queryParameters['email']!,
+              ),
+            ),
+          ],
         ),
       ],
     );
