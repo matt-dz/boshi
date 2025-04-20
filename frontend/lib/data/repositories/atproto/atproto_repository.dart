@@ -92,6 +92,7 @@ class AtProtoRepository extends ChangeNotifier {
       await _initializeOAuthClient();
       final session = await _apiClient.generateSession(oAuthClient!, callback);
       atProto = atp.ATProto.fromOAuthSession(session);
+      bluesky = bsky.Bluesky.fromOAuthSession(session);
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
@@ -105,6 +106,7 @@ class AtProtoRepository extends ChangeNotifier {
       await _initializeOAuthClient();
       final (_, newAtproto) = await _apiClient.refreshSession(oAuthClient!);
       atProto = newAtproto;
+      bluesky = bsky.Bluesky.fromOAuthSession(newAtproto.oAuthSession!);
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
@@ -209,7 +211,7 @@ class AtProtoRepository extends ChangeNotifier {
   }
 
   Future<Result<List<domain_models.Post>>> getFeed() async {
-    if (!authorized) {
+    if (!authorized || bluesky == null) {
       return Result.error(OAuthUnauthorizedException());
     }
     final bskyFeed = await _apiClient.getFeed(bluesky!);
