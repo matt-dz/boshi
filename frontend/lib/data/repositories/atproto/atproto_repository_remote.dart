@@ -87,7 +87,8 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
     if (!authorized) {
       return Result.error(UnauthorizedException('getFeed'));
     }
-    final bskyFeed = await _apiClient.getFeed(atProto!.oAuthSession!);
+
+    final bskyFeed = await _apiClient.getFeed(bluesky!);
 
     switch (bskyFeed) {
       case Ok<bsky.Feed>():

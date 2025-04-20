@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:convert';
-import 'dart:js_interop';
 import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
@@ -30,9 +29,8 @@ class ApiClient {
   final String _host;
   final HttpClient Function() _clientFactory;
 
-  Future<Result<bsky.Feed>> getFeed(OAuthSession session) async {
+  Future<Result<bsky.Feed>> getFeed(bsky.Bluesky bluesky) async {
     logger.d('Getting Feed');
-    final bskyServer = bsky.Bluesky.fromOAuthSession(session);
 
     if (EnvironmentConfig.feedGenUri == '') {
       return Result.error(
@@ -42,8 +40,7 @@ class ApiClient {
 
     final generatorUri = AtUri.parse(EnvironmentConfig.feedGenUri);
 
-    final xrpcResponse =
-        await bskyServer.feed.getFeed(generatorUri: generatorUri);
+    final xrpcResponse = await bluesky.feed.getFeed(generatorUri: generatorUri);
 
     logger.d(xrpcResponse.data);
 
