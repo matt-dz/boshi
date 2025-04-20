@@ -11,7 +11,6 @@ import 'main.dart';
 /// Uses local data.
 void main() async {
   Logger.level = Level.all;
-
   usePathUrlStrategy();
   runApp(MultiProvider(providers: providersLocal, child: const MainApp()));
 }

@@ -13,6 +13,9 @@ import 'package:frontend/data/models/requests/reply/reply.dart'
     as reply_request;
 import 'package:frontend/shared/models/post/post.dart' as post_request;
 import 'package:frontend/shared/oauth/oauth.dart' as oauth_shared;
+import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
+import 'package:frontend/data/models/responses/verification_code_ttl/verification_code_ttl.dart';
+import 'package:frontend/shared/atproto/atproto.dart' as atproto_shared;
 
 class LocalDataService {
   Result<bsky.Feed> getFeed() {
@@ -88,5 +91,32 @@ class LocalDataService {
 
   Future<(OAuthSession, ATProto)> refreshSession(OAuthClient client) async {
     return oauth_shared.refreshSession(client);
+  }
+
+  Future<Result<void>> addVerificationEmail(
+    String email,
+    String authorDID,
+  ) async {
+    return await atproto_shared.addVerificationEmail(email, authorDID);
+  }
+
+  Future<Result<void>> confirmVerificationCode(
+    String email,
+    String code,
+    String authorDID,
+  ) async {
+    return await atproto_shared.confirmVerificationCode(email, code, authorDID);
+  }
+
+  Future<Result<VerificationStatus>> isUserVerified(
+    String userDID,
+  ) async {
+    return await atproto_shared.isUserVerified(userDID);
+  }
+
+  Future<Result<VerificationCodeTTL>> getVerificationCodeTTL(
+    String userDID,
+  ) async {
+    return await atproto_shared.getVerificationCodeTTL(userDID);
   }
 }

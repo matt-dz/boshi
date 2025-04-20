@@ -36,14 +36,14 @@ CREATE TABLE mail_list (
     PRIMARY KEY (email)
 );
 
-CREATE TYPE verification_status AS ENUM ('no_match', 'already_verified', 'just_verified');
+CREATE TYPE verify_email_result AS ENUM ('no_match', 'already_verified', 'just_verified');
 
 CREATE TABLE emails (
     user_id VARCHAR NOT NULL,
     email VARCHAR NOT NULL,
-    school VARCHAR,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
     verified_at TIMESTAMPTZ,
+    school VARCHAR,
     PRIMARY KEY (user_id),
     UNIQUE (email)
 );

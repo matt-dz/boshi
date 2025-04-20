@@ -24,12 +24,18 @@ updated AS (
 )
 SELECT
     CASE
-        WHEN NOT EXISTS (SELECT 1 FROM matched) THEN 'no_match'::verification_status
-        WHEN EXISTS (SELECT 1 FROM matched WHERE verified_at IS NOT NULL) THEN 'already_verified'::verification_status
-        ELSE 'just_verified'::verification_status
+        WHEN NOT EXISTS (SELECT 1 FROM matched) THEN 'no_match'::verify_email_result
+        WHEN EXISTS (SELECT 1 FROM matched WHERE verified_at IS NOT NULL) THEN 'already_verified'::verify_email_result
+        ELSE 'just_verified'::verify_email_result
     END AS status;
 
 -- name: GetUser :one
 SELECT school, verified_at
 FROM emails
 WHERE emails.user_id = $1;
+
+-- name: VerificationStatus :one
+SELECT verified_at FROM emails WHERE user_id = $1;
+
+-- name: GetEmail :one
+SELECT email FROM emails WHERE user_id = $1;

@@ -81,6 +81,22 @@ func main() {
 		),
 	)
 
+	mux.HandleFunc("GET /user/{user_id}/verification-status",
+		middleware.Chain(
+			endpoints.GetVerificationStatus,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
+	mux.HandleFunc("GET /user/{user_id}/code/ttl",
+		middleware.Chain(
+			endpoints.GetCodeExpiry,
+			middleware.AddCors(),
+			middleware.LogRequest(),
+		),
+	)
+
 	/* Setup server*/
 	port := os.Getenv("PORT")
 	if port == "" {
