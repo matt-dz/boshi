@@ -49,9 +49,8 @@ Future<void> _setSessionVars(
 }
 
 class ApiClient {
-  Future<Result<bsky.Feed>> getFeed(OAuthSession session) async {
+  Future<Result<bsky.Feed>> getFeed(bsky.Bluesky bluesky) async {
     logger.d('Getting Feed');
-    final bskyServer = bsky.Bluesky.fromOAuthSession(session);
 
     if (EnvironmentConfig.feedGenUri == '') {
       return Result.error(
@@ -61,8 +60,7 @@ class ApiClient {
 
     final generatorUri = AtUri.parse(EnvironmentConfig.feedGenUri);
 
-    final xrpcResponse =
-        await bskyServer.feed.getFeed(generatorUri: generatorUri);
+    final xrpcResponse = await bluesky.feed.getFeed(generatorUri: generatorUri);
 
     logger.d(xrpcResponse.data);
 
@@ -108,17 +106,19 @@ class ApiClient {
   }
 
   Future<Result<void>> createPost(
-    ATProto session,
+    bsky.Bluesky bluesky,
     post_request.Post post,
   ) async {
     logger.d('Creating post');
-    final xrpcResponse = await session.repo.createRecord(
-      collection: NSID.create('feed.boshi.app', 'post'),
-      record: {
-        'title': post.title,
-        'content': post.content,
-        'timestamp': DateTime.now().toString(),
-      },
+    final xrpcResponse = await bluesky.feed.post(
+      text: '${post.title}\n${post.content}',
+      tags: List.from(['boshi.post']),
+      facets: [
+        bsky.Facet(
+          index: bsky.ByteSlice(byteStart: 0, byteEnd: post.title.length),
+          features: [bsky.FacetFeature.tag(data: bsky.FacetTag(tag: 'boshi'))],
+        ),
+      ],
     );
 
     if (xrpcResponse.status == HttpStatus.ok) {
