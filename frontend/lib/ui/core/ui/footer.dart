@@ -17,7 +17,7 @@ class Footer extends StatelessWidget {
         ShadDivider.horizontal(),
         ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: 450,
+            maxWidth: 250,
           ),
           child: Column(
             children: [
@@ -29,16 +29,7 @@ class Footer extends StatelessWidget {
                     IconButton(
                       icon: Icon(PhosphorIconsRegular.house, size: _iconSize),
                       onPressed: () {
-                        logger.d('pencil pressed!');
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        PhosphorIconsRegular.graduationCap,
-                        size: _iconSize,
-                      ),
-                      onPressed: () {
-                        logger.d('school pressed!');
+                        context.go('/');
                       },
                     ),
                     IconButton(
@@ -53,12 +44,6 @@ class Footer extends StatelessWidget {
                       ),
                       onPressed: () {
                         context.go('/post');
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(PhosphorIconsRegular.bell, size: _iconSize),
-                      onPressed: () {
-                        logger.d('bell pressed!');
                       },
                     ),
                     IconButton(
