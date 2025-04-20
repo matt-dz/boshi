@@ -50,12 +50,8 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 			userResponseStruct.School = school
 		}
 		log.Info("VerifiedAt", slog.Any("time", result[1]))
-		if verifiedAtRaw, ok := result[1].(string); ok {
-			log.Info(verifiedAtRaw)
-			verifiedAt, err := time.Parse(time.RFC3339Nano, verifiedAtRaw)
-			if err != nil {
-				log.Info("Invalid timestamp format", slog.Any("error", err))
-			}
+		if verifiedAt, ok := result[1].(time.Time); ok {
+			log.Info("Invalid timestamp format", slog.Any("error", err))
 			userResponseStruct.VerifiedAt = pgtype.Timestamptz{Time: verifiedAt, Valid: true}
 		}
 	}
