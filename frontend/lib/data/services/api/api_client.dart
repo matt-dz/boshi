@@ -107,8 +107,10 @@ class ApiClient {
     logger.d('Sending GET request for Users');
 
     final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
-
-    final Uri requestUri = hostUri.replace(queryParameters: {'user_ids': dids});
+    final Uri requestUri = hostUri.replace(
+      pathSegments: ['users'],
+      queryParameters: {'user_ids': dids},
+    );
 
     final response = await http.get(requestUri);
 

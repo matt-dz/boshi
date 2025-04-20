@@ -6,9 +6,12 @@ import 'package:frontend/domain/models/users/users.dart';
 import 'package:frontend/internal/result/result.dart';
 
 Future<Result<List<Post>>> convertFeedToDomainPosts(
-    AtProtoRepository atproto, bsky.Feed feed) async {
+  AtProtoRepository atproto,
+  bsky.Feed feed,
+) async {
   final userDids =
       feed.feed.map((post) => post.post.author.did).toSet().toList();
+
   final usersResponse = await atproto.getUsers(userDids);
   final Users users;
   switch (usersResponse) {
