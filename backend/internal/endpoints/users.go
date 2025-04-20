@@ -41,6 +41,7 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Debug("Response", slog.Any("res", result))
 	// Map the result to the User struct
 	var userResponseStruct getUserResponse
 	if len(result) >= 2 {
@@ -51,7 +52,6 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 		if verifiedAt, ok := result[1].(pgtype.Timestamptz); ok {
 			userResponseStruct.VerifiedAt = verifiedAt
 		}
-		log.Debug("Verified At", slog.Any("timestamp", result[1]))
 	}
 
 	w.Header().Set("Content-Type", "application/json")
