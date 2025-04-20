@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/mail"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -135,7 +136,7 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if errors.Is(err, pgx.ErrNoRows) {
 		log.ErrorContext(r.Context(), "No row returned - user_id already verified email")
-		http.Error(w, "user_id already verified email", http.StatusConflict)
+		http.Error(w, "User already verified email", http.StatusConflict)
 		return
 	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to insert email into database", slog.Any("error", err))
@@ -173,7 +174,12 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	}
 	if !ok {
 		log.ErrorContext(r.Context(), "Key already exists, not setting.", slog.String("key", key))
-		http.Error(w, "Verification code already set", http.StatusConflict)
+		http.Error(w, "Verification code already set", http.StatusTooManyRequests)
+		return
+	}
+
+	if os.Getenv("SEND_EMAIL") != "true" {
+		log.DebugContext(r.Context(), "Skipping email send...")
 		return
 	}
 
@@ -187,7 +193,6 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.ErrorContext(r.Context(), "Failed to send email", slog.Any("error", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
 	}
 }
 
@@ -208,8 +213,8 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 
 	// Validate user id
 	if !DIDRegex.MatchString(payload.UserID) {
-		log.ErrorContext(r.Context(), "user_id not a valid DID", slog.String("did", payload.UserID))
-		http.Error(w, "user_id not a valid DID", http.StatusBadRequest)
+		log.ErrorContext(r.Context(), "Invalid DID", slog.String("did", payload.UserID))
+		http.Error(w, "Invalid DID", http.StatusBadRequest)
 		return
 	}
 
@@ -242,20 +247,20 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	switch verificationStatus {
-	case sqlc.VerificationStatusNoMatch:
+	case sqlc.VerifyEmailResultNoMatch:
 		log.ErrorContext(
 			r.Context(),
-			"user_id not associated with  email",
+			"user_id not associated with email",
 			slog.String("user_id", payload.UserID),
 			slog.String("email", payload.Email),
 		)
-		http.Error(w, "user_id not associated with email", http.StatusConflict)
+		http.Error(w, "User not associated with email", http.StatusConflict)
 		return
-	case sqlc.VerificationStatusAlreadyVerified:
+	case sqlc.VerifyEmailResultAlreadyVerified:
 		log.ErrorContext(r.Context(), "user_id already verified")
-		http.Error(w, "user_id already verified", http.StatusConflict)
+		http.Error(w, "User already verified", http.StatusConflict)
 		return
-	case sqlc.VerificationStatusJustVerified:
+	case sqlc.VerifyEmailResultJustVerified:
 		log.DebugContext(r.Context(), "email verification status updated")
 	default:
 		log.ErrorContext(
@@ -274,7 +279,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	code, err := redisClient.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
 		log.ErrorContext(r.Context(), "Key not found", slog.String("key", key))
-		http.Error(w, "Code does not exist for user", http.StatusConflict)
+		http.Error(w, "Code not found", http.StatusConflict)
 		return
 	} else if err != nil {
 		log.ErrorContext(r.Context(), "Failed to GET key", slog.Any("error", err))
