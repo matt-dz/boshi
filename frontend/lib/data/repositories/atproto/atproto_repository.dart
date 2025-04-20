@@ -13,11 +13,9 @@ abstract class AtProtoRepository extends ChangeNotifier {
         clientMetadata = null,
         oAuthClient = null,
         service = 'bsky.social',
-        identity = '',
         initialized = false;
 
   String service;
-  String identity;
   bool initialized;
   final Uri _clientId;
   late OAuthContext oAuthContext;

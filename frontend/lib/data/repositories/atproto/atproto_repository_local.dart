@@ -46,8 +46,6 @@ class AtProtoRepositoryLocal extends AtProtoRepository {
     String service,
   ) async {
     try {
-      this.identity = identity;
-      this.service = service;
       _initializeOAuthClient();
       final (uri, context) = await _localDataService.getOAuthAuthorizationURI(
         oAuthClient!,
