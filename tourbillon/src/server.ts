@@ -4,7 +4,6 @@ import express from 'express'
 import { DidResolver, MemoryCache } from '@atproto/identity'
 import { createServer } from './lexicon'
 import skeletonFeedGeneration from './methods/skeleton-feed-generation'
-import feedGeneration from './methods/feed-generation'
 import describeGenerator from './methods/describe-generator'
 import { createDb, Database } from './db'
 import { AppContext, Config } from './config'
@@ -46,7 +45,6 @@ export class FeedGenerator {
       cfg,
     }
     skeletonFeedGeneration(server, ctx)
-    feedGeneration(server, ctx)
     describeGenerator(server, ctx)
     app.use(server.xrpc.router)
     app.use(wellKnown(ctx))

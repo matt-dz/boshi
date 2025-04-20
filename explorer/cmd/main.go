@@ -3,37 +3,27 @@ package main
 import (
 	"boshi-explorer/internal/database"
 	"boshi-explorer/internal/logger"
-	"boshi-explorer/internal/payloads"
 	"boshi-explorer/internal/sqlc"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"math"
-
-	"net/http"
-	"net/url"
 	"os"
-	"strings"
+	"slices"
 	"time"
 
-	"github.com/bluesky-social/indigo/api/atproto"
-	"github.com/bluesky-social/indigo/atproto/identity"
-	"github.com/bluesky-social/indigo/atproto/syntax"
-	"github.com/bluesky-social/indigo/events"
-	"github.com/bluesky-social/indigo/events/schedulers/sequential"
-	"github.com/gorilla/websocket"
+	apibsky "github.com/bluesky-social/indigo/api/bsky"
+	"github.com/bluesky-social/jetstream/pkg/client"
+	"github.com/bluesky-social/jetstream/pkg/client/schedulers/sequential"
+	"github.com/bluesky-social/jetstream/pkg/models"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/joho/godotenv"
 )
 
 var log = logger.GetLogger()
 
-var uri string
+var socketUri string
 var firehoseIdentifier string
-
-const retries = 5
-const baseDelay = 100 * time.Millisecond
 
 func init() {
 	err := godotenv.Load()
@@ -41,8 +31,8 @@ func init() {
 		log.Info("Failed to load env -- defaulting to environment")
 	}
 
-	uri = os.Getenv("SOCKET_URI")
-	if uri == "" {
+	socketUri = os.Getenv("SOCKET_URI")
+	if socketUri == "" {
 		panic("Expected SOCKET_URI to be set")
 	}
 
@@ -52,122 +42,85 @@ func init() {
 	}
 }
 
-func runExplorer(workScheduler *sequential.Scheduler) {
-	for {
-		var firehoseConnection *websocket.Conn = nil
-		var err error
-
-		log.Debug("Connecting to firehose", "uri", uri)
-
-		for i := range retries {
-			firehoseConnection, _, err = websocket.DefaultDialer.Dial(uri, http.Header{})
-			if err != nil {
-				delay := time.Duration(math.Pow(2, float64(i))) * baseDelay
-				log.Error("WebSocket retry", slog.Int("attempt", i+1), slog.Any("waiting", delay), slog.Any("error", err))
-				time.Sleep(delay)
-				continue
-			} else {
-				break
-			}
-		}
-
-		if firehoseConnection == nil {
-			log.Error("Failed to establish a connection -- killing explorer.")
-			break
-		}
-
-		/* Create event processor and connect it to the firehose */
-		log.Debug("Starting repo stream")
-
-		err = events.HandleRepoStream(context.Background(), firehoseConnection, workScheduler, log)
-		if err != nil {
-			log.Error("Failed while handling firehose stream", slog.Any("error", err))
-		}
-	}
-}
-
-func getRecord(evt *atproto.SyncSubscribeRepos_Commit, op *atproto.SyncSubscribeRepos_RepoOp) (payloads.Record, time.Time, error) {
-	did, err := syntax.ParseDID(evt.Repo)
-	if err != nil {
-		log.Error("Failed to parse did", "did", evt.Repo)
-		return payloads.Record{}, time.Time{}, err
-	}
-
-	didDoc, err := identity.DefaultDirectory().LookupDID(context.Background(), did)
-	if err != nil {
-		log.Error("Failed to lookup did", "did", did.AtIdentifier())
-		return payloads.Record{}, time.Time{}, err
-	}
-
-	apiURL := fmt.Sprintf("%s/xrpc/com.atproto.repo.getRecord", didDoc.PDSEndpoint())
-
-	params := url.Values{}
-	params.Add("repo", evt.Repo)
-	params.Add("collection", "app.boshi.feed.post")
-	splitPath := strings.Split(op.Path, "/")
-	params.Add("rkey", splitPath[len(splitPath)-1])
-
-	fullUrl := fmt.Sprintf("%s?%s", apiURL, params.Encode())
-
-	resp, err := http.Get(fullUrl)
-	if err != nil {
-		log.Error("Failed to get record", slog.Any("error", err))
-		return payloads.Record{}, time.Time{}, err
-	}
-	defer resp.Body.Close()
-
-	var record payloads.Record
-	if err := json.NewDecoder(resp.Body).Decode(&record); err != nil {
-		log.Error("Failed to parse record response", slog.Any("error", err))
-		return payloads.Record{}, time.Time{}, err
-	}
-
-	indexedTime, err := time.Parse("2006-01-02 15:04:05.000", record.Value.Timestamp)
-	if err != nil {
-		log.Error("Failed to parse time", slog.Any("error", err))
-		return record, time.Time{}, err
-	}
-
-	return record, indexedTime, err
-}
-
 func main() {
+	ctx := context.Background()
+	
+	_ = database.UseQueries(ctx)
+	defer database.Close()
 
-	log.Debug("Connecting to postgres")
-	pool := database.Connect(context.Background())
-	defer pool.Close()
-	queries := sqlc.New(pool)
+	config := client.DefaultClientConfig()
+	config.WantedCollections = []string{"app.bsky.feed.post"}
+	config.WebsocketURL = socketUri
+	config.Compress = true
 
-	repoCallbacks := &events.RepoStreamCallbacks{
-		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) error {
-			for _, op := range evt.Ops {
-				if strings.HasPrefix(op.Path, "app.boshi.feed") {
-					uri := fmt.Sprintf("at://%s/%s", evt.Repo, op.Path)
-					log.Info("New Activity @", slog.String("uri", uri))
-
-					record, indexedTime, err := getRecord(evt, op)
-					if err != nil {
-						log.Error("Failed to get record", slog.Any("error", err))
-					}
-
-					post := sqlc.CreatePostParams{
-						Uri:       uri,
-						Cid:       op.Cid.String(),
-						AuthorDid: evt.Repo,
-						Title:     record.Value.Title,
-						Content:   record.Value.Content,
-						IndexedAt: pgtype.Timestamptz{Time: indexedTime, Valid: true},
-					}
-
-					queries.CreatePost(context.Background(), post)
-
-					log.Info("Post created", slog.Any("post", post))
-				}
-			}
-			return nil
-		},
+	h := &handler{
+		seenSeqs: make(map[int64]struct{}),
 	}
 
-	workScheduler := sequential.NewScheduler(firehoseIdentifier, repoCallbacks.EventHandler)
-	runExplorer(workScheduler)
+	scheduler := sequential.NewScheduler(firehoseIdentifier, log, h.HandleEvent)
+
+	c, err := client.NewClient(config, log, scheduler)
+	if err != nil {
+		log.Error("failed to create client", slog.Any("error", err))
+	}
+
+	cursor := time.Now().Add(5 * -time.Minute).UnixMicro()
+
+	if err := c.ConnectAndRead(ctx, &cursor); err != nil {
+		log.Error("failed to connect:", slog.Any("error", err))
+	}
+
+	log.Info("shutdown")
+}
+
+type handler struct {
+	seenSeqs  map[int64]struct{}
+	highwater int64
+}
+
+func (h *handler) HandleEvent(ctx context.Context, event *models.Event) error {
+	// Unmarshal the record if there is one
+	if event.Commit != nil && (event.Commit.Operation == models.CommitOperationCreate || event.Commit.Operation == models.CommitOperationUpdate) {
+		switch event.Commit.Collection {
+			case "app.bsky.feed.post":
+				var post apibsky.FeedPost
+				if err := json.Unmarshal(event.Commit.Record, &post); err != nil {
+					return fmt.Errorf("failed to unmarshal post: %w", err)
+				}
+				if len(post.Tags) != 0 && slices.Contains(post.Tags, "boshi.post") {
+					StorePost(ctx, event, post)
+				}
+		}
+	}
+
+	return nil
+}
+
+func StorePost(
+	ctx context.Context,
+	event *models.Event,
+	post apibsky.FeedPost,
+) error {
+	timeStamp, err := time.Parse(time.RFC3339, post.CreatedAt)
+	if err != nil {
+		log.Error("Failed to parse time from post")
+		return err
+	}
+
+	uri := fmt.Sprintf("at://%s/%s/%s", event.Did, event.Commit.Collection, event.Commit.RKey)
+
+	postToStore := sqlc.CreatePostParams{
+		Uri:       uri,
+		Cid:       event.Commit.CID,
+		AuthorDid: event.Did,
+		IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
+	}
+
+	returnedPost, err := database.UseQueries(ctx).CreatePost(ctx, postToStore)
+	if err != nil {
+		log.Error("Failed to store post", slog.Any("error", err))
+		return err
+	}
+	log.Info("Post created", slog.Any("post", returnedPost))
+	return nil
 }

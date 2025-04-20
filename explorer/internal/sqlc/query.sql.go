@@ -13,11 +13,11 @@ import (
 
 const createPost = `-- name: CreatePost :one
 INSERT INTO post (
-  uri, cid, author_did, indexed_at, title, content
+  uri, cid, author_did, indexed_at
 ) VALUES (
-  $1, $2, $3, $4, $5, $6
+  $1, $2, $3, $4
 )
-RETURNING uri, cid, author_did, indexed_at, title, content
+RETURNING uri, cid, author_did, indexed_at
 `
 
 type CreatePostParams struct {
@@ -25,8 +25,6 @@ type CreatePostParams struct {
 	Cid       string
 	AuthorDid string
 	IndexedAt pgtype.Timestamptz
-	Title     string
-	Content   string
 }
 
 func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
@@ -35,8 +33,6 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 		arg.Cid,
 		arg.AuthorDid,
 		arg.IndexedAt,
-		arg.Title,
-		arg.Content,
 	)
 	var i Post
 	err := row.Scan(
@@ -44,8 +40,6 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 		&i.Cid,
 		&i.AuthorDid,
 		&i.IndexedAt,
-		&i.Title,
-		&i.Content,
 	)
 	return i, err
 }
@@ -61,7 +55,7 @@ func (q *Queries) DeletePost(ctx context.Context, uri string) error {
 }
 
 const getPost = `-- name: GetPost :one
-SELECT uri, cid, author_did, indexed_at, title, content FROM post
+SELECT uri, cid, author_did, indexed_at FROM post
 WHERE uri = $1 LIMIT 1
 `
 
@@ -73,14 +67,12 @@ func (q *Queries) GetPost(ctx context.Context, uri string) (Post, error) {
 		&i.Cid,
 		&i.AuthorDid,
 		&i.IndexedAt,
-		&i.Title,
-		&i.Content,
 	)
 	return i, err
 }
 
 const listPosts = `-- name: ListPosts :many
-SELECT uri, cid, author_did, indexed_at, title, content FROM post
+SELECT uri, cid, author_did, indexed_at FROM post
 ORDER BY indexed_at
 `
 
@@ -98,8 +90,6 @@ func (q *Queries) ListPosts(ctx context.Context) ([]Post, error) {
 			&i.Cid,
 			&i.AuthorDid,
 			&i.IndexedAt,
-			&i.Title,
-			&i.Content,
 		); err != nil {
 			return nil, err
 		}

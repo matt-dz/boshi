@@ -8,9 +8,9 @@ ORDER BY indexed_at;
 
 -- name: CreatePost :one
 INSERT INTO post (
-  uri, cid, author_did, indexed_at, title, content
+  uri, cid, author_did, indexed_at
 ) VALUES (
-  $1, $2, $3, $4, $5, $6
+  $1, $2, $3, $4
 )
 RETURNING *;
 

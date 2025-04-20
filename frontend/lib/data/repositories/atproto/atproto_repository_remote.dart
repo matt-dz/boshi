@@ -50,6 +50,7 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
       await _initializeOAuthClient();
       final session = await _apiClient.generateSession(oAuthClient!, callback);
       atProto = atp.ATProto.fromOAuthSession(session);
+      bluesky = bsky.Bluesky.fromOAuthSession(session);
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
@@ -64,6 +65,7 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
       await _initializeOAuthClient();
       final (_, newAtproto) = await _apiClient.refreshSession(oAuthClient!);
       atProto = newAtproto;
+      bluesky = bsky.Bluesky.fromOAuthSession(newAtproto.oAuthSession!);
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
@@ -77,7 +79,7 @@ class AtProtoRepositoryRemote extends AtProtoRepository {
     if (!authorized) {
       return Result.error(UnauthorizedException('createPost'));
     }
-    return await _apiClient.createPost(atProto!, post);
+    return await _apiClient.createPost(bluesky!, post);
   }
 
   @override
