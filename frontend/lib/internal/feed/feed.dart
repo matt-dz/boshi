@@ -10,7 +10,6 @@ List<Post> convertFeedToDomainPosts(bsky.Feed feed) {
           author: User(
             id: feedView.post.author.did,
             school: '',
-            verifiedAt: DateTime.now(),
           ),
           content: feedView.post.record.text,
           timestamp: feedView.post.indexedAt,

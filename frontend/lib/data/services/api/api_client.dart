@@ -74,7 +74,6 @@ class ApiClient {
 
     try {
       final decoded = json.decode(response.body);
-      logger.d(decoded);
       final User result = User.fromJson(decoded);
       return Result.ok(result);
     } catch (error) {

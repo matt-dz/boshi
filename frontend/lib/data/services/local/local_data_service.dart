@@ -27,7 +27,6 @@ class LocalDataService {
       User(
         id: '1',
         school: 'University of Florida',
-        verifiedAt: DateTime.now(),
       ),
     );
   }

@@ -8,7 +8,6 @@ abstract class User with _$User {
   const factory User({
     required String id,
     required String school,
-    required DateTime verifiedAt,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);
