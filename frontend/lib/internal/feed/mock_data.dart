@@ -16,10 +16,8 @@ var mockPost = bsky.Post(
   indexedAt: DateTime.now(),
 );
 
-var mockFeedView = bsky.FeedView(post: mockPost);
-
 var mockGetFeedResult = bsky.Feed(
-  feed: List.from([mockFeedView]),
+  feed: List.from([bsky.FeedView(post: mockPost)]),
 );
 
 var mockFeed = [

@@ -23,8 +23,8 @@ import 'package:frontend/internal/exceptions/already_verified_exception.dart';
 import 'package:frontend/internal/exceptions/user_not_found_exception.dart';
 import 'package:frontend/data/models/responses/verification_status/verification_status.dart';
 import 'package:frontend/data/models/responses/verification_code_ttl/verification_code_ttl.dart';
-import 'package:frontend/shared/models/mock_data/feed/feed.dart';
 import 'package:frontend/internal/logger/logger.dart';
+import 'package:frontend/internal/feed/mock_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> _setSessionVars(
@@ -51,6 +51,9 @@ Future<void> _setSessionVars(
 class ApiClient {
   Future<Result<bsky.Feed>> getFeed(bsky.Bluesky bluesky) async {
     logger.d('Getting Feed');
+    if (!EnvironmentConfig.prod) {
+      return Result.ok(mockGetFeedResult);
+    }
 
     if (EnvironmentConfig.feedGenUri == '') {
       return Result.error(
