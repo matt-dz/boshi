@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import '../view_model/email_register_viewmodel.dart';
-import 'package:frontend/utils/result.dart';
+import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/ui/core/ui/error_controller.dart';
-import 'package:frontend/exceptions/format.dart';
+import 'package:frontend/internal/exceptions/format.dart';
 
 const emailId = 'email';
 final emailRegex = RegExp(r'.+\@.+'); // lax af

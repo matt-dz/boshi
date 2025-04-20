@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
-import 'package:frontend/utils/logger.dart';
-import 'package:frontend/utils/result.dart';
+import 'package:frontend/internal/logger/logger.dart';
+import 'package:frontend/internal/result/result.dart';
 
 FutureOr<String?> localRouteGuard(
   BuildContext context,

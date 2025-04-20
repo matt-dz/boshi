@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
-import 'package:frontend/ui/post/widgets/post_screen.dart';
+import 'ui/post/view_model/post_viewmodel.dart';
+import 'ui/post/widgets/post_screen.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/ui/login/widgets/login_screen.dart';
-import 'package:frontend/ui/login/widgets/oauth_callback_screen.dart';
-import 'package:frontend/ui/login/view_model/login_viewmodel.dart';
+import 'ui/login/widgets/login_screen.dart';
+import 'ui/login/widgets/oauth_callback_screen.dart';
+import 'ui/login/view_model/login_viewmodel.dart';
 
-import 'package:frontend/ui/home/view_model/home_viewmodel.dart';
-import 'package:frontend/ui/home/widgets/home_screen.dart';
-import 'package:frontend/ui/signup/widgets/email_register_screen.dart';
-import 'package:frontend/ui/signup/view_model/email_register_viewmodel.dart';
-import 'package:frontend/ui/signup/widgets/email_verification_screen.dart';
-import 'package:frontend/ui/signup/view_model/email_verification_viewmodel.dart';
+import 'ui/home/view_model/home_viewmodel.dart';
+import 'ui/home/widgets/home_screen.dart';
+import 'ui/signup/widgets/email_register_screen.dart';
+import 'ui/signup/view_model/email_register_viewmodel.dart';
+import 'ui/signup/widgets/email_verification_screen.dart';
+import 'ui/signup/view_model/email_verification_viewmodel.dart';
 
-import 'package:frontend/data/repositories/feed/feed_repository.dart';
-import 'package:frontend/data/repositories/user/user_repository.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
-import 'package:frontend/utils/auth.dart';
-import 'package:frontend/config/environment.dart';
-
-import 'main_development.dart' as dev;
+import 'package:logger/logger.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'internal/guards/guards.dart';
+import 'internal/config/environment.dart';
+import 'internal/config/dependencies.dart';
 
 void main() {
-  dev.main();
+  Logger.level = Level.all;
+  usePathUrlStrategy();
+  runApp(MultiProvider(providers: providers, child: const MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -50,8 +51,6 @@ class MainApp extends StatelessWidget {
           builder: (context, state) => HomeScreen(
             title: 'Boshi',
             viewModel: HomeViewModel(
-              feedRepository: context.read<FeedRepository>(),
-              userRepository: context.read<UserRepository>(),
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/shared/exceptions/already_verified_exception.dart';
+import 'package:frontend/internal/exceptions/already_verified_exception.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:frontend/ui/models/verification_code/verification_code.dart';
 import '../view_model/email_verification_viewmodel.dart';
-import 'package:frontend/utils/result.dart';
+import 'package:frontend/internal/result/result.dart';
 import 'package:flutter/services.dart';
-import 'package:frontend/exceptions/format.dart';
+import 'package:frontend/internal/exceptions/format.dart';
 import 'package:frontend/ui/core/ui/error_controller.dart';
-import 'package:frontend/shared/exceptions/code_not_found_exception.dart';
-import 'package:frontend/shared/exceptions/user_not_found_exception.dart';
+import 'package:frontend/internal/exceptions/code_not_found_exception.dart';
+import 'package:frontend/internal/exceptions/user_not_found_exception.dart';
 import 'package:frontend/ui/core/ui/error_screen.dart';
-import 'package:frontend/utils/logger.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 const verificationInputId = 'verification-input';
 
