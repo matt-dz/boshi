@@ -30,6 +30,6 @@ SELECT
     END AS status;
 
 -- name: GetUser :one
-SELECT (school, verified_at)
+SELECT school, verified_at
 FROM emails
 WHERE emails.user_id = $1;

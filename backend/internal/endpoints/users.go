@@ -6,11 +6,8 @@ import (
 	"context"
 	"encoding/json"
 	"log/slog"
-	"time"
 
 	"net/http"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
@@ -34,29 +31,8 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Assert the interface{} to the expected tuple (school, verified_at)
-	result, ok := userResponse.([]any)
-	if !ok {
-		log.ErrorContext(r.Context(), "Unexpected result from DB")
-		http.Error(w, "Unexpected result from DB", http.StatusInternalServerError)
-		return
-	}
-
 	// Map the result to the User struct
-	var userResponseStruct getUserResponse
-	if len(result) >= 2 {
-		// Assert and assign values
-		if school, ok := result[0].(string); ok {
-			userResponseStruct.School = school
-		}
-		log.Info("VerifiedAt", slog.Any("time", result[1]))
-		if verifiedAt, ok := result[1].(time.Time); ok {
-			log.Info("Invalid timestamp format", slog.Any("error", err))
-			userResponseStruct.VerifiedAt = pgtype.Timestamptz{Time: verifiedAt, Valid: true}
-		}
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(userResponseStruct)
+	json.NewEncoder(w).Encode(userResponse)
 }
