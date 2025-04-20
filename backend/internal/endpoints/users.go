@@ -50,6 +50,7 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 			userResponseStruct.School = school
 		}
 		if verifiedAtRaw, ok := result[1].(string); ok {
+			log.Info(verifiedAtRaw)
 			verifiedAt, err := time.Parse(time.RFC3339Nano, verifiedAtRaw)
 			if err != nil {
 				log.Info("Invalid timestamp format", slog.Any("error", err))
