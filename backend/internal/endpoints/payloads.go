@@ -27,6 +27,10 @@ type getUserResponse struct {
 	VerifiedAt pgtype.Timestamptz `json:"verifiedAt"`
 }
 
+type getUsersResponse struct {
+	Users []getUserResponse `json:"users"`
+}
+
 type emailListPayload struct {
 	Email string `json:"email"`
 }

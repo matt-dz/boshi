@@ -10,6 +10,41 @@ import (
 	"net/http"
 )
 
+func GetUsersByID(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	db := database.GetDb(ctx)
+	sqlcDb := sqlc.New(db)
+
+	log.DebugContext(r.Context(), "Getting users")
+
+	userIDs := r.URL.Query()["user_id"]
+	if len(userIDs) == 0 {
+		log.ErrorContext(r.Context(), "No user ids specified")
+		http.Error(w, "No user ids specified", http.StatusBadRequest)
+		return
+	}
+
+	usersResponse, err := sqlcDb.GetUsers(ctx, userIDs)
+
+	if err != nil {
+		log.ErrorContext(r.Context(), "Failed to get users", slog.Any("error", err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var convertedResponse []getUserResponse
+	for _, u := range usersResponse {
+		convertedResponse = append(convertedResponse, getUserResponse(u)) // Manual field-to-field copy
+	}
+
+	// Map the result to the User struct
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(getUsersResponse{
+		Users: convertedResponse,
+	})
+}
+
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	db := database.GetDb(ctx)
