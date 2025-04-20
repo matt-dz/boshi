@@ -5,7 +5,6 @@ import 'package:frontend/ui/core/ui/footer.dart';
 import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/exceptions/format.dart';
-import 'package:frontend/internal/logger/logger.dart';
 
 import '../view_model/home_viewmodel.dart';
 import 'feed.dart';
