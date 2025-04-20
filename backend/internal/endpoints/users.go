@@ -42,7 +42,6 @@ func GetUsersByID(w http.ResponseWriter, r *http.Request) {
 
 	// Map the result to the User struct
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(getUsersResponse{
 		Users: convertedResponse,
 	})
@@ -71,6 +70,5 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 
 	// Map the result to the User struct
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(getUserResponse(userResponse))
 }
