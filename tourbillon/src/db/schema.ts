@@ -9,6 +9,7 @@ export type DatabaseSchema = {
 export type Emails = {
   user_id: string
   email: string
+  school: string
   created_at: Date
   verified_at: Date
 }

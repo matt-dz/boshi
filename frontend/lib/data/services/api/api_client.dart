@@ -4,6 +4,7 @@ import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
+import 'package:frontend/domain/models/users/users.dart';
 import 'package:frontend/internal/config/environment.dart';
 import 'package:frontend/internal/exceptions/missing_env.dart';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
@@ -51,6 +52,7 @@ Future<void> _setSessionVars(
 class ApiClient {
   Future<Result<bsky.Feed>> getFeed(bsky.Bluesky bluesky) async {
     logger.d('Getting Feed');
+
     if (!EnvironmentConfig.prod) {
       return Result.ok(mockGetFeedResult);
     }
@@ -74,16 +76,60 @@ class ApiClient {
         ),
       );
     }
-
     return Result.ok(xrpcResponse.data);
   }
 
-  // TODO: Implement the getUser method
-  Future<Result<User>> getUser() async {
-    logger.w('Function not implemented. Returning default user.');
-    return Result.ok(
-      User(id: '1', username: 'anonymous1', school: 'University of Florida'),
+  Future<Result<User>> getUser(String did) async {
+    logger.d('Sending GET request for User $did');
+
+    final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
+    final Uri requestUri = hostUri.replace(pathSegments: ['user', did]);
+
+    final response = await http.get(requestUri);
+
+    if (response.statusCode == 400) {
+      return Result.error(
+        Exception('Failed to get user, missing user_ids'),
+      );
+    } else if (response.statusCode == 404) {
+      return Result.error(UserNotFoundException());
+    }
+
+    try {
+      final decoded = json.decode(response.body);
+      final User result = User.fromJson(decoded);
+      return Result.ok(result);
+    } on Exception catch (error) {
+      return Result.error(error);
+    }
+  }
+
+  Future<Result<Users>> getUsers(List<String> dids) async {
+    logger.d('Sending GET request for Users');
+
+    final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
+    final Uri requestUri = hostUri.replace(
+      pathSegments: ['users'],
+      queryParameters: {'user_id': dids},
     );
+
+    final response = await http.get(requestUri);
+
+    if (response.statusCode == 400) {
+      return Result.error(
+        Exception('Failed to get user, missing user_ids'),
+      );
+    } else if (response.statusCode == 404) {
+      return Result.error(UserNotFoundException());
+    }
+
+    try {
+      final decoded = json.decode(response.body);
+      final Users result = Users.fromJson(decoded);
+      return Result.ok(result);
+    } on Exception catch (error) {
+      return Result.error(error);
+    }
   }
 
   Future<Result<Post>> getPost(String id) async {

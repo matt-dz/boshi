@@ -24,7 +24,6 @@ var mockFeed = [
   Post(
     author: User(
       id: '1',
-      username: 'anonymous1',
       school: 'University of Florida',
     ),
     content: 'Hello, world!',
@@ -41,7 +40,6 @@ var mockFeed = [
   Post(
     author: User(
       id: '2',
-      username: 'anonymous2',
       school: 'Stanford University',
     ),
     content: '''
@@ -59,7 +57,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
         id: '100',
         author: User(
           id: '1',
-          username: 'anonymous1',
           school: 'University of Florida',
         ),
         content: 'This is a reply',
@@ -75,7 +72,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
             id: '101',
             author: User(
               id: '2',
-              username: 'anonymous2',
               school: 'Stanford University',
             ),
             content: 'This is a reply to a reply',
@@ -87,7 +83,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
                 id: '102',
                 author: User(
                   id: '3',
-                  username: 'anonymous3',
                   school: 'University of Washington',
                 ),
                 content: 'This is a reply to a reply to a reply',
@@ -102,7 +97,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
             id: '103',
             author: User(
               id: '4',
-              username: 'anonymous4',
               school: 'Princeton University',
             ),
             content: 'This is a reply to a reply',
@@ -114,7 +108,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
                 id: '104',
                 author: User(
                   id: '3',
-                  username: 'anonymous3',
                   school: 'University of Washington',
                 ),
                 content: 'This is a reply to a reply to a reply',
@@ -134,7 +127,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
   Post(
     author: User(
       id: '3',
-      username: 'anonymous3',
       school: 'University of Washington',
     ),
     content: '''
@@ -148,7 +140,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
   Post(
     author: User(
       id: '4',
-      username: 'anonymous4',
       school: 'Princeton University',
     ),
     content: '''
@@ -162,7 +153,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit , sed do eiusmod tempor 
   Post(
     author: User(
       id: '5',
-      username: 'anonymous5',
       school: 'Harvard University',
     ),
     content: '''
@@ -176,7 +166,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
   Post(
     author: User(
       id: '6',
-      username: 'anonymous6',
       school: 'University of California, Berkely',
     ),
     content: '''
@@ -190,7 +179,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
   Post(
     author: User(
       id: '7',
-      username: 'anonymous7',
       school: 'University of Southern California',
     ),
     content: '''
@@ -204,7 +192,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
   Post(
     author: User(
       id: '8',
-      username: 'anonymous8',
       school: 'University of California, Los Angeles',
     ),
     content: '''
@@ -218,7 +205,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
   Post(
     author: User(
       id: '9',
-      username: 'anonymous9',
       school: 'University of Pennsylvania',
     ),
     content: '''
@@ -232,7 +218,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
   Post(
     author: User(
       id: '10',
-      username: 'anonymous10',
       school: 'Massachusetts Institute of Technology',
     ),
     content: '''

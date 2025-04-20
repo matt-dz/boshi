@@ -19,14 +19,10 @@ export const handler = async (
 ) => {
   let builder = ctx.db
     .selectFrom('post')
-    .selectAll()
+    .select(['uri'])
     .orderBy('indexed_at', 'desc')
     .limit(params.limit)
 
-  if (params.cursor) {
-    const timeStr = new Date(parseInt(params.cursor, 10))
-    builder = builder.where('post.indexed_at', '<', timeStr)
-  }
   const res = await builder.execute()
 
   const feed = res.map((row) => ({

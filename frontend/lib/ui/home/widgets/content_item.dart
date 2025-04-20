@@ -143,18 +143,10 @@ class ContentItemHeader extends StatelessWidget {
               TextSpan(
                 children: [
                   TextSpan(
-                    text: '${post.author.username} ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                  TextSpan(
                     text: post.author.school,
                     style: TextStyle(
-                      color: Colors.grey.shade700,
                       fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   TextSpan(
