@@ -24,7 +24,7 @@ mixin _$Reply {
   User get author => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
-  int get karma => throw _privateConstructorUsedError;
+  int get likes => throw _privateConstructorUsedError;
   int get numReplies => throw _privateConstructorUsedError;
   String get replyToId => throw _privateConstructorUsedError;
 
@@ -47,7 +47,7 @@ abstract class $ReplyCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      int karma,
+      int likes,
       int numReplies,
       String replyToId});
 
@@ -73,7 +73,7 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
-    Object? karma = null,
+    Object? likes = null,
     Object? numReplies = null,
     Object? replyToId = null,
   }) {
@@ -94,9 +94,9 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      karma: null == karma
-          ? _value.karma
-          : karma // ignore: cast_nullable_to_non_nullable
+      likes: null == likes
+          ? _value.likes
+          : likes // ignore: cast_nullable_to_non_nullable
               as int,
       numReplies: null == numReplies
           ? _value.numReplies
@@ -132,7 +132,7 @@ abstract class _$$ReplyImplCopyWith<$Res> implements $ReplyCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      int karma,
+      int likes,
       int numReplies,
       String replyToId});
 
@@ -157,7 +157,7 @@ class __$$ReplyImplCopyWithImpl<$Res>
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
-    Object? karma = null,
+    Object? likes = null,
     Object? numReplies = null,
     Object? replyToId = null,
   }) {
@@ -178,9 +178,9 @@ class __$$ReplyImplCopyWithImpl<$Res>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      karma: null == karma
-          ? _value.karma
-          : karma // ignore: cast_nullable_to_non_nullable
+      likes: null == likes
+          ? _value.likes
+          : likes // ignore: cast_nullable_to_non_nullable
               as int,
       numReplies: null == numReplies
           ? _value.numReplies
@@ -202,7 +202,7 @@ class _$ReplyImpl implements _Reply {
       required this.author,
       required this.content,
       required this.timestamp,
-      required this.karma,
+      required this.likes,
       required this.numReplies,
       required this.replyToId});
 
@@ -218,7 +218,7 @@ class _$ReplyImpl implements _Reply {
   @override
   final DateTime timestamp;
   @override
-  final int karma;
+  final int likes;
   @override
   final int numReplies;
   @override
@@ -226,7 +226,7 @@ class _$ReplyImpl implements _Reply {
 
   @override
   String toString() {
-    return 'Reply(id: $id, author: $author, content: $content, timestamp: $timestamp, karma: $karma, numReplies: $numReplies, replyToId: $replyToId)';
+    return 'Reply(id: $id, author: $author, content: $content, timestamp: $timestamp, likes: $likes, numReplies: $numReplies, replyToId: $replyToId)';
   }
 
   @override
@@ -239,7 +239,7 @@ class _$ReplyImpl implements _Reply {
             (identical(other.content, content) || other.content == content) &&
             (identical(other.timestamp, timestamp) ||
                 other.timestamp == timestamp) &&
-            (identical(other.karma, karma) || other.karma == karma) &&
+            (identical(other.likes, likes) || other.likes == likes) &&
             (identical(other.numReplies, numReplies) ||
                 other.numReplies == numReplies) &&
             (identical(other.replyToId, replyToId) ||
@@ -249,7 +249,7 @@ class _$ReplyImpl implements _Reply {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, author, content, timestamp,
-      karma, numReplies, replyToId);
+      likes, numReplies, replyToId);
 
   /// Create a copy of Reply
   /// with the given fields replaced by the non-null parameter values.
@@ -273,7 +273,7 @@ abstract class _Reply implements Reply {
       required final User author,
       required final String content,
       required final DateTime timestamp,
-      required final int karma,
+      required final int likes,
       required final int numReplies,
       required final String replyToId}) = _$ReplyImpl;
 
@@ -288,7 +288,7 @@ abstract class _Reply implements Reply {
   @override
   DateTime get timestamp;
   @override
-  int get karma;
+  int get likes;
   @override
   int get numReplies;
   @override

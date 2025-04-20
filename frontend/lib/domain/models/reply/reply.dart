@@ -12,7 +12,7 @@ abstract class Reply with _$Reply implements ContentItem {
     required User author,
     required String content,
     required DateTime timestamp,
-    required int karma,
+    required int likes,
     required int numReplies,
     required String replyToId,
   }) = _Reply;

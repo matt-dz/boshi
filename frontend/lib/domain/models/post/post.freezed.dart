@@ -24,7 +24,7 @@ mixin _$Post {
   User get author => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
-  int get karma => throw _privateConstructorUsedError;
+  int get likes => throw _privateConstructorUsedError;
   int get numReplies => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
 
@@ -47,7 +47,7 @@ abstract class $PostCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      int karma,
+      int likes,
       int numReplies,
       String title});
 
@@ -73,7 +73,7 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
-    Object? karma = null,
+    Object? likes = null,
     Object? numReplies = null,
     Object? title = null,
   }) {
@@ -94,9 +94,9 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      karma: null == karma
-          ? _value.karma
-          : karma // ignore: cast_nullable_to_non_nullable
+      likes: null == likes
+          ? _value.likes
+          : likes // ignore: cast_nullable_to_non_nullable
               as int,
       numReplies: null == numReplies
           ? _value.numReplies
@@ -132,7 +132,7 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
       User author,
       String content,
       DateTime timestamp,
-      int karma,
+      int likes,
       int numReplies,
       String title});
 
@@ -156,7 +156,7 @@ class __$$PostImplCopyWithImpl<$Res>
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
-    Object? karma = null,
+    Object? likes = null,
     Object? numReplies = null,
     Object? title = null,
   }) {
@@ -177,9 +177,9 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      karma: null == karma
-          ? _value.karma
-          : karma // ignore: cast_nullable_to_non_nullable
+      likes: null == likes
+          ? _value.likes
+          : likes // ignore: cast_nullable_to_non_nullable
               as int,
       numReplies: null == numReplies
           ? _value.numReplies
@@ -201,7 +201,7 @@ class _$PostImpl implements _Post {
       required this.author,
       required this.content,
       required this.timestamp,
-      required this.karma,
+      required this.likes,
       required this.numReplies,
       required this.title});
 
@@ -217,7 +217,7 @@ class _$PostImpl implements _Post {
   @override
   final DateTime timestamp;
   @override
-  final int karma;
+  final int likes;
   @override
   final int numReplies;
   @override
@@ -225,7 +225,7 @@ class _$PostImpl implements _Post {
 
   @override
   String toString() {
-    return 'Post(id: $id, author: $author, content: $content, timestamp: $timestamp, karma: $karma, numReplies: $numReplies, title: $title)';
+    return 'Post(id: $id, author: $author, content: $content, timestamp: $timestamp, likes: $likes, numReplies: $numReplies, title: $title)';
   }
 
   @override
@@ -238,7 +238,7 @@ class _$PostImpl implements _Post {
             (identical(other.content, content) || other.content == content) &&
             (identical(other.timestamp, timestamp) ||
                 other.timestamp == timestamp) &&
-            (identical(other.karma, karma) || other.karma == karma) &&
+            (identical(other.likes, likes) || other.likes == likes) &&
             (identical(other.numReplies, numReplies) ||
                 other.numReplies == numReplies) &&
             (identical(other.title, title) || other.title == title));
@@ -247,7 +247,7 @@ class _$PostImpl implements _Post {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, author, content, timestamp, karma, numReplies, title);
+      runtimeType, id, author, content, timestamp, likes, numReplies, title);
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.
@@ -271,7 +271,7 @@ abstract class _Post implements Post {
       required final User author,
       required final String content,
       required final DateTime timestamp,
-      required final int karma,
+      required final int likes,
       required final int numReplies,
       required final String title}) = _$PostImpl;
 
@@ -286,7 +286,7 @@ abstract class _Post implements Post {
   @override
   DateTime get timestamp;
   @override
-  int get karma;
+  int get likes;
   @override
   int get numReplies;
   @override

@@ -20,7 +20,7 @@ List<Post> convertFeedToDomainPosts(bsky.Feed feed) {
       title: title,
       content: content,
       timestamp: feedView.post.indexedAt,
-      karma: 50,
+      likes: 50,
       numReplies: 5,
     );
   }).toList();

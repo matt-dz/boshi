@@ -11,7 +11,7 @@ _$PostImpl _$$PostImplFromJson(Map<String, dynamic> json) => _$PostImpl(
       author: User.fromJson(json['author'] as Map<String, dynamic>),
       content: json['content'] as String,
       timestamp: DateTime.parse(json['timestamp'] as String),
-      karma: (json['karma'] as num).toInt(),
+      likes: (json['likes'] as num).toInt(),
       numReplies: (json['num_replies'] as num).toInt(),
       title: json['title'] as String,
     );
@@ -22,7 +22,7 @@ Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
       'author': instance.author,
       'content': instance.content,
       'timestamp': instance.timestamp.toIso8601String(),
-      'karma': instance.karma,
+      'likes': instance.likes,
       'num_replies': instance.numReplies,
       'title': instance.title,
     };
