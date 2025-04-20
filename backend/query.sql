@@ -9,13 +9,11 @@ SET email = EXCLUDED.email
 WHERE emails.verified_at IS NULL
 RETURNING *;
 
--- name: UpsertSchool :one
-INSERT INTO emails (user_id, school)
-VALUES ($1, $2)
-ON CONFLICT (user_id) DO UPDATE
-SET school = EXCLUDED.school
+-- name: SetSchool :one
+UPDATE emails
+SET school = $2
+WHERE emails.user_id = $1
 RETURNING *;
-
 
 -- name: VerifyEmail :one
 WITH matched AS (

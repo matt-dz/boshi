@@ -82,6 +82,31 @@ func (q *Queries) GetUsers(ctx context.Context, dollar_1 []string) ([]GetUsersRo
 	return items, nil
 }
 
+const setSchool = `-- name: SetSchool :one
+UPDATE emails
+SET school = $2
+WHERE emails.user_id = $1
+RETURNING user_id, email, created_at, verified_at, school
+`
+
+type SetSchoolParams struct {
+	UserID string
+	School pgtype.Text
+}
+
+func (q *Queries) SetSchool(ctx context.Context, arg SetSchoolParams) (Email, error) {
+	row := q.db.QueryRow(ctx, setSchool, arg.UserID, arg.School)
+	var i Email
+	err := row.Scan(
+		&i.UserID,
+		&i.Email,
+		&i.CreatedAt,
+		&i.VerifiedAt,
+		&i.School,
+	)
+	return i, err
+}
+
 const upsertEmail = `-- name: UpsertEmail :one
 INSERT INTO emails (user_id, email)
 VALUES ($1, $2)
@@ -98,32 +123,6 @@ type UpsertEmailParams struct {
 
 func (q *Queries) UpsertEmail(ctx context.Context, arg UpsertEmailParams) (Email, error) {
 	row := q.db.QueryRow(ctx, upsertEmail, arg.UserID, arg.Email)
-	var i Email
-	err := row.Scan(
-		&i.UserID,
-		&i.Email,
-		&i.CreatedAt,
-		&i.VerifiedAt,
-		&i.School,
-	)
-	return i, err
-}
-
-const upsertSchool = `-- name: UpsertSchool :one
-INSERT INTO emails (user_id, school)
-VALUES ($1, $2)
-ON CONFLICT (user_id) DO UPDATE
-SET school = EXCLUDED.school
-RETURNING user_id, email, created_at, verified_at, school
-`
-
-type UpsertSchoolParams struct {
-	UserID string
-	School pgtype.Text
-}
-
-func (q *Queries) UpsertSchool(ctx context.Context, arg UpsertSchoolParams) (Email, error) {
-	row := q.db.QueryRow(ctx, upsertSchool, arg.UserID, arg.School)
 	var i Email
 	err := row.Scan(
 		&i.UserID,

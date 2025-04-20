@@ -273,7 +273,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = qtx.UpsertSchool(r.Context(), sqlc.UpsertSchoolParams{
+		_, err = qtx.SetSchool(r.Context(), sqlc.SetSchoolParams{
 			UserID: payload.UserID,
 			School: pgtype.Text{
 				String: school,
