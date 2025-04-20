@@ -19,6 +19,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -261,6 +262,33 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User already verified", http.StatusConflict)
 		return
 	case sqlc.VerifyEmailResultJustVerified:
+		school, err := ResolveSchoolFromEmail(payload.Email)
+		if err != nil {
+			log.ErrorContext(
+				r.Context(),
+				"Failed to resolve school from email",
+			)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		_, err = qtx.UpsertSchool(r.Context(), sqlc.UpsertSchoolParams{
+			UserID: payload.UserID,
+			School: pgtype.Text{
+				String: school,
+				Valid:  true,
+			},
+		})
+
+		if err != nil {
+			log.ErrorContext(
+				r.Context(),
+				"Failed to store new school",
+			)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
 		log.DebugContext(r.Context(), "email verification status updated")
 	default:
 		log.ErrorContext(
