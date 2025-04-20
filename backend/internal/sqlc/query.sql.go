@@ -53,7 +53,7 @@ func (q *Queries) GetUser(ctx context.Context, userID string) (GetUserRow, error
 const getUsers = `-- name: GetUsers :many
 SELECT user_id, school, verified_at
 FROM emails
-WHERE emails.user_id = ANY($1::string[])
+WHERE emails.user_id = ANY($1::text[])
 `
 
 type GetUsersRow struct {

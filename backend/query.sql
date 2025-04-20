@@ -37,7 +37,7 @@ WHERE emails.user_id = $1;
 -- name: GetUsers :many
 SELECT user_id, school, verified_at
 FROM emails
-WHERE emails.user_id = ANY($1::string[]);
+WHERE emails.user_id = ANY($1::text[]);
 
 -- name: VerificationStatus :one
 SELECT verified_at FROM emails WHERE user_id = $1;
