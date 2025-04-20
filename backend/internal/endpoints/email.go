@@ -267,6 +267,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 			log.ErrorContext(
 				r.Context(),
 				"Failed to resolve school from email",
+				slog.Any("error", err),
 			)
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
