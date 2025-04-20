@@ -50,7 +50,7 @@ func main() {
 
 	config := client.DefaultClientConfig()
 	config.WantedCollections = []string{"app.bsky.feed.post"}
-	config.WebsocketURL = "wss://jetstream2.us-east.bsky.network/subscribe"
+	config.WebsocketURL = socketUri
 	config.Compress = true
 
 	h := &handler{
