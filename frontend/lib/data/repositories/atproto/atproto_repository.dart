@@ -1,6 +1,7 @@
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/foundation.dart';
 import 'package:frontend/domain/models/user/user.dart';
+import 'package:frontend/domain/models/users/users.dart';
 import 'package:frontend/internal/exceptions/oauth_unauthorized_exception.dart';
 import 'package:frontend/internal/exceptions/verification_code_already_set_exception.dart';
 import 'package:frontend/internal/exceptions/user_not_found_exception.dart';
@@ -218,10 +219,20 @@ class AtProtoRepository extends ChangeNotifier {
 
     switch (bskyFeed) {
       case Ok<bsky.Feed>():
-        return Result.ok(convertFeedToDomainPosts(bskyFeed.value));
+        return convertFeedToDomainPosts(this, bskyFeed.value);
       case Error<bsky.Feed>():
         return Result.error(bskyFeed.error);
     }
+  }
+
+  Future<Result<Users>> getUsers(List<String> dids) async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException('getUsers'));
+    }
+
+    final usersResult = await _apiClient.getUsers(dids);
+
+    return usersResult;
   }
 
   Future<Result<User>> getUser() async {

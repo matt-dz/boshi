@@ -4,6 +4,7 @@ import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
+import 'package:frontend/domain/models/users/users.dart';
 import 'package:frontend/internal/config/environment.dart';
 import 'package:frontend/internal/exceptions/missing_env.dart';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
@@ -78,7 +79,6 @@ class ApiClient {
     return Result.ok(xrpcResponse.data);
   }
 
-  // TODO: Implement the getUser method
   Future<Result<User>> getUser(String did) async {
     logger.d('Sending GET request for User $did');
 
@@ -97,6 +97,31 @@ class ApiClient {
     try {
       final decoded = json.decode(response.body);
       final User result = User.fromJson(decoded);
+      return Result.ok(result);
+    } catch (error) {
+      return Result.error(Exception('Failed to parse user with error $error'));
+    }
+  }
+
+  Future<Result<Users>> getUsers(List<String> dids) async {
+    logger.d('Sending GET request for Users');
+
+    final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
+
+    final Uri requestUri = hostUri.replace(queryParameters: {'user_ids': dids});
+
+    final response = await http.get(requestUri);
+
+    if (response.statusCode != 200) {
+      logger.e('Failed to get user: $response');
+      return Result.error(
+        Exception('Failed to get user'),
+      );
+    }
+
+    try {
+      final decoded = json.decode(response.body);
+      final Users result = Users.fromJson(decoded);
       return Result.ok(result);
     } catch (error) {
       return Result.error(Exception('Failed to parse user with error $error'));
