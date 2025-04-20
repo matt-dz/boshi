@@ -34,6 +34,7 @@ class AtProtoRepository extends ChangeNotifier {
   final bool _local;
   late OAuthContext oAuthContext;
   atp.ATProto? atProto;
+  bsky.Bluesky? bluesky;
 
   late OAuthClientMetadata? clientMetadata;
   late OAuthClient? oAuthClient;
@@ -114,7 +115,7 @@ class AtProtoRepository extends ChangeNotifier {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException('createPost'));
     }
-    return await _apiClient.createPost(atProto!, post);
+    return await _apiClient.createPost(bluesky!, post);
   }
 
   Future<Result<void>> addVerificationEmail(String email) async {
@@ -209,7 +210,7 @@ class AtProtoRepository extends ChangeNotifier {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
     }
-    final bskyFeed = await _apiClient.getFeed(atProto!.oAuthSession!);
+    final bskyFeed = await _apiClient.getFeed(bluesky!);
 
     switch (bskyFeed) {
       case Ok<bsky.Feed>():

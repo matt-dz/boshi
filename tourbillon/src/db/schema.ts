@@ -1,12 +1,12 @@
 export type DatabaseSchema = {
-  email: Email
+  emails: Emails
   mailList: MailList
   post: Post
   reaction: Reaction
   reply: Reply
 }
 
-export type Email = {
+export type Emails = {
   user_id: string
   email: string
   created_at: Date
@@ -23,8 +23,6 @@ export type Post = {
   cid: string
   author_did: string
   indexed_at: Date
-  title: string
-  content: string
 }
 
 export type Reaction = {
