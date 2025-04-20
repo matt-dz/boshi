@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/internal/exceptions/oauth_unauthorized_exception.dart';
 
 import 'package:frontend/shared/models/post/post.dart';
 
@@ -27,27 +26,24 @@ class PostViewModel extends ChangeNotifier {
 
   Future<Result> _load() async {
     try {
-      logger.d('Retrieving user ');
-      if (_atProtoRepository.authorized) {
-        final String? user = _atProtoRepository.atProto?.oAuthSession?.sub;
-
-        if (user == null) {
-          return Result.error(Exception('No authenticated user'));
-        }
-
-        final userResult = await _atProtoRepository.getUser(user);
-        switch (userResult) {
-          case Ok<User>():
-            _user = userResult.value;
-          case Error<User>():
-            logger.e('Error retrieving user: ${userResult.error}');
-        }
-        return userResult;
+      logger.d('Retrieving user');
+      final userResult = await _atProtoRepository.getUser();
+      switch (userResult) {
+        case Ok<User>():
+          _user = userResult.value;
+        case Error<User>():
+          logger.e('Failed to retrieve user: ', error: userResult.error);
       }
-      return Result.error(OAuthUnauthorizedException('GetUser'));
+      return userResult;
     } finally {
       notifyListeners();
     }
+  }
+
+  void reload() {
+    load = Command0(_load)..execute();
+    createPost = Command1(_createPost);
+    notifyListeners();
   }
 
   Future<Result<void>> _createPost(Post post) async {

@@ -27,9 +27,6 @@ class HomeViewModel extends ChangeNotifier {
   late Command1 updateReactionCount;
   final AtProtoRepository _atProtoRepository;
 
-  User? _user;
-  User? get user => _user;
-
   List<Post> _posts = [];
   UnmodifiableListView<Post> get posts => UnmodifiableListView(_posts);
 
@@ -44,24 +41,7 @@ class HomeViewModel extends ChangeNotifier {
         case Error<List<Post>>():
           logger.e('Error loading feed: ${feedResult.error}');
       }
-      logger.d('Retrieving user ');
-      if (_atProtoRepository.authorized) {
-        final String? user = _atProtoRepository.atProto?.oAuthSession?.sub;
-
-        if (user == null) {
-          return Result.error(Exception('No authenticated user'));
-        }
-
-        final userResult = await _atProtoRepository.getUser(user);
-        switch (userResult) {
-          case Ok<User>():
-            _user = userResult.value;
-          case Error<User>():
-            logger.e('Error retrieving user: ${userResult.error}');
-        }
-        return userResult;
-      }
-      return Result.error(OAuthUnauthorizedException('GetUser'));
+      return feedResult;
     } finally {
       notifyListeners();
     }

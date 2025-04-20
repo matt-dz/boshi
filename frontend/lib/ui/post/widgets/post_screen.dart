@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/internal/exceptions/format.dart';
 import 'package:frontend/shared/models/post/post.dart';
+import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
 import 'package:frontend/ui/core/ui/header.dart';
 
@@ -47,6 +49,16 @@ class _PostFormState extends State<PostForm> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.viewModel.load.running) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (widget.viewModel.load.error) {
+      final result = widget.viewModel.load.result! as Error;
+      return ErrorScreen(
+        message: formatExceptionMsg(result.error),
+        onRefresh: widget.viewModel.reload,
+      );
+    }
+
     return Padding(
       padding: EdgeInsets.only(top: 24, bottom: 16),
       child: ShadCard(
@@ -105,8 +117,9 @@ class _PostFormState extends State<PostForm> {
                   ListenableBuilder(
                     listenable: widget.viewModel,
                     builder: (context, _) {
+                      final user = widget.viewModel.user;
                       return Text(
-                        widget.viewModel.user?.school ?? 'School not found',
+                        user?.school ?? 'School not found',
                       );
                     },
                   ),
