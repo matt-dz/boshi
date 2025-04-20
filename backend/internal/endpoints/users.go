@@ -25,6 +25,7 @@ func ResolveSchoolFromEmail(email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -34,6 +35,10 @@ func ResolveSchoolFromEmail(email string) (string, error) {
 	var result []UniversityDomain
 	if err := json.Unmarshal(body, &result); err != nil {
 		return "", err
+	}
+
+	if len(result) != 1 {
+		return "", fmt.Errorf("Could not find the school with domain: %s", domain)
 	}
 
 	return result[0].Name, nil
