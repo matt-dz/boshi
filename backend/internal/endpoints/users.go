@@ -31,12 +31,12 @@ func ResolveSchoolFromEmail(email string) (string, error) {
 		return "", err
 	}
 
-	var result UniversityDomainResponse
+	var result []UniversityDomain
 	if err := json.Unmarshal(body, &result); err != nil {
 		return "", err
 	}
 
-	return result.Domains[0].Name, nil
+	return result[0].Name, nil
 }
 
 func GetUsersByID(w http.ResponseWriter, r *http.Request) {
