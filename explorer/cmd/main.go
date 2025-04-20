@@ -73,6 +73,7 @@ func storePost(
 	timeStamp, err := time.Parse(time.RFC3339, post.CreatedAt)
 	if err != nil {
 		log.Error("Failed to parse time from post")
+		return
 	}
 
 	uri := fmt.Sprintf("at://%s/%s/%s", event.Did, event.Commit.Collection, event.Commit.RKey)
@@ -85,7 +86,7 @@ func storePost(
 			IndexedAt: pgtype.Timestamptz{Time: timeStamp, Valid: true},
 		},
 	)
-	
+
 	if err != nil {
 		log.Error("Failed to store post", slog.Any("error", err))
 	}
