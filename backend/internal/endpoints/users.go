@@ -34,7 +34,10 @@ func GetUsersByID(w http.ResponseWriter, r *http.Request) {
 
 	var convertedResponse []getUserResponse
 	for _, u := range usersResponse {
-		convertedResponse = append(convertedResponse, getUserResponse(u)) // Manual field-to-field copy
+		userResponse := getUserResponse(u)
+		if userResponse.School.Valid {
+			convertedResponse = append(convertedResponse, userResponse)
+		}
 	}
 
 	// Map the result to the User struct

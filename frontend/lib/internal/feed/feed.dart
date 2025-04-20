@@ -34,7 +34,10 @@ Future<Result<List<Post>>> convertFeedToDomainPosts(
         author: User(
           id: feedView.post.author.did,
           school: users.users
-              .firstWhere((user) => user.id == feedView.post.author.did)
+              .firstWhere(
+                (user) => user.id == feedView.post.author.did,
+                orElse: () => User(id: 'unknown', school: 'unknown'),
+              )
               .school,
         ),
         title: title,
