@@ -1,5 +1,5 @@
+import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/cupertino.dart';
-import 'package:frontend/data/models/requests/reply/reply.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/internal/result/result.dart';
@@ -11,16 +11,16 @@ class ReplyViewModel extends ChangeNotifier {
   ReplyViewModel({
     required AtProtoRepository atProtoRepository,
   }) : _atProtoRepository = atProtoRepository {
-    createReply = Command1<void, Reply>(_createReply);
+    createReply = Command1<void, bsky.PostRecord>(_createReply);
   }
 
   late final Command0 load;
-  late final Command1<void, Reply> createReply;
+  late final Command1<void, bsky.PostRecord> createReply;
   final AtProtoRepository _atProtoRepository;
 
   String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
 
-  Future<Result<void>> _createReply(Reply reply) async {
+  Future<Result<void>> _createReply(bsky.PostRecord reply) async {
     try {
       logger.d('Creating a reply');
       final createReplyResult = await _atProtoRepository.createReply(reply);
