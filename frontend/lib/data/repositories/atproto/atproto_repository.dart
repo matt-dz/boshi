@@ -316,6 +316,10 @@ class AtProtoRepository extends ChangeNotifier {
   Future<Result<void>> logout() async {
     try {
       await _apiClient.logout();
+      atProto = null;
+      bluesky = null;
+      clientMetadata = null;
+      initialized = false;
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
