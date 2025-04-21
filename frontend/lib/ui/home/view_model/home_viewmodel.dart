@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
@@ -29,7 +31,7 @@ class HomeViewModel extends ChangeNotifier {
   User? _user;
   final AtProtoRepository _atProtoRepository;
 
-  List<Post> get feed => _posts;
+  UnmodifiableListView<Post> get feed => UnmodifiableListView(_posts);
 
   Future<Result> _load() async {
     try {
