@@ -1,6 +1,4 @@
-import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:frontend/data/models/requests/reply/reply.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
