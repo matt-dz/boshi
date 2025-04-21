@@ -100,23 +100,11 @@ Future<AtUri?> retrieveLikeUri(
   return retrieveLikeUri(atp, uri, did, response.data.cursor);
 }
 
-Future<String> resolveHandle(ATProto atp, String did) async {
+Future<String> resolveHandle(bsky.Bluesky bluesky, String did) async {
   logger.d('Resolving handle for $did');
-  final repo = await atp.repo.describeRepo(repo: did);
-  if (repo.status.code > 299) {
-    throw HttpException(
-      'Failed to get user repo with status: ${repo.status.code}',
-    );
+  final profile = await bluesky.actor.getProfile(actor: did);
+  if (profile.status.code > 299) {
+    throw HttpException(profile.status.message);
   }
-
-  final aka = repo.data.didDoc['alsoKnownAs'];
-  if (aka is! List) {
-    throw HttpException('Invalid alsoKnownAs format: $aka');
-  }
-  if (aka.isEmpty) {
-    throw HttpException('No alsoKnownAs found');
-  }
-  logger.d('Resolved handle to ${aka.first}');
-
-  return aka.first as String;
+  return profile.data.handle;
 }

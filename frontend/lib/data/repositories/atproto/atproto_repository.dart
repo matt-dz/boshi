@@ -257,7 +257,7 @@ class AtProtoRepository extends ChangeNotifier {
     if (userDid == null) {
       return Result.error(OAuthUnauthorizedException());
     }
-    final userResult = await _apiClient.getUser(atProto!, userDid);
+    final userResult = await _apiClient.getUser(bluesky!, userDid);
 
     switch (userResult) {
       case Ok<User>():

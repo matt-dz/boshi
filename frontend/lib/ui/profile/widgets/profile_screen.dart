@@ -42,7 +42,7 @@ class ProfileScreen extends StatelessWidget {
                   return Column(
                     children: [
                       Text(
-                        viewModel.user.handle,
+                        viewModel.user.handle!,
                       ),
                     ],
                   );

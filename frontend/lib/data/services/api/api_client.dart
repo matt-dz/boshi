@@ -75,7 +75,7 @@ class ApiClient {
     return Result.ok(xrpcResponse.data);
   }
 
-  Future<Result<User>> getUser(ATProto atp, String did) async {
+  Future<Result<User>> getUser(bsky.Bluesky bluesky, String did) async {
     logger.d('Sending GET request for User $did');
 
     final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
@@ -94,7 +94,7 @@ class ApiClient {
 
     try {
       final Map<String, dynamic> decoded = json.decode(userResponse.body);
-      decoded['handle'] = await resolveHandle(atp, did);
+      decoded['handle'] = await resolveHandle(bluesky, did);
       logger.d('User decoded: $decoded');
       final User user = User.fromJson(decoded);
       return Result.ok(user);
@@ -129,24 +129,8 @@ class ApiClient {
     try {
       logger.d('Decoding response: ${response.body}');
       final decoded = json.decode(response.body) as Map<String, Object?>;
-      if (decoded['users'] == null) {
-        logger.e('Failed to decode response');
-        return Result.error(Exception('Failed to decode response'));
-      }
       final users = decoded['users']! as List;
-
-      // Resolve handlers for all users
-      logger.d('Resolving handles for ${users.length} users');
-      final handles = await Future.wait(
-        users.map((user) => resolveHandle(atp, (user as Map)['did'])),
-      );
-
-      return Result.ok(
-        users.map((user) {
-          (user as Map)['handle'] = handles[users.indexOf(user)];
-          return User.fromJson(user as Map<String, Object?>);
-        }).toList(),
-      );
+      return Result.ok(users.map((user) => User.fromJson(user)).toList());
     } on Exception catch (error) {
       logger.e('Failed to decode response. error=$error');
       return Result.error(error);
@@ -163,7 +147,6 @@ class ApiClient {
     post_request.Post post,
   ) async {
     logger.d('Creating post');
-
     final xrpcResponse = await bluesky.feed.post(
       text: '${post.title}\n${post.content}',
       tags: List.from(['boshi.post']),
