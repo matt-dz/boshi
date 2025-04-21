@@ -1,5 +1,11 @@
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
+import 'package:frontend/domain/models/user/user.dart';
+
+var mockUser = User(
+  did: 'bafyreievgu2ty7qbiaaom5zhmkznsnajuzideek3lo7e65dwqlrvrxnmo4',
+  school: 'University of Florida',
+);
 
 var mockPost = bsky.Post(
   record: bsky.PostRecord(

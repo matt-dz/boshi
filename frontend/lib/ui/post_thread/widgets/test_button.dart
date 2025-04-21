@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
+import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/internal/feed/mock_data.dart';
 import 'package:frontend/ui/reply/view_model/reply_viewmodel.dart';
 import 'package:frontend/ui/reply/widgets/reply_view.dart';
@@ -12,9 +13,9 @@ class DialogButton extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => ReplyWidget(
-        parent: mockPost,
         viewModel: ReplyViewModel(
           atProtoRepository: context.read<AtProtoRepository>(),
+          parent: Post(bskyPost: mockPost, author: mockUser),
         ),
       ),
     );

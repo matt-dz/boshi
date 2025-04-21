@@ -1,8 +1,9 @@
 import 'package:atproto/atproto.dart';
-import 'package:bluesky/bluesky.dart';
+import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/material.dart';
 import 'package:frontend/internal/logger/logger.dart';
 import 'package:frontend/internal/result/result.dart';
+import 'package:frontend/ui/home/widgets/post.dart';
 import 'package:frontend/ui/reply/view_model/reply_viewmodel.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -10,11 +11,9 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 class ReplyWidget extends StatefulWidget {
   const ReplyWidget({
     super.key,
-    required this.parent,
     required this.viewModel,
   });
 
-  final Post parent;
   final ReplyViewModel viewModel;
 
   @override
@@ -53,16 +52,16 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                   onPressed: () async {
                     if (formKey.currentState!.saveAndValidate()) {
                       final result = await widget.viewModel.createReply.execute(
-                        PostRecord(
+                        bsky.PostRecord(
                           text: formKey.currentState!.value['content'],
-                          reply: ReplyRef(
+                          reply: bsky.ReplyRef(
                             parent: StrongRef(
-                              uri: widget.parent.uri,
-                              cid: widget.parent.cid,
+                              uri: widget.viewModel.parent.post.uri,
+                              cid: widget.viewModel.parent.post.cid,
                             ),
                             root: StrongRef(
-                              uri: widget.parent.uri,
-                              cid: widget.parent.cid,
+                              uri: widget.viewModel.parent.post.uri,
+                              cid: widget.viewModel.parent.post.cid,
                             ),
                           ),
                           createdAt: DateTime.now(),
@@ -86,7 +85,19 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                 ),
               ],
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 24),
+            PostFeed(
+              key: Key(widget.viewModel.parent.post.cid),
+              post: widget.viewModel.parent,
+              onLike: () {
+                if (widget.viewModel.parent.post.isLiked) {
+                  widget.viewModel.removeLike.execute();
+                  return;
+                }
+                widget.viewModel.addLike.execute();
+              },
+              onReply: () {},
+            ),
             ShadForm(
               key: formKey,
               child: Column(
