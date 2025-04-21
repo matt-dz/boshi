@@ -76,7 +76,7 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                       }
                     }
                   },
-                  child: const Text('Post'),
+                  child: const Text('Reply'),
                 ),
               ],
             ),
@@ -89,7 +89,7 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                     child: ShadInputFormField(
                       id: 'content',
                       placeholder: Text(
-                        'Is that really your truth?',
+                        'Do you think the same?',
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).disabledColor,
