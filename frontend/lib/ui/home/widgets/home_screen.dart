@@ -1,12 +1,13 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 
 import 'package:frontend/ui/core/ui/header.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
-import 'package:frontend/ui/models/like/like.dart';
 import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/internal/result/result.dart';
-import 'package:frontend/internal/exceptions/format.dart';
 import 'package:frontend/domain/models/post/post.dart';
+import 'package:frontend/internal/exceptions/format.dart';
 import 'post.dart';
 
 import '../view_model/home_viewmodel.dart';
@@ -15,7 +16,7 @@ class FeedView extends StatelessWidget {
   const FeedView({super.key, required this.feed, required this.viewModel});
 
   final HomeViewModel viewModel;
-  final List<Post> feed;
+  final UnmodifiableListView<Post> feed;
 
   @override
   Widget build(BuildContext context) {
@@ -25,16 +26,14 @@ class FeedView extends StatelessWidget {
           children: [
             for (final post in feed)
               PostFeed(
-                key: Key(post.cid),
+                key: Key(post.post.cid),
                 post: post,
                 onLike: () {
-                  viewModel.toggleLike.execute(
-                    Like(
-                      cid: post.cid,
-                      uri: post.uri.toString(),
-                      like: !post.likedByUser,
-                    ),
-                  );
+                  if (post.post.isLiked) {
+                    viewModel.removeLike.execute(post);
+                    return;
+                  }
+                  viewModel.addLike.execute(post);
                 },
                 onReply: () {},
               ),

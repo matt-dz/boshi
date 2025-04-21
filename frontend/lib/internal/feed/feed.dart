@@ -2,9 +2,36 @@ import 'dart:io';
 import 'package:atproto/atproto.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/internal/logger/logger.dart';
+import 'package:frontend/domain/models/post/post.dart';
+
+String extractTitle(Post post) {
+  final titleEnd = post.post.record.facets?[0].index.byteEnd;
+  return post.post.record.text.substring(0, titleEnd);
+}
+
+String extractContext(Post post) {
+  final titleEnd = post.post.record.facets?[0].index.byteEnd;
+  return post.post.record.text.substring(titleEnd == null ? 0 : titleEnd + 1);
+}
+
+String timeSincePosting(Post post) {
+  final currentTime = DateTime.now().toUtc();
+  final timeDifference = currentTime.difference(post.post.indexedAt.toUtc());
+
+  if (timeDifference.inDays >= 7) {
+    return '${timeDifference.inDays ~/ 7}w';
+  } else if (timeDifference.inDays >= 1) {
+    return '${timeDifference.inDays}d';
+  } else if (timeDifference.inHours >= 1) {
+    return '${timeDifference.inHours}h';
+  } else if (timeDifference.inMinutes >= 1) {
+    return '${timeDifference.inMinutes}m';
+  } else {
+    return '${timeDifference.inSeconds}s';
+  }
+}
 
 List<Post> convertFeedToDomainPosts(
   bsky.Feed feed,
@@ -12,11 +39,6 @@ List<Post> convertFeedToDomainPosts(
 ) {
   return feed.feed
       .map((feedView) {
-        final titleEnd = feedView.post.record.facets?[0].index.byteEnd;
-
-        final title = feedView.post.record.text.substring(0, titleEnd);
-        final content = feedView.post.record.text
-            .substring(titleEnd == null ? 0 : titleEnd + 1);
         final user = users.where(
           (u) => u.did == feedView.post.author.did,
         );
@@ -24,20 +46,12 @@ List<Post> convertFeedToDomainPosts(
         if (user.length != 1) {
           return null;
         }
-
         return Post(
-          uri: feedView.post.uri,
-          cid: feedView.post.cid,
+          bskyPost: feedView.post,
           author: User(
             did: feedView.post.author.did,
             school: user.single.school,
           ),
-          title: title,
-          content: content,
-          timestamp: feedView.post.indexedAt,
-          likes: feedView.post.likeCount,
-          numReplies: feedView.post.replyCount,
-          likedByUser: feedView.post.isLiked,
         );
       })
       .whereType<Post>()

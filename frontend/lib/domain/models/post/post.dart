@@ -1,20 +1,15 @@
-import 'package:atproto/core.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:frontend/domain/models/user/user.dart';
+import 'package:bluesky/bluesky.dart' as bsky;
 
-part 'post.freezed.dart';
-
-@freezed
-abstract class Post with _$Post {
-  const factory Post({
-    required String title,
-    required AtUri uri,
-    required String cid,
+class Post {
+  Post({
+    required bsky.Post bskyPost,
     required User author,
-    required String content,
-    required DateTime timestamp,
-    required int likes,
-    required int numReplies,
-    required bool likedByUser,
-  }) = _Post;
+  })  : post = bskyPost,
+        _author = author;
+
+  bsky.Post post;
+  final User _author;
+
+  User get author => _author;
 }

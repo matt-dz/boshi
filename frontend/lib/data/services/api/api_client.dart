@@ -425,7 +425,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<void>> addLike(
+  Future<Result<AtUri>> addLike(
     bsky.Bluesky bluesky,
     String cid,
     AtUri uri,
@@ -437,14 +437,14 @@ class ApiClient {
       if (res.status.code > 299) {
         throw HttpException(res.status.message);
       }
-      return Result.ok(null);
+      return Result.ok(res.data.uri);
     } on Exception catch (e) {
       logger.e('Request failed. error=$e');
       return Result.error(e);
     }
   }
 
-  Future<Result<void>> deleteLike(
+  Future<Result<void>> removeLike(
     ATProto atp,
     bsky.Bluesky bluesky,
     AtUri uri,
