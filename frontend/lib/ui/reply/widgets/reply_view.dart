@@ -40,7 +40,7 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                   height: 30,
                   width: 120,
                   onPressed: () {
-                    widget.viewModel.context.pop();
+                    context.pop();
                   },
                   child: const Text('Cancel'),
                 ),
@@ -65,7 +65,7 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                         case Ok<void>():
                           logger.e('Successfully created post');
                           if (context.mounted) {
-                            widget.viewModel.context.pop();
+                            context.pop();
                           }
                           return;
                         case Error():

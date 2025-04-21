@@ -9,20 +9,16 @@ import 'package:frontend/internal/logger/logger.dart';
 /// ViewModel for the Feed page
 class ReplyViewModel extends ChangeNotifier {
   ReplyViewModel({
-    required BuildContext context,
     required AtProtoRepository atProtoRepository,
-  })  : _atProtoRepository = atProtoRepository,
-        _context = context {
+  }) : _atProtoRepository = atProtoRepository {
     createReply = Command1<void, Reply>(_createReply);
   }
 
   late final Command0 load;
   late final Command1<void, Reply> createReply;
   final AtProtoRepository _atProtoRepository;
-  final BuildContext _context;
 
   String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
-  BuildContext get context => _context;
 
   Future<Result<void>> _createReply(Reply reply) async {
     try {
