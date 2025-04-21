@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:atproto/atproto.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/internal/logger/logger.dart';
 import 'package:frontend/domain/models/post/post.dart';
+import 'package:frontend/internal/result/result.dart';
 
 String extractTitle(Post post) {
   final titleEnd = post.post.record.facets?[0].index.byteEnd;
@@ -96,4 +98,25 @@ Future<AtUri?> retrieveLikeUri(
 
   logger.d('Searching next page');
   return retrieveLikeUri(atp, uri, did, response.data.cursor);
+}
+
+Future<String> resolveHandle(ATProto atp, String did) async {
+  logger.d('Resolving handle for $did');
+  final repo = await atp.repo.describeRepo(repo: did);
+  if (repo.status.code > 299) {
+    throw HttpException(
+      'Failed to get user repo with status: ${repo.status.code}',
+    );
+  }
+
+  final aka = repo.data.didDoc['alsoKnownAs'];
+  if (aka is! List) {
+    throw HttpException('Invalid alsoKnownAs format: $aka');
+  }
+  if (aka.isEmpty) {
+    throw HttpException('No alsoKnownAs found');
+  }
+  logger.d('Resolved handle to ${aka.first}');
+
+  return aka.first as String;
 }

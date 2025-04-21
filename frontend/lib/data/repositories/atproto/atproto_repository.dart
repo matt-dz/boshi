@@ -226,7 +226,7 @@ class AtProtoRepository extends ChangeNotifier {
     final feed = (bskyFeed as Ok).value as bsky.Feed;
     final userDids =
         feed.feed.map((post) => post.post.author.did).toSet().toList();
-    final response = await _apiClient.getUsers(userDids);
+    final response = await _apiClient.getUsers(atProto!, userDids);
     if (response is Error) {
       return Result.error((response as Error).error);
     }
@@ -243,7 +243,7 @@ class AtProtoRepository extends ChangeNotifier {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException('getUsers'));
     }
-    final usersResult = await _apiClient.getUsers(dids);
+    final usersResult = await _apiClient.getUsers(atProto!, dids);
     return usersResult;
   }
 

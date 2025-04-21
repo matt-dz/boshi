@@ -92,24 +92,9 @@ class ApiClient {
       );
     }
 
-    final repo = await atp.repo.describeRepo(repo: did);
-    if (repo.status.code > 299) {
-      throw HttpException(
-        'Failed to get user repo with status: ${repo.status.code}',
-      );
-    }
-
-    final aka = repo.data.didDoc['alsoKnownAs'];
-    if (aka is! List) {
-      throw HttpException('Invalid alsoKnownAs format: $aka');
-    }
-    if (aka.isEmpty) {
-      throw HttpException('No alsoKnownAs found');
-    }
-
     try {
       final Map<String, dynamic> decoded = json.decode(userResponse.body);
-      decoded['handle'] = aka.first as String;
+      decoded['handle'] = resolveHandle(atp, did);
       logger.d('User decoded: $decoded');
       final User user = User.fromJson(decoded);
       return Result.ok(user);
@@ -119,7 +104,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<List<User>>> getUsers(List<String> dids) async {
+  Future<Result<List<User>>> getUsers(ATProto atp, List<String> dids) async {
     final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
     final Uri requestUri = hostUri.replace(
       pathSegments: ['users'],
@@ -147,12 +132,12 @@ class ApiClient {
       if (decoded is! Map) {
         throw Exception('Invalid response: ${response.body}');
       }
-      final users = decoded['users'];
-      if (users is! List) {
-        throw Exception('Invalid response: ${response.body}');
-      }
+      final users = decoded['users'] as List<Map<String, dynamic>>;
       return Result.ok(
-        users.map((user) => User.fromJson(user)).toList(),
+        users.map((user) {
+          user['handle'] = resolveHandle(atp, user['did']);
+          return User.fromJson(user);
+        }).toList(),
       );
     } on Exception catch (error) {
       logger.e('Failed to decode response. error=$error');
