@@ -30,7 +30,6 @@ class HomeViewModel extends ChangeNotifier {
   final AtProtoRepository _atProtoRepository;
 
   List<Post> get feed => _posts;
-  User? get user => _user;
 
   Future<Result> _load() async {
     try {
@@ -63,14 +62,14 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<Result<void>> _toggleLike(Like like) async {
     try {
-      if (user == null) {
+      if (_user == null) {
         return Result.error(Exception('User not logged in'));
       }
 
       final result = await _atProtoRepository.toggleLike(
         like.uri,
         like.cid,
-        user!.did,
+        _user!.did,
         like.like,
       );
       if (result is Ok) {

@@ -279,7 +279,14 @@ class AtProtoRepository extends ChangeNotifier {
 
     try {
       logger.d('toggling like');
-      return await _apiClient.toggleLike(bluesky!, AtUri(uri), cid, did, like);
+      return await _apiClient.toggleLike(
+        atProto!,
+        bluesky!,
+        AtUri(uri),
+        cid,
+        did,
+        like,
+      );
     } on Exception catch (e) {
       return Result.error(e);
     } catch (e) {

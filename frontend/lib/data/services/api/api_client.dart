@@ -424,34 +424,57 @@ class ApiClient {
   }
 
   Future<Result<void>> toggleLike(
+    ATProto atp,
     bsky.Bluesky bluesky,
     AtUri uri,
     String cid,
     String did,
     bool like,
   ) async {
-    if (like) {
-      logger.d('Sending like request');
-      final res = await bluesky.feed.like(cid: cid, uri: uri);
-      logger.d('Received response: $res');
-      if (res.status.code > 299) {
-        throw HttpException(res.status.message);
+    try {
+      if (like) {
+        logger.d('Sending like request');
+        final res = await bluesky.feed.like(cid: cid, uri: uri);
+        logger.d('Received response: $res');
+        if (res.status.code > 299) {
+          throw HttpException(res.status.message);
+        }
+        return Result.ok(null);
       }
-      return Result.ok(null);
-    }
 
-    logger.d('Deleting like record');
-    final res = await bluesky.atproto.repo.deleteRecord(
-      uri: AtUri.make(
-        did,
-        'app.bsky.feed.like',
-        uri.rkey,
-      ),
-    );
-    logger.d('Received response: $res');
-    if (res.status.code > 299) {
-      throw HttpException(res.status.message);
+      logger.d('Retriving likes');
+      final likes = await atp.repo.listRecords(
+        repo: did,
+        collection: NSID('app.bsky.feed.like'),
+      );
+      if (likes.status.code > 299) {
+        throw HttpException(likes.status.message);
+      }
+
+      for (final record in likes.data.records) {
+        final value = record.value;
+        final subject = value['subject'];
+        if (subject is! Map) {
+          throw Exception('Invalid value: $value');
+        }
+        final likedPostUri = subject['uri'];
+        if (likedPostUri == uri) {
+          logger.d('Deleting like record');
+          final res = await bluesky.atproto.repo.deleteRecord(
+            uri: record.uri,
+          );
+          logger.d('Received response: $res');
+          if (res.status.code > 299) {
+            throw HttpException(res.status.message);
+          }
+          return Result.ok(null);
+        }
+      }
+      throw Exception('Record not found');
+    } on Exception catch (e) {
+      print(e);
+      logger.e('Request failed. error=$e');
+      return Result.error(e);
     }
-    return Result.ok(null);
   }
 }
