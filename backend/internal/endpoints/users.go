@@ -28,6 +28,11 @@ func GetUsersByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	usersResponse, err := sqlcDb.GetUsers(ctx, userIDs)
+	if errors.Is(err, pgx.ErrNoRows) || len(usersResponse) == 0 {
+		log.ErrorContext(r.Context(), "No rows returned")
+		http.Error(w, "No users found", http.StatusNotFound)
+		return
+	}
 	if err != nil {
 		log.ErrorContext(r.Context(), "Failed to get users", slog.Any("error", err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
