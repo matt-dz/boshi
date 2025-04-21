@@ -101,15 +101,20 @@ class _ReplyWidgetState extends State<ReplyWidget> {
               ],
             ),
             SizedBox(height: 12),
-            PostFeed(
-              key: Key(widget.viewModel.parent.post.cid),
-              post: widget.viewModel.parent,
-              onLike: () {
-                if (widget.viewModel.parent.post.isLiked) {
-                  widget.viewModel.removeLike.execute();
-                  return;
-                }
-                widget.viewModel.addLike.execute();
+            ListenableBuilder(
+              listenable: widget.viewModel,
+              builder: (context, _) {
+                return PostFeed(
+                  key: Key(widget.viewModel.parent.post.cid),
+                  post: widget.viewModel.parent,
+                  onLike: () {
+                    if (widget.viewModel.parent.post.isLiked) {
+                      widget.viewModel.removeLike.execute();
+                      return;
+                    }
+                    widget.viewModel.addLike.execute();
+                  },
+                );
               },
             ),
             ShadForm(
