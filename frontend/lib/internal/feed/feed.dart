@@ -39,11 +39,6 @@ List<Post> convertFeedToDomainPosts(
 ) {
   return feed.feed
       .map((feedView) {
-        // final titleEnd = feedView.post.record.facets?[0].index.byteEnd;
-
-        // final title = feedView.post.record.text.substring(0, titleEnd);
-        // final content = feedView.post.record.text
-        //     .substring(titleEnd == null ? 0 : titleEnd + 1);
         final user = users.where(
           (u) => u.did == feedView.post.author.did,
         );

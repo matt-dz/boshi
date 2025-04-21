@@ -29,6 +29,10 @@ class FeedView extends StatelessWidget {
                 key: Key(post.post.cid),
                 post: post,
                 onLike: () {
+                  if (post.post.isLiked) {
+                    viewModel.removeLike.execute(post);
+                    return;
+                  }
                   viewModel.addLike.execute(post);
                 },
                 onReply: () {},
