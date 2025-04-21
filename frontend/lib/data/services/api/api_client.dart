@@ -432,6 +432,7 @@ class ApiClient {
     bool like,
   ) async {
     try {
+      print('toggling like on post: $uri');
       if (like) {
         logger.d('Sending like request');
         final res = await bluesky.feed.like(cid: cid, uri: uri);
