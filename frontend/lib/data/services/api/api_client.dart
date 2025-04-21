@@ -6,6 +6,7 @@ import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/internal/config/environment.dart';
 import 'package:frontend/internal/exceptions/missing_env.dart';
+import 'package:frontend/internal/feed/feed.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/shared/models/report/report.dart' as boshi_report;
 import 'package:frontend/domain/models/user/user.dart';
@@ -423,57 +424,47 @@ class ApiClient {
     }
   }
 
-  Future<Result<void>> toggleLike(
+  Future<Result<void>> addLike(
+    bsky.Bluesky bluesky,
+    String cid,
+    AtUri uri,
+  ) async {
+    try {
+      logger.d('Sending like request');
+      final res = await bluesky.feed.like(cid: cid, uri: uri);
+      logger.d('Received response: $res');
+      if (res.status.code > 299) {
+        throw HttpException(res.status.message);
+      }
+      return Result.ok(null);
+    } on Exception catch (e) {
+      logger.e('Request failed. error=$e');
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<void>> deleteLike(
     ATProto atp,
     bsky.Bluesky bluesky,
     AtUri uri,
-    String cid,
     String did,
-    bool like,
   ) async {
     try {
-      print('toggling like on post: $uri');
-      if (like) {
-        logger.d('Sending like request');
-        final res = await bluesky.feed.like(cid: cid, uri: uri);
-        logger.d('Received response: $res');
-        if (res.status.code > 299) {
-          throw HttpException(res.status.message);
-        }
-        return Result.ok(null);
+      final likeUri = await retrieveLikeUri(atp, uri, did);
+      if (likeUri == null) {
+        throw Exception('Record not found');
       }
 
-      logger.d('Retriving likes');
-      final likes = await atp.repo.listRecords(
-        repo: did,
-        collection: NSID('app.bsky.feed.like'),
+      logger.d('Deleting like record');
+      final res = await bluesky.atproto.repo.deleteRecord(
+        uri: likeUri,
       );
-      if (likes.status.code > 299) {
-        throw HttpException(likes.status.message);
-      }
 
-      for (final record in likes.data.records) {
-        final value = record.value;
-        final subject = value['subject'];
-        if (subject is! Map) {
-          throw Exception('Invalid value: $value');
-        }
-        final likedPostUri = subject['uri'] as String;
-        if (likedPostUri == uri.toString()) {
-          logger.d('Deleting like record');
-          final res = await bluesky.atproto.repo.deleteRecord(
-            uri: record.uri,
-          );
-          logger.d('Received response: $res');
-          if (res.status.code > 299) {
-            throw HttpException(res.status.message);
-          }
-          return Result.ok(null);
-        }
+      if (res.status.code > 299) {
+        throw HttpException(res.status.message);
       }
-      throw Exception('Record not found');
+      return Result.ok(null);
     } on Exception catch (e) {
-      print(e);
       logger.e('Request failed. error=$e');
       return Result.error(e);
     }

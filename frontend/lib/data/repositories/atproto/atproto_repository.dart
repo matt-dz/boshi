@@ -278,14 +278,21 @@ class AtProtoRepository extends ChangeNotifier {
     }
 
     try {
-      logger.d('toggling like');
-      return await _apiClient.toggleLike(
+      if (like) {
+        logger.d('Adding like');
+        return _apiClient.addLike(
+          bluesky!,
+          cid,
+          AtUri(uri),
+        );
+      }
+
+      logger.d('Removing like');
+      return await _apiClient.deleteLike(
         atProto!,
         bluesky!,
         AtUri(uri),
-        cid,
         did,
-        like,
       );
     } on Exception catch (e) {
       return Result.error(e);
