@@ -195,17 +195,22 @@ class PostFeed extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 8,
-          children: [
-            PostHeader(post: viewModel.post),
-            Text(extractContext(viewModel.post)),
-            PostFooter(
-              viewModel: viewModel,
-            ),
-          ],
+        child: ListenableBuilder(
+          listenable: viewModel,
+          builder: (context, _) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
+              children: [
+                PostHeader(post: viewModel.post),
+                Text(extractContext(viewModel.post)),
+                PostFooter(
+                  viewModel: viewModel,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
