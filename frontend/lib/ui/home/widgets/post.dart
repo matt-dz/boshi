@@ -1,5 +1,5 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:frontend/internal/feed/feed.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -11,23 +11,6 @@ class PostHeader extends StatelessWidget {
   });
 
   final Post post;
-
-  String _timeSincePosting(Post post) {
-    final currentTime = DateTime.now().toUtc();
-    final timeDifference = currentTime.difference(post.timestamp.toUtc());
-
-    if (timeDifference.inDays >= 7) {
-      return '${timeDifference.inDays ~/ 7}w';
-    } else if (timeDifference.inDays >= 1) {
-      return '${timeDifference.inDays}d';
-    } else if (timeDifference.inHours >= 1) {
-      return '${timeDifference.inHours}h';
-    } else if (timeDifference.inMinutes >= 1) {
-      return '${timeDifference.inMinutes}m';
-    } else {
-      return '${timeDifference.inSeconds}s';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +32,7 @@ class PostHeader extends StatelessWidget {
                     ),
                   ),
                   TextSpan(
-                    text: '・ ${_timeSincePosting(post)}',
+                    text: '・ ${timeSincePosting(post)}',
                     style: TextStyle(
                       color: Colors.grey.shade700,
                       fontSize: 12,
@@ -62,7 +45,7 @@ class PostHeader extends StatelessWidget {
           ],
         ),
         Text(
-          post.title,
+          extractTitle(post),
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -76,13 +59,11 @@ class PostHeader extends StatelessWidget {
 class LikeButton extends StatelessWidget {
   const LikeButton({
     super.key,
-    required this.liked,
-    required this.likes,
+    required this.post,
     required this.onLike,
   });
 
-  final bool liked;
-  final int likes;
+  final Post post;
   final VoidCallback onLike;
 
   @override
@@ -100,12 +81,14 @@ class LikeButton extends StatelessWidget {
         spacing: 4,
         children: [
           Icon(
-            liked ? PhosphorIconsFill.heart : PhosphorIconsRegular.heart,
-            color: liked ? Colors.red : Colors.black,
+            post.post.isLiked
+                ? PhosphorIconsFill.heart
+                : PhosphorIconsRegular.heart,
+            color: post.post.isLiked ? Colors.red : Colors.black,
             size: 20,
           ),
           Text(
-            '$likes',
+            '${post.post.likeCount}',
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
@@ -120,11 +103,11 @@ class LikeButton extends StatelessWidget {
 class ReplyButton extends StatelessWidget {
   const ReplyButton({
     super.key,
-    required this.numReplies,
+    required this.post,
     required this.onReply,
   });
 
-  final int numReplies;
+  final Post post;
   final VoidCallback onReply;
 
   @override
@@ -146,7 +129,7 @@ class ReplyButton extends StatelessWidget {
             size: 20,
           ),
           Text(
-            '$numReplies',
+            '${post.post.replyCount}',
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
@@ -176,8 +159,8 @@ class PostFooter extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
       children: [
-        LikeButton(likes: post.likes, liked: post.likedByUser, onLike: onLike),
-        ReplyButton(numReplies: post.numReplies, onReply: onReply),
+        LikeButton(post: post, onLike: onLike),
+        ReplyButton(post: post, onReply: onReply),
       ],
     );
   }
@@ -229,7 +212,7 @@ class PostFeed extends StatelessWidget {
           spacing: 8,
           children: [
             PostHeader(post: post),
-            Text(post.content),
+            Text(extractContext(post)),
             PostFooter(
               post: post,
               onLike: onLike,

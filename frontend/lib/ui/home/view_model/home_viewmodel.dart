@@ -1,12 +1,11 @@
 import 'dart:collection';
+import 'package:atproto/core.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
-import 'package:frontend/ui/models/like/like.dart';
 
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
@@ -18,15 +17,14 @@ class HomeViewModel extends ChangeNotifier {
     required AtProtoRepository atProtoRepository,
   }) : _atProtoRepository = atProtoRepository {
     load = Command0(_load)..execute();
-    updateReactionCount = Command1<Post, ReactionPayload>(
-      _updateReactionCount,
-    );
-    toggleLike = Command1<void, Like>(_toggleLike);
+    addLike = Command1<AtUri, Post>(_addLike);
+    removeLike = Command1<void, Post>(_removeLike);
   }
 
   late final Command0 load;
-  late final Command1 toggleLike;
-  late final Command1 updateReactionCount;
+  late final Command1 addLike;
+  late final Command1 removeLike;
+
   List<Post> _posts = [];
   User? _user;
   final AtProtoRepository _atProtoRepository;
@@ -62,50 +60,70 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Result<void>> _toggleLike(Like like) async {
+  Future<Result<void>> _removeLike(Post post) async {
     try {
       if (_user == null) {
         return Result.error(Exception('User not logged in'));
       }
 
-      final result = await _atProtoRepository.toggleLike(
-        like.uri,
-        like.cid,
+      final result = await _atProtoRepository.removeLike(
+        post.post.uri,
+        post.post.cid,
         _user!.did,
-        like.like,
       );
-      if (result is Ok) {
-        _posts = _posts.map((post) {
-          if (post.uri.toString() == like.uri) {
-            return post.copyWith(
-              likedByUser: like.like,
-              likes: post.likes + (like.like ? 1 : -1),
-            );
-          }
-          return post;
-        }).toList();
-        logger.d('Post updated: $_posts');
+
+      if (result is Error) {
+        return result;
       }
+
+      _posts = _posts.map((p) {
+        if (p.post.uri == post.post.uri) {
+          p.post = p.post.copyWith(
+            viewer: p.post.viewer.copyWith(
+              like: null,
+            ),
+            likeCount: post.post.likeCount - 1,
+          );
+        }
+        return p;
+      }).toList();
       return result;
     } finally {
       notifyListeners();
     }
   }
 
-  Future<Result<Post>> _updateReactionCount(
-    ReactionPayload reactionPayload,
-  ) async {
-    throw UnimplementedError();
-    // try {
-    //   logger.d('Updating reaction count');
-    //   final post = await _feedRepository.updateReactionCount(reactionPayload);
+  Future<Result<AtUri>> _addLike(Post post) async {
+    try {
+      if (_user == null) {
+        return Result.error(Exception('User not logged in'));
+      }
 
-    //   if (post is Error<Post>) {
-    //     logger.e('Error updating reaction count: ${post.error}');
-    //   }
-    //   return post;
-    // } finally {
-    //   notifyListeners();
-    // }
+      final result = await _atProtoRepository.addLike(
+        post.post.uri,
+        post.post.cid,
+      );
+
+      switch (result) {
+        case Error():
+          return result;
+        case Ok():
+          final likeUri = result.value;
+          _posts = _posts.map((p) {
+            if (p.post.uri == post.post.uri) {
+              p.post = p.post.copyWith(
+                viewer: p.post.viewer.copyWith(
+                  like: likeUri,
+                ),
+                likeCount: post.post.likeCount + 1,
+              );
+            }
+            return p;
+          }).toList();
+      }
+      return result;
+    } finally {
+      notifyListeners();
+    }
   }
 }

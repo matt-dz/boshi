@@ -267,31 +267,42 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
-  Future<Result<void>> toggleLike(
-    String uri,
+  Future<Result<AtUri>> addLike(
+    AtUri uri,
     String cid,
-    String did,
-    bool like,
   ) async {
     if (!authorized || bluesky == null) {
       return Result.error(OAuthUnauthorizedException());
     }
 
     try {
-      if (like) {
-        logger.d('Adding like');
-        return _apiClient.addLike(
-          bluesky!,
-          cid,
-          AtUri(uri),
-        );
-      }
+      logger.d('Adding like');
+      return await _apiClient.addLike(
+        bluesky!,
+        cid,
+        uri,
+      );
+    } on Exception catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      return Result.error(Exception(e));
+    }
+  }
 
+  Future<Result<void>> removeLike(
+    AtUri uri,
+    String cid,
+    String did,
+  ) async {
+    if (!authorized || bluesky == null) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+    try {
       logger.d('Removing like');
       return await _apiClient.deleteLike(
         atProto!,
         bluesky!,
-        AtUri(uri),
+        uri,
         did,
       );
     } on Exception catch (e) {
