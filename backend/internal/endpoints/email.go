@@ -3,6 +3,7 @@ package endpoints
 import (
 	"boshi-backend/internal/database"
 	"boshi-backend/internal/email"
+	"boshi-backend/internal/exceptions"
 	boshiRedis "boshi-backend/internal/redis"
 	"boshi-backend/internal/sqlc"
 	"context"
@@ -262,8 +263,17 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User already verified", http.StatusConflict)
 		return
 	case sqlc.VerifyEmailResultJustVerified:
-		school, err := ResolveSchoolFromEmail(payload.Email)
-		if err != nil {
+		log.InfoContext(r.Context(), "Resolving school")
+		school, err := resolveSchoolFromEmail(payload.Email)
+		if err == exceptions.ErrUnknownUniversity {
+			log.ErrorContext(
+				r.Context(),
+				"Could not determine university from email",
+				slog.Any("error", err),
+			)
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		} else if err != nil {
 			log.ErrorContext(
 				r.Context(),
 				"Failed to resolve school from email",
@@ -273,6 +283,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		log.InfoContext(r.Context(), "Setting school in database")
 		_, err = qtx.SetSchool(r.Context(), sqlc.SetSchoolParams{
 			UserID: payload.UserID,
 			School: pgtype.Text{

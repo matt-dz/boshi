@@ -2,26 +2,37 @@ package endpoints
 
 import (
 	"boshi-backend/internal/database"
+	"boshi-backend/internal/email"
+	"boshi-backend/internal/exceptions"
 	"boshi-backend/internal/sqlc"
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log/slog"
 
 	"net/http"
+	"net/url"
 
 	"github.com/jackc/pgx/v5"
 )
 
-func ResolveSchoolFromEmail(email string) (string, error) {
-	domain, err := parseEmail(email)
+func resolveSchoolFromEmail(addr string) (string, error) {
+	domain, err := email.ParseEmail(addr)
+	if err != nil {
+		return "", exceptions.ErrUnknownUniversity
+	}
+
+	base, err := url.Parse("http://universities.hipolabs.com/search")
 	if err != nil {
 		return "", err
 	}
 
-	resp, err := http.Get(fmt.Sprintf("http://universities.hipolabs.com/search?domain=%s", domain))
+	params := url.Values{}
+	params.Set("domain", domain)
+	base.RawQuery = params.Encode()
+
+	resp, err := http.Get(base.String())
 	if err != nil {
 		return "", err
 	}
@@ -32,13 +43,13 @@ func ResolveSchoolFromEmail(email string) (string, error) {
 		return "", err
 	}
 
-	var result []UniversityDomain
+	var result []universityDomain
 	if err := json.Unmarshal(body, &result); err != nil {
 		return "", err
 	}
 
 	if len(result) != 1 {
-		return "", fmt.Errorf("Could not find the school with domain: %s", domain)
+		return "", exceptions.ErrUnknownUniversity
 	}
 
 	return result[0].Name, nil
