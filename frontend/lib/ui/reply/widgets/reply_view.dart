@@ -28,8 +28,10 @@ class _ReplyWidgetState extends State<ReplyWidget> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+      child: Container(
+        padding: EdgeInsets.all(8),
+        width: 450,
+        constraints: BoxConstraints(minWidth: 350),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -83,28 +85,30 @@ class _ReplyWidgetState extends State<ReplyWidget> {
               key: formKey,
               child: Column(
                 children: [
-                  ShadInputFormField(
-                    id: 'content',
-                    placeholder: Text(
-                      'Is that really your truth?',
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).disabledColor,
-                          ),
+                  Expanded(
+                    child: ShadInputFormField(
+                      id: 'content',
+                      placeholder: Text(
+                        'Is that really your truth?',
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).disabledColor,
+                            ),
+                      ),
+                      decoration: ShadDecoration(
+                        border: ShadBorder.none,
+                        disableSecondaryBorder: true,
+                      ),
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return "Don't you want to speak your truth?";
+                        }
+                        return null;
+                      },
+                      onChanged: (String content) => setState(() {
+                        _contentExists = content.isNotEmpty;
+                      }),
                     ),
-                    decoration: ShadDecoration(
-                      border: ShadBorder.none,
-                      disableSecondaryBorder: true,
-                    ),
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return "Don't you want to speak your truth?";
-                      }
-                      return null;
-                    },
-                    onChanged: (String content) => setState(() {
-                      _contentExists = content.isNotEmpty;
-                    }),
                   ),
                 ],
               ),
