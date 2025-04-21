@@ -22,7 +22,7 @@ type getUserPayload struct {
 }
 
 type getUserResponse struct {
-	UserID     string             `json:"id"`
+	UserID     string             `json:"did"`
 	School     pgtype.Text        `json:"school"`
 	VerifiedAt pgtype.Timestamptz `json:"verifiedAt"`
 }

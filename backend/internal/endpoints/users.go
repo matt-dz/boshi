@@ -28,12 +28,12 @@ func GetUsersByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	usersResponse, err := sqlcDb.GetUsers(ctx, userIDs)
-
-	if errors.Is(err, pgx.ErrNoRows) {
-		log.ErrorContext(r.Context(), "No row returned - no users found")
+	if errors.Is(err, pgx.ErrNoRows) || len(usersResponse) == 0 {
+		log.ErrorContext(r.Context(), "No rows returned")
 		http.Error(w, "No users found", http.StatusNotFound)
 		return
-	} else if err != nil {
+	}
+	if err != nil {
 		log.ErrorContext(r.Context(), "Failed to get users", slog.Any("error", err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -42,9 +42,16 @@ func GetUsersByID(w http.ResponseWriter, r *http.Request) {
 	var convertedResponse []getUserResponse
 	for _, u := range usersResponse {
 		userResponse := getUserResponse(u)
+		log.DebugContext(r.Context(), "User response", slog.Any("user", userResponse))
 		if userResponse.School.Valid {
 			convertedResponse = append(convertedResponse, userResponse)
 		}
+	}
+
+	if len(convertedResponse) == 0 {
+		log.ErrorContext(r.Context(), "No users found")
+		http.Error(w, "No users found", http.StatusNotFound)
+		return
 	}
 
 	// Map the result to the User struct

@@ -10,6 +10,7 @@ _$ReplyImpl _$$ReplyImplFromJson(Map<String, dynamic> json) => _$ReplyImpl(
       postId: json['post_id'] as String,
       authorId: json['author_id'] as String,
       content: json['content'] as String,
+      likedByUser: json['liked_by_user'] as bool,
       title: json['title'] as String,
     );
 
@@ -18,5 +19,6 @@ Map<String, dynamic> _$$ReplyImplToJson(_$ReplyImpl instance) =>
       'post_id': instance.postId,
       'author_id': instance.authorId,
       'content': instance.content,
+      'liked_by_user': instance.likedByUser,
       'title': instance.title,
     };

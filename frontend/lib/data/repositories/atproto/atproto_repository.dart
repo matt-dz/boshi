@@ -1,7 +1,7 @@
+import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/foundation.dart';
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/domain/models/users/users.dart';
 import 'package:frontend/internal/exceptions/oauth_unauthorized_exception.dart';
 import 'package:frontend/internal/exceptions/verification_code_already_set_exception.dart';
 import 'package:frontend/internal/exceptions/user_not_found_exception.dart';
@@ -95,6 +95,7 @@ class AtProtoRepository extends ChangeNotifier {
       bluesky = bsky.Bluesky.fromOAuthSession(session);
       return Result.ok(null);
     } on Exception catch (e) {
+      logger.e('Error generating session: $e');
       return Result.error(e);
     } catch (e) {
       return Result.error(Exception(e));
@@ -214,23 +215,35 @@ class AtProtoRepository extends ChangeNotifier {
     if (!authorized || bluesky == null) {
       return Result.error(OAuthUnauthorizedException());
     }
-    final bskyFeed = await _apiClient.getFeed(bluesky!);
 
-    switch (bskyFeed) {
-      case Ok<bsky.Feed>():
-        return convertFeedToDomainPosts(this, bskyFeed.value);
-      case Error<bsky.Feed>():
-        return Result.error(bskyFeed.error);
+    logger.d('Retrieving feed');
+    final bskyFeed = await _apiClient.getFeed(bluesky!);
+    if (bskyFeed is Error) {
+      return Result.error((bskyFeed as Error).error);
     }
+
+    logger.d('Retrieving users');
+    final feed = (bskyFeed as Ok).value as bsky.Feed;
+    final userDids =
+        feed.feed.map((post) => post.post.author.did).toSet().toList();
+    final response = await _apiClient.getUsers(userDids);
+    if (response is Error) {
+      return Result.error((response as Error).error);
+    }
+
+    return Result.ok(
+      convertFeedToDomainPosts(
+        feed,
+        (response as Ok<List<User>>).value,
+      ),
+    );
   }
 
-  Future<Result<Users>> getUsers(List<String> dids) async {
+  Future<Result<List<User>>> getUsers(List<String> dids) async {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException('getUsers'));
     }
-
     final usersResult = await _apiClient.getUsers(dids);
-
     return usersResult;
   }
 
@@ -251,6 +264,40 @@ class AtProtoRepository extends ChangeNotifier {
         return userResult;
       case Error<User>():
         return userResult;
+    }
+  }
+
+  Future<Result<void>> toggleLike(
+    String uri,
+    String cid,
+    String did,
+    bool like,
+  ) async {
+    if (!authorized || bluesky == null) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+
+    try {
+      if (like) {
+        logger.d('Adding like');
+        return _apiClient.addLike(
+          bluesky!,
+          cid,
+          AtUri(uri),
+        );
+      }
+
+      logger.d('Removing like');
+      return await _apiClient.deleteLike(
+        atProto!,
+        bluesky!,
+        AtUri(uri),
+        did,
+      );
+    } on Exception catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      return Result.error(Exception(e));
     }
   }
 }

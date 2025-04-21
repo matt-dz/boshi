@@ -14,22 +14,17 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-Reply _$ReplyFromJson(Map<String, dynamic> json) {
-  return _Reply.fromJson(json);
-}
-
 /// @nodoc
 mixin _$Reply {
-  String get id => throw _privateConstructorUsedError;
+  AtUri get uri => throw _privateConstructorUsedError;
+  String get cid => throw _privateConstructorUsedError;
   User get author => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
-  List<Reaction> get reactions => throw _privateConstructorUsedError;
-  List<Reply> get comments => throw _privateConstructorUsedError;
+  int get likes => throw _privateConstructorUsedError;
+  int get numReplies => throw _privateConstructorUsedError;
   String get replyToId => throw _privateConstructorUsedError;
-
-  /// Serializes this Reply to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  bool get likedByUser => throw _privateConstructorUsedError;
 
   /// Create a copy of Reply
   /// with the given fields replaced by the non-null parameter values.
@@ -43,13 +38,15 @@ abstract class $ReplyCopyWith<$Res> {
       _$ReplyCopyWithImpl<$Res, Reply>;
   @useResult
   $Res call(
-      {String id,
+      {AtUri uri,
+      String cid,
       User author,
       String content,
       DateTime timestamp,
-      List<Reaction> reactions,
-      List<Reply> comments,
-      String replyToId});
+      int likes,
+      int numReplies,
+      String replyToId,
+      bool likedByUser});
 
   $UserCopyWith<$Res> get author;
 }
@@ -69,18 +66,24 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? uri = null,
+    Object? cid = null,
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
-    Object? reactions = null,
-    Object? comments = null,
+    Object? likes = null,
+    Object? numReplies = null,
     Object? replyToId = null,
+    Object? likedByUser = null,
   }) {
     return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
+      uri: null == uri
+          ? _value.uri
+          : uri // ignore: cast_nullable_to_non_nullable
+              as AtUri,
+      cid: null == cid
+          ? _value.cid
+          : cid // ignore: cast_nullable_to_non_nullable
               as String,
       author: null == author
           ? _value.author
@@ -94,18 +97,22 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      reactions: null == reactions
-          ? _value.reactions
-          : reactions // ignore: cast_nullable_to_non_nullable
-              as List<Reaction>,
-      comments: null == comments
-          ? _value.comments
-          : comments // ignore: cast_nullable_to_non_nullable
-              as List<Reply>,
+      likes: null == likes
+          ? _value.likes
+          : likes // ignore: cast_nullable_to_non_nullable
+              as int,
+      numReplies: null == numReplies
+          ? _value.numReplies
+          : numReplies // ignore: cast_nullable_to_non_nullable
+              as int,
       replyToId: null == replyToId
           ? _value.replyToId
           : replyToId // ignore: cast_nullable_to_non_nullable
               as String,
+      likedByUser: null == likedByUser
+          ? _value.likedByUser
+          : likedByUser // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 
@@ -128,13 +135,15 @@ abstract class _$$ReplyImplCopyWith<$Res> implements $ReplyCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {String id,
+      {AtUri uri,
+      String cid,
       User author,
       String content,
       DateTime timestamp,
-      List<Reaction> reactions,
-      List<Reply> comments,
-      String replyToId});
+      int likes,
+      int numReplies,
+      String replyToId,
+      bool likedByUser});
 
   @override
   $UserCopyWith<$Res> get author;
@@ -153,18 +162,24 @@ class __$$ReplyImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? uri = null,
+    Object? cid = null,
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
-    Object? reactions = null,
-    Object? comments = null,
+    Object? likes = null,
+    Object? numReplies = null,
     Object? replyToId = null,
+    Object? likedByUser = null,
   }) {
     return _then(_$ReplyImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
+      uri: null == uri
+          ? _value.uri
+          : uri // ignore: cast_nullable_to_non_nullable
+              as AtUri,
+      cid: null == cid
+          ? _value.cid
+          : cid // ignore: cast_nullable_to_non_nullable
               as String,
       author: null == author
           ? _value.author
@@ -178,69 +193,62 @@ class __$$ReplyImplCopyWithImpl<$Res>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      reactions: null == reactions
-          ? _value._reactions
-          : reactions // ignore: cast_nullable_to_non_nullable
-              as List<Reaction>,
-      comments: null == comments
-          ? _value._comments
-          : comments // ignore: cast_nullable_to_non_nullable
-              as List<Reply>,
+      likes: null == likes
+          ? _value.likes
+          : likes // ignore: cast_nullable_to_non_nullable
+              as int,
+      numReplies: null == numReplies
+          ? _value.numReplies
+          : numReplies // ignore: cast_nullable_to_non_nullable
+              as int,
       replyToId: null == replyToId
           ? _value.replyToId
           : replyToId // ignore: cast_nullable_to_non_nullable
               as String,
+      likedByUser: null == likedByUser
+          ? _value.likedByUser
+          : likedByUser // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$ReplyImpl implements _Reply {
   const _$ReplyImpl(
-      {required this.id,
+      {required this.uri,
+      required this.cid,
       required this.author,
       required this.content,
       required this.timestamp,
-      required final List<Reaction> reactions,
-      required final List<Reply> comments,
-      required this.replyToId})
-      : _reactions = reactions,
-        _comments = comments;
-
-  factory _$ReplyImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ReplyImplFromJson(json);
+      required this.likes,
+      required this.numReplies,
+      required this.replyToId,
+      required this.likedByUser});
 
   @override
-  final String id;
+  final AtUri uri;
+  @override
+  final String cid;
   @override
   final User author;
   @override
   final String content;
   @override
   final DateTime timestamp;
-  final List<Reaction> _reactions;
   @override
-  List<Reaction> get reactions {
-    if (_reactions is EqualUnmodifiableListView) return _reactions;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_reactions);
-  }
-
-  final List<Reply> _comments;
+  final int likes;
   @override
-  List<Reply> get comments {
-    if (_comments is EqualUnmodifiableListView) return _comments;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_comments);
-  }
-
+  final int numReplies;
   @override
   final String replyToId;
+  @override
+  final bool likedByUser;
 
   @override
   String toString() {
-    return 'Reply(id: $id, author: $author, content: $content, timestamp: $timestamp, reactions: $reactions, comments: $comments, replyToId: $replyToId)';
+    return 'Reply(uri: $uri, cid: $cid, author: $author, content: $content, timestamp: $timestamp, likes: $likes, numReplies: $numReplies, replyToId: $replyToId, likedByUser: $likedByUser)';
   }
 
   @override
@@ -248,29 +256,24 @@ class _$ReplyImpl implements _Reply {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ReplyImpl &&
-            (identical(other.id, id) || other.id == id) &&
+            (identical(other.uri, uri) || other.uri == uri) &&
+            (identical(other.cid, cid) || other.cid == cid) &&
             (identical(other.author, author) || other.author == author) &&
             (identical(other.content, content) || other.content == content) &&
             (identical(other.timestamp, timestamp) ||
                 other.timestamp == timestamp) &&
-            const DeepCollectionEquality()
-                .equals(other._reactions, _reactions) &&
-            const DeepCollectionEquality().equals(other._comments, _comments) &&
+            (identical(other.likes, likes) || other.likes == likes) &&
+            (identical(other.numReplies, numReplies) ||
+                other.numReplies == numReplies) &&
             (identical(other.replyToId, replyToId) ||
-                other.replyToId == replyToId));
+                other.replyToId == replyToId) &&
+            (identical(other.likedByUser, likedByUser) ||
+                other.likedByUser == likedByUser));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      author,
-      content,
-      timestamp,
-      const DeepCollectionEquality().hash(_reactions),
-      const DeepCollectionEquality().hash(_comments),
-      replyToId);
+  int get hashCode => Object.hash(runtimeType, uri, cid, author, content,
+      timestamp, likes, numReplies, replyToId, likedByUser);
 
   /// Create a copy of Reply
   /// with the given fields replaced by the non-null parameter values.
@@ -279,29 +282,24 @@ class _$ReplyImpl implements _Reply {
   @pragma('vm:prefer-inline')
   _$$ReplyImplCopyWith<_$ReplyImpl> get copyWith =>
       __$$ReplyImplCopyWithImpl<_$ReplyImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ReplyImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _Reply implements Reply {
   const factory _Reply(
-      {required final String id,
+      {required final AtUri uri,
+      required final String cid,
       required final User author,
       required final String content,
       required final DateTime timestamp,
-      required final List<Reaction> reactions,
-      required final List<Reply> comments,
-      required final String replyToId}) = _$ReplyImpl;
-
-  factory _Reply.fromJson(Map<String, dynamic> json) = _$ReplyImpl.fromJson;
+      required final int likes,
+      required final int numReplies,
+      required final String replyToId,
+      required final bool likedByUser}) = _$ReplyImpl;
 
   @override
-  String get id;
+  AtUri get uri;
+  @override
+  String get cid;
   @override
   User get author;
   @override
@@ -309,11 +307,13 @@ abstract class _Reply implements Reply {
   @override
   DateTime get timestamp;
   @override
-  List<Reaction> get reactions;
+  int get likes;
   @override
-  List<Reply> get comments;
+  int get numReplies;
   @override
   String get replyToId;
+  @override
+  bool get likedByUser;
 
   /// Create a copy of Reply
   /// with the given fields replaced by the non-null parameter values.
