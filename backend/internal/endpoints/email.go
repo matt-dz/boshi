@@ -271,7 +271,7 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 				"Could not determine university from email",
 				slog.Any("error", err),
 			)
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			http.Error(w, "Could not determine university from email", http.StatusBadRequest)
 			return
 		} else if err != nil {
 			log.ErrorContext(
