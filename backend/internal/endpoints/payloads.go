@@ -17,6 +17,13 @@ type clientMetadata struct {
 	DpopBoundAccessTokens   bool     `json:"dpop_bound_access_tokens"`
 }
 
+type universityDomain struct {
+	AlphaCode string   `json:"alpha_two_code"`
+	Name      string   `json:"name"`
+	Domains   []string `json:"domains"`
+	WebPages  []string `json:"web_pages"`
+}
+
 type getUserPayload struct {
 	UserID string `json:"user_id"`
 }

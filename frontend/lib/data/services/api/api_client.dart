@@ -151,6 +151,7 @@ class ApiClient {
     post_request.Post post,
   ) async {
     logger.d('Creating post');
+
     final xrpcResponse = await bluesky.feed.post(
       text: '${post.title}\n${post.content}',
       tags: List.from(['boshi.post']),

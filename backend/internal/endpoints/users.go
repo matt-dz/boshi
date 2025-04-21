@@ -2,16 +2,58 @@ package endpoints
 
 import (
 	"boshi-backend/internal/database"
+	"boshi-backend/internal/email"
+	"boshi-backend/internal/exceptions"
 	"boshi-backend/internal/sqlc"
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"log/slog"
 
 	"net/http"
+	"net/url"
 
 	"github.com/jackc/pgx/v5"
 )
+
+func resolveSchoolFromEmail(addr string) (string, error) {
+	domain, err := email.ParseEmail(addr)
+	if err != nil {
+		return "", exceptions.ErrUnknownUniversity
+	}
+
+	base, err := url.Parse("http://universities.hipolabs.com/search")
+	if err != nil {
+		return "", err
+	}
+
+	params := url.Values{}
+	params.Set("domain", domain)
+	base.RawQuery = params.Encode()
+
+	resp, err := http.Get(base.String())
+	if err != nil {
+		return "", err
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var result []universityDomain
+	if err := json.Unmarshal(body, &result); err != nil {
+		return "", err
+	}
+
+	if len(result) != 1 {
+		return "", exceptions.ErrUnknownUniversity
+	}
+
+	return result[0].Name, nil
+}
 
 func GetUsersByID(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -85,7 +127,6 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	// Map the result to the User struct
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(getUserResponse(userResponse))
