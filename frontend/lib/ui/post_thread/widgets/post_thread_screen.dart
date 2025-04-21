@@ -44,7 +44,7 @@ class PostThreadScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // ContentItemWidget(post: ),
-                      RepliesWidget(replies: viewModel.thread!.replies),
+                      RepliesWidget(replies: viewModel.thread?.replies),
                     ],
                   ),
                 ),
