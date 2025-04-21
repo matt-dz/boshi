@@ -267,14 +267,19 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
-  Future<Result<void>> toggleLike(String uri, String cid, bool like) async {
+  Future<Result<void>> toggleLike(
+    String uri,
+    String cid,
+    String did,
+    bool like,
+  ) async {
     if (!authorized || bluesky == null) {
       return Result.error(OAuthUnauthorizedException());
     }
 
     try {
       logger.d('toggling like');
-      return await _apiClient.toggleLike(bluesky!, AtUri(uri), cid, like);
+      return await _apiClient.toggleLike(bluesky!, AtUri(uri), cid, did, like);
     } on Exception catch (e) {
       return Result.error(e);
     } catch (e) {
