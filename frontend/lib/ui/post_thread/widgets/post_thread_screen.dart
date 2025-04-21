@@ -6,7 +6,6 @@ import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/exceptions/format.dart';
 import 'package:frontend/ui/post_thread/widgets/replies.dart';
-import 'package:frontend/ui/post_thread/widgets/test_button.dart';
 
 import '../view_model/post_thread_viewmodel.dart';
 
@@ -46,7 +45,6 @@ class PostThreadScreen extends StatelessWidget {
                     children: [
                       // ContentItemWidget(post: ),
                       RepliesWidget(replies: viewModel.thread?.replies),
-                      DialogButton(),
                     ],
                   ),
                 ),

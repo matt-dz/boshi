@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/ui/core/ui/header.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
@@ -8,6 +9,8 @@ import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/internal/exceptions/format.dart';
+import 'package:frontend/ui/reply/widgets/reply_view.dart';
+import 'package:provider/provider.dart';
 import 'post.dart';
 
 import '../view_model/home_viewmodel.dart';
@@ -35,7 +38,9 @@ class FeedView extends StatelessWidget {
                   }
                   viewModel.addLike.execute(post);
                 },
-                onReply: () {},
+                onReply: () {
+                  showReplyDialog(context, post);
+                },
               ),
           ],
         ),

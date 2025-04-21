@@ -1,12 +1,27 @@
 import 'package:atproto/atproto.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/material.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
+import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/internal/logger/logger.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/ui/home/widgets/post.dart';
 import 'package:frontend/ui/reply/view_model/reply_viewmodel.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+
+void showReplyDialog(BuildContext context, Post parent) {
+  showDialog(
+    context: context,
+    builder: (_) => ReplyWidget(
+      viewModel: ReplyViewModel(
+        atProtoRepository: context.read<AtProtoRepository>(),
+        parent: parent,
+      ),
+    ),
+  );
+}
 
 class ReplyWidget extends StatefulWidget {
   const ReplyWidget({
