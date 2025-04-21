@@ -128,19 +128,23 @@ class ApiClient {
 
     try {
       logger.d('Decoding response: ${response.body}');
-      final decoded = json.decode(response.body) as Map<String, dynamic>;
-      final users = decoded['users'] as List<Map<String, dynamic>>;
+      final decoded = json.decode(response.body) as Map<String, Object?>;
+      if (decoded['users'] == null) {
+        logger.e('Failed to decode response');
+        return Result.error(Exception('Failed to decode response'));
+      }
+      final users = decoded['users']! as List;
 
       // Resolve handlers for all users
       logger.d('Resolving handles for ${users.length} users');
       final handles = await Future.wait(
-        users.map((user) => resolveHandle(atp, user['did'])),
+        users.map((user) => resolveHandle(atp, (user as Map)['did'])),
       );
 
       return Result.ok(
         users.map((user) {
-          user['handle'] = handles[users.indexOf(user)];
-          return User.fromJson(user);
+          (user as Map)['handle'] = handles[users.indexOf(user)];
+          return User.fromJson(user as Map<String, Object?>);
         }).toList(),
       );
     } on Exception catch (error) {
