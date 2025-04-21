@@ -85,7 +85,7 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                 ),
               ],
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 12),
             PostFeed(
               key: Key(widget.viewModel.parent.post.cid),
               post: widget.viewModel.parent,
@@ -96,7 +96,6 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                 }
                 widget.viewModel.addLike.execute();
               },
-              onReply: () {},
             ),
             ShadForm(
               key: formKey,

@@ -104,11 +104,11 @@ class ReplyButton extends StatelessWidget {
   const ReplyButton({
     super.key,
     required this.post,
-    required this.onReply,
+    this.onReply,
   });
 
   final Post post;
-  final VoidCallback onReply;
+  final VoidCallback? onReply;
 
   @override
   Widget build(BuildContext context) {
@@ -146,11 +146,11 @@ class PostFooter extends StatelessWidget {
     super.key,
     required this.post,
     required this.onLike,
-    required this.onReply,
+    this.onReply,
   });
 
   final VoidCallback onLike;
-  final VoidCallback onReply;
+  final VoidCallback? onReply;
   final Post post;
 
   @override
@@ -171,7 +171,7 @@ class PostFeed extends StatelessWidget {
     super.key,
     required this.post,
     required this.onLike,
-    required this.onReply,
+    this.onReply,
     this.replyIndent = 0,
     this.shadowColor = Colors.grey,
   });
@@ -180,7 +180,7 @@ class PostFeed extends StatelessWidget {
   final int replyIndent;
   final Color shadowColor;
   final VoidCallback onLike;
-  final VoidCallback onReply;
+  final VoidCallback? onReply;
 
   @override
   Widget build(BuildContext context) {
