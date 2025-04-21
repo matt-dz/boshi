@@ -299,7 +299,7 @@ class AtProtoRepository extends ChangeNotifier {
     }
     try {
       logger.d('Removing like');
-      return await _apiClient.deleteLike(
+      return await _apiClient.removeLike(
         atProto!,
         bluesky!,
         uri,

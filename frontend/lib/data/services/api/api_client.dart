@@ -443,7 +443,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<void>> deleteLike(
+  Future<Result<void>> removeLike(
     ATProto atp,
     bsky.Bluesky bluesky,
     AtUri uri,
