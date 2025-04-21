@@ -20,10 +20,12 @@ Reply _$ReplyFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Reply {
-  String get postId => throw _privateConstructorUsedError;
+  String get rootCid => throw _privateConstructorUsedError;
+  String get rootUri => throw _privateConstructorUsedError;
+  String get postCid => throw _privateConstructorUsedError;
+  String get postUri => throw _privateConstructorUsedError;
   String get authorId => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
 
   /// Serializes this Reply to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -39,7 +41,13 @@ abstract class $ReplyCopyWith<$Res> {
   factory $ReplyCopyWith(Reply value, $Res Function(Reply) then) =
       _$ReplyCopyWithImpl<$Res, Reply>;
   @useResult
-  $Res call({String postId, String authorId, String content, String title});
+  $Res call(
+      {String rootCid,
+      String rootUri,
+      String postCid,
+      String postUri,
+      String authorId,
+      String content});
 }
 
 /// @nodoc
@@ -57,15 +65,29 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? postId = null,
+    Object? rootCid = null,
+    Object? rootUri = null,
+    Object? postCid = null,
+    Object? postUri = null,
     Object? authorId = null,
     Object? content = null,
-    Object? title = null,
   }) {
     return _then(_value.copyWith(
-      postId: null == postId
-          ? _value.postId
-          : postId // ignore: cast_nullable_to_non_nullable
+      rootCid: null == rootCid
+          ? _value.rootCid
+          : rootCid // ignore: cast_nullable_to_non_nullable
+              as String,
+      rootUri: null == rootUri
+          ? _value.rootUri
+          : rootUri // ignore: cast_nullable_to_non_nullable
+              as String,
+      postCid: null == postCid
+          ? _value.postCid
+          : postCid // ignore: cast_nullable_to_non_nullable
+              as String,
+      postUri: null == postUri
+          ? _value.postUri
+          : postUri // ignore: cast_nullable_to_non_nullable
               as String,
       authorId: null == authorId
           ? _value.authorId
@@ -74,10 +96,6 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
       content: null == content
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
               as String,
     ) as $Val);
   }
@@ -90,7 +108,13 @@ abstract class _$$ReplyImplCopyWith<$Res> implements $ReplyCopyWith<$Res> {
       __$$ReplyImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String postId, String authorId, String content, String title});
+  $Res call(
+      {String rootCid,
+      String rootUri,
+      String postCid,
+      String postUri,
+      String authorId,
+      String content});
 }
 
 /// @nodoc
@@ -106,15 +130,29 @@ class __$$ReplyImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? postId = null,
+    Object? rootCid = null,
+    Object? rootUri = null,
+    Object? postCid = null,
+    Object? postUri = null,
     Object? authorId = null,
     Object? content = null,
-    Object? title = null,
   }) {
     return _then(_$ReplyImpl(
-      postId: null == postId
-          ? _value.postId
-          : postId // ignore: cast_nullable_to_non_nullable
+      rootCid: null == rootCid
+          ? _value.rootCid
+          : rootCid // ignore: cast_nullable_to_non_nullable
+              as String,
+      rootUri: null == rootUri
+          ? _value.rootUri
+          : rootUri // ignore: cast_nullable_to_non_nullable
+              as String,
+      postCid: null == postCid
+          ? _value.postCid
+          : postCid // ignore: cast_nullable_to_non_nullable
+              as String,
+      postUri: null == postUri
+          ? _value.postUri
+          : postUri // ignore: cast_nullable_to_non_nullable
               as String,
       authorId: null == authorId
           ? _value.authorId
@@ -124,10 +162,6 @@ class __$$ReplyImplCopyWithImpl<$Res>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
     ));
   }
 }
@@ -136,26 +170,32 @@ class __$$ReplyImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ReplyImpl implements _Reply {
   const _$ReplyImpl(
-      {required this.postId,
+      {required this.rootCid,
+      required this.rootUri,
+      required this.postCid,
+      required this.postUri,
       required this.authorId,
-      required this.content,
-      required this.title});
+      required this.content});
 
   factory _$ReplyImpl.fromJson(Map<String, dynamic> json) =>
       _$$ReplyImplFromJson(json);
 
   @override
-  final String postId;
+  final String rootCid;
+  @override
+  final String rootUri;
+  @override
+  final String postCid;
+  @override
+  final String postUri;
   @override
   final String authorId;
   @override
   final String content;
-  @override
-  final String title;
 
   @override
   String toString() {
-    return 'Reply(postId: $postId, authorId: $authorId, content: $content, title: $title)';
+    return 'Reply(rootCid: $rootCid, rootUri: $rootUri, postCid: $postCid, postUri: $postUri, authorId: $authorId, content: $content)';
   }
 
   @override
@@ -163,17 +203,19 @@ class _$ReplyImpl implements _Reply {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ReplyImpl &&
-            (identical(other.postId, postId) || other.postId == postId) &&
+            (identical(other.rootCid, rootCid) || other.rootCid == rootCid) &&
+            (identical(other.rootUri, rootUri) || other.rootUri == rootUri) &&
+            (identical(other.postCid, postCid) || other.postCid == postCid) &&
+            (identical(other.postUri, postUri) || other.postUri == postUri) &&
             (identical(other.authorId, authorId) ||
                 other.authorId == authorId) &&
-            (identical(other.content, content) || other.content == content) &&
-            (identical(other.title, title) || other.title == title));
+            (identical(other.content, content) || other.content == content));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, postId, authorId, content, title);
+  int get hashCode => Object.hash(
+      runtimeType, rootCid, rootUri, postCid, postUri, authorId, content);
 
   /// Create a copy of Reply
   /// with the given fields replaced by the non-null parameter values.
@@ -193,21 +235,27 @@ class _$ReplyImpl implements _Reply {
 
 abstract class _Reply implements Reply {
   const factory _Reply(
-      {required final String postId,
+      {required final String rootCid,
+      required final String rootUri,
+      required final String postCid,
+      required final String postUri,
       required final String authorId,
-      required final String content,
-      required final String title}) = _$ReplyImpl;
+      required final String content}) = _$ReplyImpl;
 
   factory _Reply.fromJson(Map<String, dynamic> json) = _$ReplyImpl.fromJson;
 
   @override
-  String get postId;
+  String get rootCid;
+  @override
+  String get rootUri;
+  @override
+  String get postCid;
+  @override
+  String get postUri;
   @override
   String get authorId;
   @override
   String get content;
-  @override
-  String get title;
 
   /// Create a copy of Reply
   /// with the given fields replaced by the non-null parameter values.

@@ -181,6 +181,55 @@ class ApiClient {
     }
   }
 
+  Future<Result<void>> createReply(
+    bsky.Bluesky bluesky,
+    reply_request.Reply reply,
+  ) async {
+    logger.d('Creating reply');
+    final xrpcResponse = await bluesky.feed.post(
+      text: reply.content,
+      tags: List.from(['boshi.reply']),
+      reply: bsky.ReplyRef(
+        parent: StrongRef(
+          cid: reply.postCid,
+          uri: AtUri.parse(reply.postUri),
+        ),
+        root: StrongRef(
+          cid: reply.rootCid,
+          uri: AtUri.parse(reply.rootUri),
+        ),
+      ),
+    );
+
+    if (xrpcResponse.status != HttpStatus.ok) {
+      return Result.error(
+        Exception(
+          'Failed to create a reply record with status: ${xrpcResponse.status}',
+        ),
+      );
+    }
+    return Result.ok(null);
+  }
+
+  Future<Result<bsky.PostThread>> getPostThread(
+    bsky.Bluesky bluesky,
+    String url,
+  ) async {
+    logger.d('Creating reply');
+    final xrpcResponse =
+        await bluesky.feed.getPostThread(uri: AtUri.parse(url));
+
+    if (xrpcResponse.status != HttpStatus.ok) {
+      return Result.error(
+        Exception(
+          'Failed to create a reply record with status: ${xrpcResponse.status}',
+        ),
+      );
+    }
+
+    return Result.ok(xrpcResponse.data);
+  }
+
   /// Sends a GET request to the Boshi backend to get
   /// the OAuth client metadata
   Future<OAuthClientMetadata> getOAuthClientMetadata(

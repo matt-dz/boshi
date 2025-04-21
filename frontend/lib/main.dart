@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/post_thread/view_model/post_thread_viewmodel.dart';
+import 'package:frontend/ui/post_thread/widgets/post_thread_screen.dart';
 import 'ui/post/view_model/post_viewmodel.dart';
 import 'ui/post/widgets/post_screen.dart';
 
@@ -56,7 +58,17 @@ class MainApp extends StatelessWidget {
           ),
         ),
         GoRoute(
-          path: '/post',
+          path: '/post/:rooturl',
+          builder: (context, state) => PostThreadScreen(
+            title: 'Boshi',
+            viewModel: PostThreadViewModel(
+              atProtoRepository: context.read<AtProtoRepository>(),
+              rootUrl: state.pathParameters['rooturl']!,
+            ),
+          ),
+        ),
+        GoRoute(
+          path: '/create',
           builder: (context, state) => PostScreen(
             title: 'Boshi',
             viewModel: PostViewModel(

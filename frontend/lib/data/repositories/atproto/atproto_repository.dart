@@ -1,5 +1,6 @@
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/foundation.dart';
+import 'package:frontend/data/models/requests/reply/reply.dart';
 import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/domain/models/users/users.dart';
 import 'package:frontend/internal/exceptions/oauth_unauthorized_exception.dart';
@@ -115,11 +116,25 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
+  Future<Result<void>> createReply(Reply reply) async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+    return await _apiClient.createReply(bluesky!, reply);
+  }
+
   Future<Result<void>> createPost(Post post) async {
     if (!authorized) {
-      return Result.error(OAuthUnauthorizedException('createPost'));
+      return Result.error(OAuthUnauthorizedException());
     }
     return await _apiClient.createPost(bluesky!, post);
+  }
+
+  Future<Result<bsky.PostThread>> getPostThread(String postUrl) async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+    return await _apiClient.getPostThread(bluesky!, postUrl);
   }
 
   Future<Result<void>> addVerificationEmail(String email) async {

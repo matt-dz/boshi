@@ -43,7 +43,7 @@ class Footer extends StatelessWidget {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                        context.go('/post');
+                        context.go('/create');
                       },
                     ),
                     IconButton(
