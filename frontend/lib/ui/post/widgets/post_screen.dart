@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/internal/exceptions/format.dart';
-import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
 import 'package:frontend/ui/core/ui/header.dart';
@@ -91,12 +90,9 @@ class _PostFormState extends State<PostForm> {
                               if (formKey.currentState!.saveAndValidate()) {
                                 final result =
                                     await widget.viewModel.createPost.execute(
-                                  Post(
-                                    school: '',
-                                    title: formKey.currentState!.value['title'],
-                                    content:
-                                        formKey.currentState!.value['content'],
-                                    indexedAt: DateTime.now(),
+                                  (
+                                    formKey.currentState!.value['title'],
+                                    formKey.currentState!.value['content']
                                   ),
                                 );
 

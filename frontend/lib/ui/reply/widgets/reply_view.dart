@@ -1,8 +1,8 @@
+import 'package:atproto/atproto.dart';
+import 'package:bluesky/bluesky.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/data/models/requests/reply/reply.dart';
 import 'package:frontend/internal/logger/logger.dart';
 import 'package:frontend/internal/result/result.dart';
-import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/ui/reply/view_model/reply_viewmodel.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -10,11 +10,11 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 class ReplyWidget extends StatefulWidget {
   const ReplyWidget({
     super.key,
-    required this.post,
+    required this.parent,
     required this.viewModel,
   });
 
-  final Post post;
+  final Post parent;
   final ReplyViewModel viewModel;
 
   @override
@@ -53,13 +53,19 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                   onPressed: () async {
                     if (formKey.currentState!.saveAndValidate()) {
                       final result = await widget.viewModel.createReply.execute(
-                        Reply(
-                          rootCid: '',
-                          rootUri: '',
-                          postCid: '',
-                          postUri: '',
-                          authorId: widget.viewModel.userDid ?? 'invalid',
-                          content: formKey.currentState!.value['content'],
+                        PostRecord(
+                          text: formKey.currentState!.value['content'],
+                          reply: ReplyRef(
+                            parent: StrongRef(
+                              uri: widget.parent.uri,
+                              cid: widget.parent.cid,
+                            ),
+                            root: StrongRef(
+                              uri: widget.parent.uri,
+                              cid: widget.parent.cid,
+                            ),
+                          ),
+                          createdAt: DateTime.now(),
                         ),
                       );
 

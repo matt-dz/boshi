@@ -1,56 +1,98 @@
+import 'dart:io';
+import 'package:atproto/atproto.dart';
+import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
-import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/domain/models/users/users.dart';
-import 'package:frontend/internal/result/result.dart';
+import 'package:frontend/internal/logger/logger.dart';
+import 'package:frontend/domain/models/post/post.dart';
 
-Future<Result<List<Post>>> convertFeedToDomainPosts(
-  AtProtoRepository atproto,
+String extractTitle(Post post) {
+  final titleEnd = post.post.record.facets?[0].index.byteEnd;
+  return post.post.record.text.substring(0, titleEnd);
+}
+
+String extractContext(Post post) {
+  final titleEnd = post.post.record.facets?[0].index.byteEnd;
+  return post.post.record.text.substring(titleEnd == null ? 0 : titleEnd + 1);
+}
+
+String timeSincePosting(Post post) {
+  final currentTime = DateTime.now().toUtc();
+  final timeDifference = currentTime.difference(post.post.indexedAt.toUtc());
+
+  if (timeDifference.inDays >= 7) {
+    return '${timeDifference.inDays ~/ 7}w';
+  } else if (timeDifference.inDays >= 1) {
+    return '${timeDifference.inDays}d';
+  } else if (timeDifference.inHours >= 1) {
+    return '${timeDifference.inHours}h';
+  } else if (timeDifference.inMinutes >= 1) {
+    return '${timeDifference.inMinutes}m';
+  } else {
+    return '${timeDifference.inSeconds}s';
+  }
+}
+
+List<Post> convertFeedToDomainPosts(
   bsky.Feed feed,
-) async {
-  final userDids =
-      feed.feed.map((post) => post.post.author.did).toSet().toList();
+  List<User> users,
+) {
+  return feed.feed
+      .map((feedView) {
+        final user = users.where(
+          (u) => u.did == feedView.post.author.did,
+        );
 
-  final usersResponse = await atproto.getUsers(userDids);
-  final Users users;
-  switch (usersResponse) {
-    case Ok<Users>():
-      users = usersResponse.value;
-    case Error<Users>():
-      return Result.error(usersResponse.error);
+        if (user.length != 1) {
+          return null;
+        }
+        return Post(
+          bskyPost: feedView.post,
+          author: User(
+            did: feedView.post.author.did,
+            school: user.single.school,
+          ),
+        );
+      })
+      .whereType<Post>()
+      .toList();
+}
+
+Future<AtUri?> retrieveLikeUri(
+  ATProto atp,
+  AtUri uri,
+  String did, [
+  String? cursor,
+]) async {
+  logger.d('Retriving likes');
+  final response = await atp.repo.listRecords(
+    repo: did,
+    collection: NSID('app.bsky.feed.like'),
+    cursor: cursor,
+  );
+  if (response.status.code > 299) {
+    throw HttpException(response.status.message);
   }
 
-  return Result.ok(
-    feed.feed
-        .map((feedView) {
-          final titleEnd = feedView.post.record.facets?[0].index.byteEnd;
+  // Base case - no more records
+  if (response.data.records.isEmpty) {
+    logger.d('No more records');
+    return null;
+  }
 
-          final title = feedView.post.record.text.substring(0, titleEnd);
-          final content = feedView.post.record.text
-              .substring(titleEnd == null ? 0 : titleEnd + 1);
-          final user = users.users.where(
-            (user) => user.id == feedView.post.author.did,
-          );
+  for (final record in response.data.records) {
+    final value = record.value;
+    final subject = value['subject'];
+    if (subject is! Map) {
+      throw Exception('Invalid value: $value');
+    }
+    final likedPostUri = subject['uri'] as String;
+    if (likedPostUri == uri.toString()) {
+      logger.d('Found record: ${record.uri}');
+      return record.uri;
+    }
+  }
 
-          if (user.length != 1) {
-            return null;
-          }
-
-          return Post(
-            id: feedView.post.cid,
-            author: User(
-              id: feedView.post.author.did,
-              school: user.single.school,
-            ),
-            title: title,
-            content: content,
-            timestamp: feedView.post.indexedAt,
-            reactions: List.empty(),
-            comments: List.empty(),
-          );
-        })
-        .whereType<Post>()
-        .toList(),
-  );
+  logger.d('Searching next page');
+  return retrieveLikeUri(atp, uri, did, response.data.cursor);
 }

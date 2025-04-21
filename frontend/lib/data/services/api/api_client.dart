@@ -4,17 +4,11 @@ import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:frontend/domain/models/users/users.dart';
 import 'package:frontend/internal/config/environment.dart';
 import 'package:frontend/internal/exceptions/missing_env.dart';
-import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
+import 'package:frontend/internal/feed/feed.dart';
 import 'package:frontend/internal/result/result.dart';
-import 'package:frontend/shared/models/report/report.dart' as boshi_report;
-import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/data/models/requests/reply/reply.dart'
-    as reply_request;
-import 'package:frontend/shared/models/post/post.dart' as post_request;
 import 'package:http/http.dart' as http;
 import 'package:frontend/data/models/requests/add_email/add_email.dart';
 import 'package:frontend/data/models/requests/verify_code/verify_code.dart';
@@ -104,15 +98,14 @@ class ApiClient {
     }
   }
 
-  Future<Result<Users>> getUsers(List<String> dids) async {
-    logger.d('Sending GET request for Users');
-
+  Future<Result<List<User>>> getUsers(List<String> dids) async {
     final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
     final Uri requestUri = hostUri.replace(
       pathSegments: ['users'],
       queryParameters: {'user_id': dids},
     );
 
+    logger.d('Sending request');
     final response = await http.get(requestUri);
 
     if (response.statusCode == 400) {
@@ -120,51 +113,45 @@ class ApiClient {
         Exception('Failed to get user, missing user_ids'),
       );
     } else if (response.statusCode == 404) {
+      logger.e(response.body);
       return Result.error(UserNotFoundException());
+    } else if (response.statusCode > 299) {
+      logger.e(response.body);
+      return Result.error(HttpException(response.body));
     }
 
     try {
+      logger.d('Decoding response: ${response.body}');
       final decoded = json.decode(response.body);
-      final Users result = Users.fromJson(decoded);
-      return Result.ok(result);
+      if (decoded is! Map) {
+        throw Exception('Invalid response: ${response.body}');
+      }
+      final users = decoded['users'];
+      if (users is! List) {
+        throw Exception('Invalid response: ${response.body}');
+      }
+      return Result.ok(
+        users.map((user) => User.fromJson(user)).toList(),
+      );
     } on Exception catch (error) {
+      logger.e('Failed to decode response. error=$error');
       return Result.error(error);
     }
   }
 
-  Future<Result<Post>> getPost(String id) async {
-    logger.d('Retrieving post');
-    return Result.ok(mockFeed[0]);
-  }
-
-  Future<Result<Post>> updateReactionCount(
-    ReactionPayload reactionPayload,
-  ) async {
-    logger.d('Updating reaction count');
-    return Result.ok(mockFeed[0]);
-  }
-
-  Future<Result<Post>> addReply(reply_request.Reply reply) async {
-    logger.d('Adding reply');
-    return Result.ok(mockFeed[0]);
-  }
-
-  Future<Result<void>> reportPost(boshi_report.Report report) async {
-    logger.d('Reporting post');
-    return Result.ok(null);
-  }
-
   Future<Result<void>> createPost(
     bsky.Bluesky bluesky,
-    post_request.Post post,
+    String title,
+    String content,
   ) async {
     logger.d('Creating post');
+
     final xrpcResponse = await bluesky.feed.post(
-      text: '${post.title}\n${post.content}',
+      text: '$title\n$content',
       tags: List.from(['boshi.post']),
       facets: [
         bsky.Facet(
-          index: bsky.ByteSlice(byteStart: 0, byteEnd: post.title.length),
+          index: bsky.ByteSlice(byteStart: 0, byteEnd: title.length),
           features: [bsky.FacetFeature.tag(data: bsky.FacetTag(tag: 'boshi'))],
         ),
       ],
@@ -183,23 +170,11 @@ class ApiClient {
 
   Future<Result<void>> createReply(
     bsky.Bluesky bluesky,
-    reply_request.Reply reply,
+    bsky.PostRecord reply,
   ) async {
     logger.d('Creating reply');
     final xrpcResponse = await bluesky.feed.post(
-      text: reply.content,
-      tags: List.from(['boshi.reply']),
-      reply: bsky.ReplyRef(
-        parent: StrongRef(
-          cid: reply.postCid,
-          uri: AtUri.parse(reply.postUri),
-        ),
-        root: StrongRef(
-          cid: reply.rootCid,
-          uri: AtUri.parse(reply.rootUri),
-        ),
-      ),
-    );
+        text: reply.text, tags: List.from(['boshi.reply']), reply: reply.reply);
 
     if (xrpcResponse.status != HttpStatus.ok) {
       return Result.error(
@@ -478,6 +453,52 @@ class ApiClient {
     } catch (e) {
       logger.e('Request failed. error=$e');
       return Result.error(Exception(e));
+    }
+  }
+
+  Future<Result<AtUri>> addLike(
+    bsky.Bluesky bluesky,
+    String cid,
+    AtUri uri,
+  ) async {
+    try {
+      logger.d('Sending like request');
+      final res = await bluesky.feed.like(cid: cid, uri: uri);
+      logger.d('Received response: $res');
+      if (res.status.code > 299) {
+        throw HttpException(res.status.message);
+      }
+      return Result.ok(res.data.uri);
+    } on Exception catch (e) {
+      logger.e('Request failed. error=$e');
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<void>> removeLike(
+    ATProto atp,
+    bsky.Bluesky bluesky,
+    AtUri uri,
+    String did,
+  ) async {
+    try {
+      final likeUri = await retrieveLikeUri(atp, uri, did);
+      if (likeUri == null) {
+        throw Exception('Record not found');
+      }
+
+      logger.d('Deleting like record');
+      final res = await bluesky.atproto.repo.deleteRecord(
+        uri: likeUri,
+      );
+
+      if (res.status.code > 299) {
+        throw HttpException(res.status.message);
+      }
+      return Result.ok(null);
+    } on Exception catch (e) {
+      logger.e('Request failed. error=$e');
+      return Result.error(e);
     }
   }
 }

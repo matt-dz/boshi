@@ -1,6 +1,5 @@
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/foundation.dart';
-import 'package:frontend/data/models/requests/reply/reply.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/internal/result/result.dart';
@@ -15,11 +14,11 @@ class PostThreadViewModel extends ChangeNotifier {
   })  : _atProtoRepository = atProtoRepository,
         _rootUrl = rootUrl {
     load = Command0(_load)..execute();
-    createReply = Command1<void, Reply>(_createReply);
+    createReply = Command1<void, bsky.PostRecord>(_createReply);
   }
 
   late final Command0 load;
-  late final Command1<void, Reply> createReply;
+  late final Command1<void, bsky.PostRecord> createReply;
   final AtProtoRepository _atProtoRepository;
   final String _rootUrl;
 
@@ -51,7 +50,7 @@ class PostThreadViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Result<void>> _createReply(Reply reply) async {
+  Future<Result<void>> _createReply(bsky.PostRecord reply) async {
     try {
       logger.d('Creating a reply');
       final createReplyResult = await _atProtoRepository.createReply(reply);

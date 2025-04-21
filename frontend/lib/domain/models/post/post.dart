@@ -1,23 +1,15 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/domain/models/content_item/content_item.dart';
-import 'package:frontend/domain/models/reply/reply.dart';
-import 'package:frontend/domain/models/reaction/reaction.dart';
+import 'package:bluesky/bluesky.dart' as bsky;
 
-part 'post.freezed.dart';
-part 'post.g.dart';
-
-@freezed
-abstract class Post with _$Post implements ContentItem {
-  const factory Post({
-    required String id,
+class Post {
+  Post({
+    required bsky.Post bskyPost,
     required User author,
-    required String content,
-    required DateTime timestamp,
-    required List<Reaction> reactions,
-    required List<Reply> comments,
-    required String title,
-  }) = _Post;
+  })  : post = bskyPost,
+        _author = author;
 
-  factory Post.fromJson(Map<String, Object?> json) => _$PostFromJson(json);
+  bsky.Post post;
+  final User _author;
+
+  User get author => _author;
 }

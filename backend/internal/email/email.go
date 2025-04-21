@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/smtp"
 	"os"
+	"strings"
 )
 
 const verificationCodeSet = "ABCDEFGHJKMNOPQRSTUVWXYZ23456789" // Similar characters removed
@@ -59,3 +60,11 @@ func GenerateVerificationCode() (string, error) {
 	}
 	return string(code), nil
 }
+
+func ParseEmail(address string) (string, error) {
+	at := strings.LastIndex(address, "@")
+	if at >= 0 {
+		return "", errors.New("domain not found in email")
+	}
+	return address[at+1:], nil
+} 

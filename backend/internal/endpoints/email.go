@@ -3,6 +3,7 @@ package endpoints
 import (
 	"boshi-backend/internal/database"
 	"boshi-backend/internal/email"
+	"boshi-backend/internal/exceptions"
 	boshiRedis "boshi-backend/internal/redis"
 	"boshi-backend/internal/sqlc"
 	"context"
@@ -19,6 +20,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -261,6 +263,45 @@ func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User already verified", http.StatusConflict)
 		return
 	case sqlc.VerifyEmailResultJustVerified:
+		log.InfoContext(r.Context(), "Resolving school")
+		school, err := resolveSchoolFromEmail(payload.Email)
+		if err == exceptions.ErrUnknownUniversity {
+			log.ErrorContext(
+				r.Context(),
+				"Could not determine university from email",
+				slog.Any("error", err),
+			)
+			http.Error(w, "Could not determine university from email", http.StatusBadRequest)
+			return
+		} else if err != nil {
+			log.ErrorContext(
+				r.Context(),
+				"Failed to resolve school from email",
+				slog.Any("error", err),
+			)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		log.InfoContext(r.Context(), "Setting school in database")
+		_, err = qtx.SetSchool(r.Context(), sqlc.SetSchoolParams{
+			UserID: payload.UserID,
+			School: pgtype.Text{
+				String: school,
+				Valid:  true,
+			},
+		})
+
+		if err != nil {
+			log.ErrorContext(
+				r.Context(),
+				"Failed to store new school",
+				slog.Any("error", err),
+			)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
 		log.DebugContext(r.Context(), "email verification status updated")
 	default:
 		log.ErrorContext(

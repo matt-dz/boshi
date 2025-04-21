@@ -9,6 +9,11 @@ SET email = EXCLUDED.email
 WHERE emails.verified_at IS NULL
 RETURNING *;
 
+-- name: SetSchool :one
+UPDATE emails
+SET school = $2
+WHERE emails.user_id = $1
+RETURNING *;
 
 -- name: VerifyEmail :one
 WITH matched AS (

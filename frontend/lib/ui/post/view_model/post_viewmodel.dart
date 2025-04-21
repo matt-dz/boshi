@@ -2,8 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:frontend/domain/models/user/user.dart';
 
-import 'package:frontend/shared/models/post/post.dart';
-
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
 import 'package:frontend/internal/logger/logger.dart';
@@ -14,11 +12,11 @@ class PostViewModel extends ChangeNotifier {
     required AtProtoRepository atProtoRepository,
   }) : _atProtoRepository = atProtoRepository {
     load = Command0(_load)..execute();
-    createPost = Command1<void, Post>(_createPost);
+    createPost = Command1<void, (String, String)>(_createPost);
   }
 
   late final Command0 load;
-  late final Command1<void, Post> createPost;
+  late final Command1<void, (String, String)> createPost;
   final AtProtoRepository _atProtoRepository;
 
   User? _user;
@@ -45,10 +43,11 @@ class PostViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Result<void>> _createPost(Post post) async {
+  Future<Result<void>> _createPost((String, String) postValues) async {
     try {
       logger.d('Creating a post');
-      final createPostResult = await _atProtoRepository.createPost(post);
+      final createPostResult =
+          await _atProtoRepository.createPost(postValues.$1, postValues.$2);
       switch (createPostResult) {
         case Ok<void>():
           logger.d('Successfully created post');
