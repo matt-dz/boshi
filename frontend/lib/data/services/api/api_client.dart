@@ -135,7 +135,9 @@ class ApiClient {
       final users = decoded['users'] as List<Map<String, dynamic>>;
       return Result.ok(
         users.map((user) {
-          user['handle'] = resolveHandle(atp, user['did']);
+          resolveHandle(atp, user['did']).then((handle) {
+            user['handle'] = handle;
+          });
           return User.fromJson(user);
         }).toList(),
       );
