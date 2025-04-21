@@ -113,6 +113,7 @@ class ApiClient {
       final User user = User.fromJson(decoded);
       return Result.ok(user);
     } on Exception catch (error) {
+      logger.e('Failed to get user: $error');
       return Result.error(error);
     }
   }
