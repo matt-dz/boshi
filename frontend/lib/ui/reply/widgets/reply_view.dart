@@ -56,7 +56,9 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                   height: 30,
                   width: 120,
                   onPressed: () {
-                    context.pop();
+                    context.pop(
+                      Result.error(Exception('Cancelled creating reply')),
+                    );
                   },
                   child: const Text('Cancel'),
                 ),
@@ -87,12 +89,10 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                         case Ok<void>():
                           logger.e('Successfully created post');
                           if (context.mounted) {
-                            context.pop();
+                            context.pop(result);
                           }
-                          return;
                         case Error():
-                          logger.e('Error creating post in: $result');
-                          return;
+                          logger.e('Error creating post with: $result');
                       }
                     }
                   },

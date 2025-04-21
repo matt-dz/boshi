@@ -36,6 +36,7 @@ class PostViewModel extends ChangeNotifier {
   Future<Result<void>> _handleReply(BuildContext context) async {
     try {
       final replyResult = await showReplyDialog(context, this);
+      logger.d(replyResult);
       switch (replyResult) {
         case Ok<void>():
           _post.post = _post.post.copyWith(
