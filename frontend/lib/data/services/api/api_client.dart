@@ -75,26 +75,43 @@ class ApiClient {
     return Result.ok(xrpcResponse.data);
   }
 
-  Future<Result<User>> getUser(String did) async {
+  Future<Result<User>> getUser(ATProto atp, String did) async {
     logger.d('Sending GET request for User $did');
 
     final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
     final Uri requestUri = hostUri.replace(pathSegments: ['user', did]);
+    final userResponse = await http.get(requestUri);
 
-    final response = await http.get(requestUri);
-
-    if (response.statusCode == 400) {
-      return Result.error(
-        Exception('Failed to get user, missing user_ids'),
+    if (userResponse.statusCode == 400) {
+      return throw HttpException('Failed to get user, missing user_ids');
+    } else if (userResponse.statusCode == 404) {
+      return throw UserNotFoundException();
+    } else if (userResponse.statusCode > 299) {
+      return throw HttpException(
+        'Failed to get user with status: ${userResponse.statusCode}',
       );
-    } else if (response.statusCode == 404) {
-      return Result.error(UserNotFoundException());
+    }
+
+    final repo = await atp.repo.describeRepo(repo: did);
+    if (repo.status.code > 299) {
+      throw HttpException(
+        'Failed to get user repo with status: ${repo.status.code}',
+      );
+    }
+
+    final aka = repo.data.didDoc['alsoKnownAs'];
+    if (aka is! List) {
+      throw HttpException('Invalid alsoKnownAs format: $aka');
+    }
+    if (aka.isEmpty) {
+      throw HttpException('No alsoKnownAs found');
     }
 
     try {
-      final decoded = json.decode(response.body);
-      final User result = User.fromJson(decoded);
-      return Result.ok(result);
+      final Map<String, dynamic> decoded = json.decode(userResponse.body);
+      decoded['handle'] = aka.first;
+      final User user = User.fromJson(decoded);
+      return Result.ok(user);
     } on Exception catch (error) {
       return Result.error(error);
     }

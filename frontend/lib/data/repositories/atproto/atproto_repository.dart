@@ -252,12 +252,12 @@ class AtProtoRepository extends ChangeNotifier {
       return Result.error(OAuthUnauthorizedException());
     }
 
-    final String? userDid = atProto?.oAuthSession?.sub;
+    final String? userDid = atProto!.oAuthSession?.sub;
 
     if (userDid == null) {
       return Result.error(OAuthUnauthorizedException());
     }
-    final userResult = await _apiClient.getUser(userDid);
+    final userResult = await _apiClient.getUser(atProto!, userDid);
 
     switch (userResult) {
       case Ok<User>():

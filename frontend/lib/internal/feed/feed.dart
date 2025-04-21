@@ -51,6 +51,7 @@ List<Post> convertFeedToDomainPosts(
           author: User(
             did: feedView.post.author.did,
             school: user.single.school,
+            handle: user.single.handle,
           ),
         );
       })

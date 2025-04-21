@@ -39,7 +39,13 @@ class ProfileScreen extends StatelessWidget {
                     );
                   }
 
-                  return Text('Profile');
+                  return Column(
+                    children: [
+                      Text(
+                        viewModel.user.handle,
+                      ),
+                    ],
+                  );
                 },
               ),
             ),
