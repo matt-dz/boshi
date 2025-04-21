@@ -35,8 +35,8 @@ List<Post> convertFeedToDomainPosts(
           title: title,
           content: content,
           timestamp: feedView.post.indexedAt,
-          likes: 50,
-          numReplies: 10,
+          likes: feedView.post.likeCount,
+          numReplies: feedView.post.replyCount,
           likedByUser: feedView.post.isLiked,
         );
       })
