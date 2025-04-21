@@ -13,23 +13,23 @@ class ReplyViewModel extends ChangeNotifier {
   ReplyViewModel({
     required AtProtoRepository atProtoRepository,
     required Post parent,
+    VoidCallback? onLike,
   })  : _atProtoRepository = atProtoRepository,
-        _parent = parent {
-    addLike = Command0(_addLike);
-    removeLike = Command0(_removeLike);
+        _parent = parent,
+        _onLike = onLike {
     createReply = Command1<void, bsky.PostRecord>(_createReply);
   }
 
   late final Command0 load;
-  late final Command0 addLike;
-  late final Command0 removeLike;
   late final Command1<void, bsky.PostRecord> createReply;
 
   final AtProtoRepository _atProtoRepository;
   final Post _parent;
+  final VoidCallback? _onLike;
 
   String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
   Post get parent => _parent;
+  VoidCallback? get onLike => _onLike;
 
   Future<Result<void>> _createReply(bsky.PostRecord reply) async {
     try {

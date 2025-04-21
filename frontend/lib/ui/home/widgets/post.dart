@@ -60,11 +60,11 @@ class LikeButton extends StatelessWidget {
   const LikeButton({
     super.key,
     required this.post,
-    required this.onLike,
+    this.onLike,
   });
 
   final Post post;
-  final VoidCallback onLike;
+  final VoidCallback? onLike;
 
   @override
   Widget build(BuildContext context) {
@@ -145,11 +145,11 @@ class PostFooter extends StatelessWidget {
   const PostFooter({
     super.key,
     required this.post,
-    required this.onLike,
+    this.onLike,
     this.onReply,
   });
 
-  final VoidCallback onLike;
+  final VoidCallback? onLike;
   final VoidCallback? onReply;
   final Post post;
 
@@ -170,7 +170,7 @@ class PostFeed extends StatelessWidget {
   const PostFeed({
     super.key,
     required this.post,
-    required this.onLike,
+    this.onLike,
     this.onReply,
     this.replyIndent = 0,
     this.shadowColor = Colors.grey,
@@ -179,7 +179,7 @@ class PostFeed extends StatelessWidget {
   final Post post;
   final int replyIndent;
   final Color shadowColor;
-  final VoidCallback onLike;
+  final VoidCallback? onLike;
   final VoidCallback? onReply;
 
   @override

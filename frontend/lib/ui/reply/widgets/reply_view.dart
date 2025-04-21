@@ -11,13 +11,14 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-void showReplyDialog(BuildContext context, Post parent) {
+void showReplyDialog(BuildContext context, Post parent, VoidCallback? onLike) {
   showDialog(
     context: context,
     builder: (_) => ReplyWidget(
       viewModel: ReplyViewModel(
         atProtoRepository: context.read<AtProtoRepository>(),
         parent: parent,
+        onLike: onLike,
       ),
     ),
   );
@@ -107,13 +108,7 @@ class _ReplyWidgetState extends State<ReplyWidget> {
                 return PostFeed(
                   key: Key(widget.viewModel.parent.post.cid),
                   post: widget.viewModel.parent,
-                  onLike: () {
-                    if (widget.viewModel.parent.post.isLiked) {
-                      widget.viewModel.removeLike.execute();
-                      return;
-                    }
-                    widget.viewModel.addLike.execute();
-                  },
+                  onLike: widget.viewModel.onLike,
                 );
               },
             ),
