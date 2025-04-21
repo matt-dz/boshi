@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
-import 'package:frontend/shared/models/mock_data/feed/feed.dart';
+import 'package:frontend/internal/feed/mock_data.dart';
 import 'package:frontend/ui/reply/view_model/reply_viewmodel.dart';
 import 'package:frontend/ui/reply/widgets/reply_view.dart';
 import 'package:provider/provider.dart';
