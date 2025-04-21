@@ -1,101 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-
 import 'package:frontend/domain/models/post/post.dart';
-import 'package:frontend/domain/models/content_item/content_item.dart';
-import 'package:frontend/domain/models/reaction/reaction.dart';
-
-import 'package:frontend/internal/logger/logger.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-class Sidebar extends StatelessWidget {
-  const Sidebar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          icon: Icon(
-            PhosphorIconsRegular.flag,
-            size: 16,
-          ),
-          onPressed: () {
-            logger.d('flag pressed!');
-          },
-        ),
-        IconButton(
-          icon: Icon(
-            PhosphorIconsRegular.chatCircle,
-            size: 16,
-          ),
-          onPressed: () {
-            logger.d('comment pressed!');
-          },
-        ),
-      ],
-    );
-  }
-}
-
-// TODO: Figure out padding issue
-class ReactionWrapper extends StatelessWidget {
-  const ReactionWrapper({
-    super.key,
-    required this.child,
-    this.onPressed,
-    this.padding = const EdgeInsets.fromLTRB(8, 12, 8, 12),
-  });
-
-  final Widget child;
-  final void Function()? onPressed;
-  final EdgeInsetsGeometry padding;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.all(
-          Radius.circular(100),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade400,
-            blurRadius: 3,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          padding: padding,
-          fixedSize: Size(double.infinity, 24),
-          side: BorderSide(
-            color: Colors.grey,
-          ),
-        ),
-        onPressed: onPressed,
-        child: child,
-      ),
-    );
-  }
-}
-
-class ContentItemHeader extends StatelessWidget {
-  const ContentItemHeader({
+class PostHeader extends StatelessWidget {
+  const PostHeader({
     super.key,
     required this.post,
   });
 
-  final ContentItem post;
+  final Post post;
 
-  String _timeSincePosting(ContentItem contentItem) {
+  String _timeSincePosting(Post post) {
     final currentTime = DateTime.now().toUtc();
-    final timeDifference =
-        currentTime.difference(contentItem.timestamp.toUtc());
+    final timeDifference = currentTime.difference(post.timestamp.toUtc());
 
     if (timeDifference.inDays >= 7) {
       return '${timeDifference.inDays ~/ 7}w';
@@ -140,62 +58,42 @@ class ContentItemHeader extends StatelessWidget {
                 ],
               ),
             ),
-            // Spacer(),
-            // IconButton(
-            //   icon: Icon(
-            //     PhosphorIconsRegular.dotsThreeVertical,
-            //     size: 20,
-            //   ),
-            //   onPressed: () {
-            //     logger.d('dots pressed!');
-            //   },
-            // ),
           ],
         ),
-        if (post is Post)
-          Text(
-            (post as Post).title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
+        Text(
+          post.title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
+        ),
       ],
     );
   }
 }
 
-class AddReactionButton extends StatelessWidget {
-  const AddReactionButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ReactionWrapper(
-      onPressed: () {
-        logger.d('plus pressed!');
-      },
-      child: Icon(
-        PhosphorIconsRegular.plus,
-        size: 20,
-        color: Colors.black,
-      ),
-    );
-  }
-}
-
-class KarmaButton extends StatelessWidget {
-  const KarmaButton({super.key, required this.likes});
+class LikeButton extends StatelessWidget {
+  const LikeButton({super.key, required this.liked, required this.likes});
+  final bool liked;
   final int likes;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left: 4, right: 4),
+    return OutlinedButton(
+      onPressed: () {},
+      style: OutlinedButton.styleFrom(
+        padding: EdgeInsets.zero,
+        side: BorderSide(color: Colors.transparent),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
       child: Row(
         spacing: 4,
         children: [
           Icon(
-            LucideIcons.heart,
+            liked ? PhosphorIconsRegular.heart : PhosphorIconsFill.heart,
+            color: liked ? Colors.black : Colors.red,
             size: 20,
           ),
           Text(
@@ -217,8 +115,15 @@ class ReplyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left: 4, right: 4),
+    return OutlinedButton(
+      onPressed: () {},
+      style: OutlinedButton.styleFrom(
+        padding: EdgeInsets.zero,
+        side: BorderSide(color: Colors.transparent),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
       child: Row(
         spacing: 4,
         children: [
@@ -239,10 +144,10 @@ class ReplyButton extends StatelessWidget {
   }
 }
 
-class ContentItemFooter extends StatelessWidget {
-  const ContentItemFooter({super.key, required this.post});
+class PostFooter extends StatelessWidget {
+  const PostFooter({super.key, required this.post});
 
-  final ContentItem post;
+  final Post post;
 
   @override
   Widget build(BuildContext context) {
@@ -250,22 +155,22 @@ class ContentItemFooter extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
       children: [
-        KarmaButton(likes: post.likes),
+        LikeButton(likes: post.likes, liked: post.likedByUser),
         ReplyButton(numReplies: post.numReplies),
       ],
     );
   }
 }
 
-class ContentItemWidget extends StatelessWidget {
-  const ContentItemWidget({
+class PostFeed extends StatelessWidget {
+  const PostFeed({
     super.key,
     required this.post,
     this.replyIndent = 0,
     this.shadowColor = Colors.grey,
   });
 
-  final ContentItem post;
+  final Post post;
   final int replyIndent;
   final Color shadowColor;
 
@@ -298,9 +203,9 @@ class ContentItemWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 8,
           children: [
-            ContentItemHeader(post: post),
+            PostHeader(post: post),
             Text(post.content),
-            ContentItemFooter(post: post),
+            PostFooter(post: post),
           ],
         ),
       ),

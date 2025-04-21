@@ -4,7 +4,6 @@ import 'package:atproto/atproto.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:frontend/domain/models/users/users.dart';
 import 'package:frontend/internal/config/environment.dart';
 import 'package:frontend/internal/exceptions/missing_env.dart';
 import 'package:frontend/internal/result/result.dart';
@@ -100,15 +99,14 @@ class ApiClient {
     }
   }
 
-  Future<Result<Users>> getUsers(List<String> dids) async {
-    logger.d('Sending GET request for Users');
-
+  Future<Result<List<User>>> getUsers(List<String> dids) async {
     final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
     final Uri requestUri = hostUri.replace(
       pathSegments: ['users'],
       queryParameters: {'user_id': dids},
     );
 
+    logger.d('Sending request');
     final response = await http.get(requestUri);
 
     if (response.statusCode == 400) {
@@ -116,14 +114,28 @@ class ApiClient {
         Exception('Failed to get user, missing user_ids'),
       );
     } else if (response.statusCode == 404) {
+      logger.e(response.body);
       return Result.error(UserNotFoundException());
+    } else if (response.statusCode > 299) {
+      logger.e(response.body);
+      return Result.error(HttpException(response.body));
     }
 
     try {
+      logger.d('Decoding response: ${response.body}');
       final decoded = json.decode(response.body);
-      final Users result = Users.fromJson(decoded);
-      return Result.ok(result);
+      if (decoded is! Map) {
+        throw Exception('Invalid response: ${response.body}');
+      }
+      final users = decoded['users'];
+      if (users is! List) {
+        throw Exception('Invalid response: ${response.body}');
+      }
+      return Result.ok(
+        users.map((user) => User.fromJson(user)).toList(),
+      );
     } on Exception catch (error) {
+      logger.e('Failed to decode response. error=$error');
       return Result.error(error);
     }
   }
@@ -409,5 +421,26 @@ class ApiClient {
       logger.e('Request failed. error=$e');
       return Result.error(Exception(e));
     }
+  }
+
+  Future<Result<void>> toggleLike(
+    bsky.Bluesky bluesky,
+    AtUri uri,
+    String cid,
+    bool like,
+  ) async {
+    if (like) {
+      final res = await bluesky.feed.like(cid: cid, uri: uri);
+      if (res.status.code > 299) {
+        throw HttpException(res.status.message);
+      }
+      return Result.ok(null);
+    }
+
+    final res = await bluesky.atproto.repo.deleteRecord(uri: uri);
+    if (res.status.code > 299) {
+      throw HttpException(res.status.message);
+    }
+    return Result.ok(null);
   }
 }

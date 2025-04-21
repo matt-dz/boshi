@@ -16,6 +16,7 @@ abstract class Reply with _$Reply implements ContentItem {
     required String postId,
     required String authorId,
     required String content,
+    required bool likedByUser,
     required String title,
   }) = _Reply;
 

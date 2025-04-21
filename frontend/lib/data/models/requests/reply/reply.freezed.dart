@@ -23,6 +23,7 @@ mixin _$Reply {
   String get postId => throw _privateConstructorUsedError;
   String get authorId => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
+  bool get likedByUser => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
 
   /// Serializes this Reply to a JSON map.
@@ -39,7 +40,12 @@ abstract class $ReplyCopyWith<$Res> {
   factory $ReplyCopyWith(Reply value, $Res Function(Reply) then) =
       _$ReplyCopyWithImpl<$Res, Reply>;
   @useResult
-  $Res call({String postId, String authorId, String content, String title});
+  $Res call(
+      {String postId,
+      String authorId,
+      String content,
+      bool likedByUser,
+      String title});
 }
 
 /// @nodoc
@@ -60,6 +66,7 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
     Object? postId = null,
     Object? authorId = null,
     Object? content = null,
+    Object? likedByUser = null,
     Object? title = null,
   }) {
     return _then(_value.copyWith(
@@ -75,6 +82,10 @@ class _$ReplyCopyWithImpl<$Res, $Val extends Reply>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      likedByUser: null == likedByUser
+          ? _value.likedByUser
+          : likedByUser // ignore: cast_nullable_to_non_nullable
+              as bool,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -90,7 +101,12 @@ abstract class _$$ReplyImplCopyWith<$Res> implements $ReplyCopyWith<$Res> {
       __$$ReplyImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String postId, String authorId, String content, String title});
+  $Res call(
+      {String postId,
+      String authorId,
+      String content,
+      bool likedByUser,
+      String title});
 }
 
 /// @nodoc
@@ -109,6 +125,7 @@ class __$$ReplyImplCopyWithImpl<$Res>
     Object? postId = null,
     Object? authorId = null,
     Object? content = null,
+    Object? likedByUser = null,
     Object? title = null,
   }) {
     return _then(_$ReplyImpl(
@@ -124,6 +141,10 @@ class __$$ReplyImplCopyWithImpl<$Res>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      likedByUser: null == likedByUser
+          ? _value.likedByUser
+          : likedByUser // ignore: cast_nullable_to_non_nullable
+              as bool,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -139,6 +160,7 @@ class _$ReplyImpl implements _Reply {
       {required this.postId,
       required this.authorId,
       required this.content,
+      required this.likedByUser,
       required this.title});
 
   factory _$ReplyImpl.fromJson(Map<String, dynamic> json) =>
@@ -151,11 +173,13 @@ class _$ReplyImpl implements _Reply {
   @override
   final String content;
   @override
+  final bool likedByUser;
+  @override
   final String title;
 
   @override
   String toString() {
-    return 'Reply(postId: $postId, authorId: $authorId, content: $content, title: $title)';
+    return 'Reply(postId: $postId, authorId: $authorId, content: $content, likedByUser: $likedByUser, title: $title)';
   }
 
   @override
@@ -167,13 +191,15 @@ class _$ReplyImpl implements _Reply {
             (identical(other.authorId, authorId) ||
                 other.authorId == authorId) &&
             (identical(other.content, content) || other.content == content) &&
+            (identical(other.likedByUser, likedByUser) ||
+                other.likedByUser == likedByUser) &&
             (identical(other.title, title) || other.title == title));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, postId, authorId, content, title);
+      Object.hash(runtimeType, postId, authorId, content, likedByUser, title);
 
   /// Create a copy of Reply
   /// with the given fields replaced by the non-null parameter values.
@@ -196,6 +222,7 @@ abstract class _Reply implements Reply {
       {required final String postId,
       required final String authorId,
       required final String content,
+      required final bool likedByUser,
       required final String title}) = _$ReplyImpl;
 
   factory _Reply.fromJson(Map<String, dynamic> json) = _$ReplyImpl.fromJson;
@@ -206,6 +233,8 @@ abstract class _Reply implements Reply {
   String get authorId;
   @override
   String get content;
+  @override
+  bool get likedByUser;
   @override
   String get title;
 

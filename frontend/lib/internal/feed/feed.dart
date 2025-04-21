@@ -1,56 +1,41 @@
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/domain/models/users/users.dart';
-import 'package:frontend/internal/result/result.dart';
 
-Future<Result<List<Post>>> convertFeedToDomainPosts(
-  AtProtoRepository atproto,
+List<Post> convertFeedToDomainPosts(
   bsky.Feed feed,
-) async {
-  final userDids =
-      feed.feed.map((post) => post.post.author.did).toSet().toList();
+  List<User> users,
+) {
+  return feed.feed
+      .map((feedView) {
+        final titleEnd = feedView.post.record.facets?[0].index.byteEnd;
 
-  final usersResponse = await atproto.getUsers(userDids);
-  final Users users;
-  switch (usersResponse) {
-    case Ok<Users>():
-      users = usersResponse.value;
-    case Error<Users>():
-      return Result.error(usersResponse.error);
-  }
+        final title = feedView.post.record.text.substring(0, titleEnd);
+        final content = feedView.post.record.text
+            .substring(titleEnd == null ? 0 : titleEnd + 1);
+        final user = users.where(
+          (u) => u.did == feedView.post.author.did,
+        );
 
-  return Result.ok(
-    feed.feed
-        .map((feedView) {
-          final titleEnd = feedView.post.record.facets?[0].index.byteEnd;
+        if (user.length != 1) {
+          return null;
+        }
 
-          final title = feedView.post.record.text.substring(0, titleEnd);
-          final content = feedView.post.record.text
-              .substring(titleEnd == null ? 0 : titleEnd + 1);
-          final user = users.users.where(
-            (user) => user.id == feedView.post.author.did,
-          );
-
-          if (user.length != 1) {
-            return null;
-          }
-
-          return Post(
-            id: feedView.post.cid,
-            author: User(
-              id: feedView.post.author.did,
-              school: user.single.school,
-            ),
-            title: title,
-            content: content,
-            timestamp: feedView.post.indexedAt,
-            likes: 50,
-            numReplies: 10,
-          );
-        })
-        .whereType<Post>()
-        .toList(),
-  );
+        return Post(
+          uri: feedView.post.uri,
+          cid: feedView.post.cid,
+          author: User(
+            did: feedView.post.author.did,
+            school: user.single.school,
+          ),
+          title: title,
+          content: content,
+          timestamp: feedView.post.indexedAt,
+          likes: 50,
+          numReplies: 10,
+          likedByUser: feedView.post.isLiked,
+        );
+      })
+      .whereType<Post>()
+      .toList();
 }

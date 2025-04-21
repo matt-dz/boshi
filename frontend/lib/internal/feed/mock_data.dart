@@ -21,9 +21,12 @@ var mockPost = bsky.Post(
     ],
     createdAt: DateTime.now(),
   ),
-  author: bsky.ActorBasic(did: 'mockDid', handle: 'mockHandle'),
-  uri: AtUri('mockUri'),
-  cid: 'mockCid',
+  author: bsky.ActorBasic(
+    did: 'did:plc:pqlrhvmhtthnggkr6ws7mpms',
+    handle: 'bsky.app',
+  ),
+  uri: AtUri('did:web:discover.bsky.app'),
+  cid: 'bafyreievgu2ty7qbiaaom5zhmkznsnajuzideek3lo7e65dwqlrvrxnmo4',
   indexedAt: DateTime.now(),
 );
 

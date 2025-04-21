@@ -1,14 +1,12 @@
-import 'dart:collection';
-
 import 'package:flutter/foundation.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/shared/models/reaction_payload/reaction_payload.dart';
+import 'package:frontend/ui/models/like/like.dart';
 
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
-import 'package:frontend/internal/logger/logger.dart';
 
 /// ViewModel for the Feed page
 class HomeViewModel extends ChangeNotifier {
@@ -19,27 +17,17 @@ class HomeViewModel extends ChangeNotifier {
     updateReactionCount = Command1<Post, ReactionPayload>(
       _updateReactionCount,
     );
+    toggleLike = Command1<void, Like>(_toggleLike);
   }
 
   late final Command0 load;
+  late final Command1 toggleLike;
   late final Command1 updateReactionCount;
   final AtProtoRepository _atProtoRepository;
 
-  List<Post> _posts = [];
-  UnmodifiableListView<Post> get posts => UnmodifiableListView(_posts);
-
   Future<Result> _load() async {
     try {
-      logger.d('Retrieving feed');
-      final feedResult = await _atProtoRepository.getFeed();
-      switch (feedResult) {
-        case Ok<List<Post>>():
-          _posts = feedResult.value;
-          logger.d('Retrieved feed');
-        case Error<List<Post>>():
-          logger.e('Error loading feed: ${feedResult.error}');
-      }
-      return feedResult;
+      return await _atProtoRepository.getFeed();
     } finally {
       notifyListeners();
     }
@@ -48,6 +36,14 @@ class HomeViewModel extends ChangeNotifier {
   void reload() {
     load = Command0(_load)..execute();
     notifyListeners();
+  }
+
+  Future<Result<void>> _toggleLike(Like like) async {
+    try {
+      return await _atProtoRepository.toggleLike(like.uri, like.cid, like.like);
+    } finally {
+      notifyListeners();
+    }
   }
 
   Future<Result<Post>> _updateReactionCount(

@@ -14,22 +14,17 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-Post _$PostFromJson(Map<String, dynamic> json) {
-  return _Post.fromJson(json);
-}
-
 /// @nodoc
 mixin _$Post {
-  String get id => throw _privateConstructorUsedError;
+  String get title => throw _privateConstructorUsedError;
+  AtUri get uri => throw _privateConstructorUsedError;
+  String get cid => throw _privateConstructorUsedError;
   User get author => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
   int get likes => throw _privateConstructorUsedError;
   int get numReplies => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-
-  /// Serializes this Post to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  bool get likedByUser => throw _privateConstructorUsedError;
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.
@@ -43,13 +38,15 @@ abstract class $PostCopyWith<$Res> {
       _$PostCopyWithImpl<$Res, Post>;
   @useResult
   $Res call(
-      {String id,
+      {String title,
+      AtUri uri,
+      String cid,
       User author,
       String content,
       DateTime timestamp,
       int likes,
       int numReplies,
-      String title});
+      bool likedByUser});
 
   $UserCopyWith<$Res> get author;
 }
@@ -69,18 +66,28 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? title = null,
+    Object? uri = null,
+    Object? cid = null,
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
     Object? likes = null,
     Object? numReplies = null,
-    Object? title = null,
+    Object? likedByUser = null,
   }) {
     return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      uri: null == uri
+          ? _value.uri
+          : uri // ignore: cast_nullable_to_non_nullable
+              as AtUri,
+      cid: null == cid
+          ? _value.cid
+          : cid // ignore: cast_nullable_to_non_nullable
               as String,
       author: null == author
           ? _value.author
@@ -102,10 +109,10 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.numReplies
           : numReplies // ignore: cast_nullable_to_non_nullable
               as int,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
+      likedByUser: null == likedByUser
+          ? _value.likedByUser
+          : likedByUser // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 
@@ -128,13 +135,15 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {String id,
+      {String title,
+      AtUri uri,
+      String cid,
       User author,
       String content,
       DateTime timestamp,
       int likes,
       int numReplies,
-      String title});
+      bool likedByUser});
 
   @override
   $UserCopyWith<$Res> get author;
@@ -152,18 +161,28 @@ class __$$PostImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? title = null,
+    Object? uri = null,
+    Object? cid = null,
     Object? author = null,
     Object? content = null,
     Object? timestamp = null,
     Object? likes = null,
     Object? numReplies = null,
-    Object? title = null,
+    Object? likedByUser = null,
   }) {
     return _then(_$PostImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      uri: null == uri
+          ? _value.uri
+          : uri // ignore: cast_nullable_to_non_nullable
+              as AtUri,
+      cid: null == cid
+          ? _value.cid
+          : cid // ignore: cast_nullable_to_non_nullable
               as String,
       author: null == author
           ? _value.author
@@ -185,31 +204,34 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.numReplies
           : numReplies // ignore: cast_nullable_to_non_nullable
               as int,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
+      likedByUser: null == likedByUser
+          ? _value.likedByUser
+          : likedByUser // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$PostImpl implements _Post {
   const _$PostImpl(
-      {required this.id,
+      {required this.title,
+      required this.uri,
+      required this.cid,
       required this.author,
       required this.content,
       required this.timestamp,
       required this.likes,
       required this.numReplies,
-      required this.title});
-
-  factory _$PostImpl.fromJson(Map<String, dynamic> json) =>
-      _$$PostImplFromJson(json);
+      required this.likedByUser});
 
   @override
-  final String id;
+  final String title;
+  @override
+  final AtUri uri;
+  @override
+  final String cid;
   @override
   final User author;
   @override
@@ -221,11 +243,11 @@ class _$PostImpl implements _Post {
   @override
   final int numReplies;
   @override
-  final String title;
+  final bool likedByUser;
 
   @override
   String toString() {
-    return 'Post(id: $id, author: $author, content: $content, timestamp: $timestamp, likes: $likes, numReplies: $numReplies, title: $title)';
+    return 'Post(title: $title, uri: $uri, cid: $cid, author: $author, content: $content, timestamp: $timestamp, likes: $likes, numReplies: $numReplies, likedByUser: $likedByUser)';
   }
 
   @override
@@ -233,7 +255,9 @@ class _$PostImpl implements _Post {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PostImpl &&
-            (identical(other.id, id) || other.id == id) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.uri, uri) || other.uri == uri) &&
+            (identical(other.cid, cid) || other.cid == cid) &&
             (identical(other.author, author) || other.author == author) &&
             (identical(other.content, content) || other.content == content) &&
             (identical(other.timestamp, timestamp) ||
@@ -241,13 +265,13 @@ class _$PostImpl implements _Post {
             (identical(other.likes, likes) || other.likes == likes) &&
             (identical(other.numReplies, numReplies) ||
                 other.numReplies == numReplies) &&
-            (identical(other.title, title) || other.title == title));
+            (identical(other.likedByUser, likedByUser) ||
+                other.likedByUser == likedByUser));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, author, content, timestamp, likes, numReplies, title);
+  int get hashCode => Object.hash(runtimeType, title, uri, cid, author, content,
+      timestamp, likes, numReplies, likedByUser);
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.
@@ -256,29 +280,26 @@ class _$PostImpl implements _Post {
   @pragma('vm:prefer-inline')
   _$$PostImplCopyWith<_$PostImpl> get copyWith =>
       __$$PostImplCopyWithImpl<_$PostImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$PostImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _Post implements Post {
   const factory _Post(
-      {required final String id,
+      {required final String title,
+      required final AtUri uri,
+      required final String cid,
       required final User author,
       required final String content,
       required final DateTime timestamp,
       required final int likes,
       required final int numReplies,
-      required final String title}) = _$PostImpl;
-
-  factory _Post.fromJson(Map<String, dynamic> json) = _$PostImpl.fromJson;
+      required final bool likedByUser}) = _$PostImpl;
 
   @override
-  String get id;
+  String get title;
+  @override
+  AtUri get uri;
+  @override
+  String get cid;
   @override
   User get author;
   @override
@@ -290,7 +311,7 @@ abstract class _Post implements Post {
   @override
   int get numReplies;
   @override
-  String get title;
+  bool get likedByUser;
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.

@@ -37,6 +37,7 @@ func GetUsersByID(w http.ResponseWriter, r *http.Request) {
 	var convertedResponse []getUserResponse
 	for _, u := range usersResponse {
 		userResponse := getUserResponse(u)
+		log.DebugContext(r.Context(), "User response", slog.Any("user", userResponse))
 		if userResponse.School.Valid {
 			convertedResponse = append(convertedResponse, userResponse)
 		}

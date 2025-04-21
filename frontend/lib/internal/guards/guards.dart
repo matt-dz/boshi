@@ -59,6 +59,7 @@ FutureOr<String?> rootRouteGuard(
 ) async {
   final atProto = context.read<AtProtoRepository>();
   final verified = await atProto.isUserVerified();
+  logger.d('verified: $verified');
   switch (verified) {
     case Ok<bool>():
       if (!verified.value) {
@@ -66,6 +67,7 @@ FutureOr<String?> rootRouteGuard(
       }
     case Error<bool>():
       print(verified.error.toString());
+      logger.e('User is not verified: ${verified.error}');
       return '/login';
   }
   return null;
