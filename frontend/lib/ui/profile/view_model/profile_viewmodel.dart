@@ -13,9 +13,11 @@ class ProfileViewModel extends ChangeNotifier {
     required AtProtoRepository atProtoRepository,
   }) : _atProtoRepository = atProtoRepository {
     load = Command0(_load)..execute();
+    logout = Command0(_logout);
   }
 
-  late final Command0 load;
+  late Command0 load;
+  late final Command0 logout;
 
   late final User _user;
   final AtProtoRepository _atProtoRepository;
@@ -38,8 +40,16 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
-  void reload() {
+  Future<void> reload() async {
     load = Command0(_load)..execute();
     notifyListeners();
+  }
+
+  Future<Result<void>> _logout() async {
+    try {
+      return await _atProtoRepository.logout();
+    } finally {
+      notifyListeners();
+    }
   }
 }

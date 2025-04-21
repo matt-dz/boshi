@@ -78,6 +78,10 @@ class ApiClient {
   Future<Result<User>> getUser(bsky.Bluesky bluesky, String did) async {
     logger.d('Sending GET request for User $did');
 
+    if (!EnvironmentConfig.prod) {
+      return Result.ok(mockUser);
+    }
+
     final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
     final Uri requestUri = hostUri.replace(pathSegments: ['user', did]);
     final userResponse = await http.get(requestUri);
@@ -464,5 +468,10 @@ class ApiClient {
       logger.e('Request failed. error=$e');
       return Result.error(e);
     }
+  }
+
+  Future<void> logout() async {
+    final prefs = SharedPreferencesAsync();
+    await prefs.clear();
   }
 }

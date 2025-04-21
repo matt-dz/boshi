@@ -297,6 +297,7 @@ class AtProtoRepository extends ChangeNotifier {
     if (!authorized || bluesky == null) {
       return Result.error(OAuthUnauthorizedException());
     }
+
     try {
       logger.d('Removing like');
       return await _apiClient.removeLike(
@@ -305,6 +306,17 @@ class AtProtoRepository extends ChangeNotifier {
         uri,
         did,
       );
+    } on Exception catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      return Result.error(Exception(e));
+    }
+  }
+
+  Future<Result<void>> logout() async {
+    try {
+      await _apiClient.logout();
+      return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
     } catch (e) {

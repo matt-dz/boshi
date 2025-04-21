@@ -5,6 +5,7 @@ import 'package:frontend/ui/core/ui/footer.dart';
 import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/exceptions/format.dart';
+import 'package:go_router/go_router.dart';
 
 import '../view_model/profile_viewmodel.dart';
 
@@ -39,12 +40,42 @@ class ProfileScreen extends StatelessWidget {
                     );
                   }
 
-                  return Column(
-                    children: [
-                      Text(
-                        viewModel.user.handle!,
-                      ),
-                    ],
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Welcome back ${viewModel.user.handle!}!',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          viewModel.user.school,
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () async {
+                            await viewModel.logout.execute();
+                            if (context.mounted) {
+                              context.go('/login');
+                            }
+                          },
+                          child: Text(
+                            'Log out',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
