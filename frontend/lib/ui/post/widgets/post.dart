@@ -201,7 +201,7 @@ class PostFeed extends StatelessWidget {
             return Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 8,
+              spacing: 4,
               children: [
                 PostHeader(post: viewModel.post),
                 Text(extractContext(viewModel.post)),
