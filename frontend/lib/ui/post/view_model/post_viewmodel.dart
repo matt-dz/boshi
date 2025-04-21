@@ -1,61 +1,119 @@
-import 'package:flutter/foundation.dart';
+import 'package:atproto/core.dart';
+import 'package:flutter/material.dart';
+
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
-import 'package:frontend/domain/models/user/user.dart';
+
+import 'package:frontend/domain/models/post/post.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
-import 'package:frontend/internal/logger/logger.dart';
+import 'package:frontend/ui/reply/widgets/reply_view.dart';
 
 /// ViewModel for the Feed page
 class PostViewModel extends ChangeNotifier {
   PostViewModel({
     required AtProtoRepository atProtoRepository,
-  }) : _atProtoRepository = atProtoRepository {
-    load = Command0(_load)..execute();
-    createPost = Command1<void, (String, String)>(_createPost);
+    required Post post,
+    bool? disableLike,
+    bool? disableReply,
+  })  : _atProtoRepository = atProtoRepository,
+        _post = post {
+    toggleLike = Command0(_toggleLike);
+    handleReply = Command1<void, BuildContext>(_handleReply);
   }
 
-  late final Command0 load;
-  late final Command1<void, (String, String)> createPost;
+  late final Command0 toggleLike;
+  late final Command1 handleReply;
+
   final AtProtoRepository _atProtoRepository;
+  final Post _post;
 
-  User? _user;
-  User? get user => _user;
+  AtProtoRepository get atProtoRepository => _atProtoRepository;
+  String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
+  Post get post => _post;
 
-  Future<Result> _load() async {
+  Future<Result<void>> _handleReply(BuildContext context) async {
     try {
-      logger.d('Retrieving user');
-      final userResult = await _atProtoRepository.getUser();
-      switch (userResult) {
-        case Ok<User>():
-          _user = userResult.value;
-        case Error<User>():
-          logger.e('Failed to retrieve user: ', error: userResult.error);
+      final replyResult = await showReplyDialog(context, this);
+      switch (replyResult) {
+        case Ok<void>():
+          _post.post = _post.post.copyWith(
+            replyCount: _post.post.replyCount + 1,
+          );
+        case Error<void>():
+          logger.d('did not create reply');
       }
-      return userResult;
+      return replyResult;
     } finally {
       notifyListeners();
     }
   }
 
-  void reload() {
-    load = Command0(_load)..execute();
-    notifyListeners();
+  Future<Result<void>> _toggleLike() async {
+    try {
+      if (_post.post.isLiked) {
+        return _removeLike();
+      }
+      return _addLike();
+    } finally {
+      notifyListeners();
+    }
   }
 
-  Future<Result<void>> _createPost((String, String) postValues) async {
+  Future<Result<void>> _removeLike() async {
     try {
-      logger.d('Creating a post');
-      final createPostResult =
-          await _atProtoRepository.createPost(postValues.$1, postValues.$2);
-      switch (createPostResult) {
-        case Ok<void>():
-          logger.d('Successfully created post');
-          return createPostResult;
-        case Error<void>():
-          logger.e('Error creating post: ${createPostResult.error}');
-          return createPostResult;
+      if (userDid == null) {
+        return Result.error(Exception('User not logged in'));
       }
+
+      final result = await _atProtoRepository.removeLike(
+        _post.post.uri,
+        _post.post.cid,
+        userDid!,
+      );
+
+      if (result is Error) {
+        return result;
+      }
+
+      _post.post = _post.post.copyWith(
+        viewer: _post.post.viewer.copyWith(
+          like: null,
+        ),
+        likeCount: _post.post.likeCount - 1,
+      );
+
+      return result;
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<Result<AtUri>> _addLike() async {
+    try {
+      if (userDid == null) {
+        return Result.error(Exception('User not logged in'));
+      }
+
+      final result = await _atProtoRepository.addLike(
+        _post.post.uri,
+        _post.post.cid,
+      );
+
+      switch (result) {
+        case Error():
+          return result;
+        case Ok():
+          final likeUri = result.value;
+          _post.post = _post.post.copyWith(
+            viewer: _post.post.viewer.copyWith(
+              like: likeUri,
+            ),
+            likeCount: _post.post.likeCount + 1,
+          );
+      }
+      return result;
     } finally {
       notifyListeners();
     }

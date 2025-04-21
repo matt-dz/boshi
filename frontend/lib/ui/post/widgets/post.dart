@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/internal/feed/feed.dart';
+import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -59,17 +60,15 @@ class PostHeader extends StatelessWidget {
 class LikeButton extends StatelessWidget {
   const LikeButton({
     super.key,
-    required this.post,
-    this.onLike,
+    required this.viewModel,
   });
 
-  final Post post;
-  final VoidCallback? onLike;
+  final PostViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: onLike,
+      onPressed: viewModel.toggleLike.execute,
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
@@ -81,14 +80,14 @@ class LikeButton extends StatelessWidget {
         spacing: 4,
         children: [
           Icon(
-            post.post.isLiked
+            viewModel.post.post.isLiked
                 ? PhosphorIconsFill.heart
                 : PhosphorIconsRegular.heart,
-            color: post.post.isLiked ? Colors.red : Colors.black,
+            color: viewModel.post.post.isLiked ? Colors.red : Colors.black,
             size: 20,
           ),
           Text(
-            '${post.post.likeCount}',
+            '${viewModel.post.post.likeCount}',
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
@@ -103,17 +102,15 @@ class LikeButton extends StatelessWidget {
 class ReplyButton extends StatelessWidget {
   const ReplyButton({
     super.key,
-    required this.post,
-    this.onReply,
+    required this.viewModel,
   });
 
-  final Post post;
-  final VoidCallback? onReply;
+  final PostViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: onReply,
+      onPressed: () => viewModel.handleReply.execute(context),
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
@@ -129,7 +126,7 @@ class ReplyButton extends StatelessWidget {
             size: 20,
           ),
           Text(
-            '${post.post.replyCount}',
+            '${viewModel.post.post.replyCount}',
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
@@ -144,14 +141,10 @@ class ReplyButton extends StatelessWidget {
 class PostFooter extends StatelessWidget {
   const PostFooter({
     super.key,
-    required this.post,
-    this.onLike,
-    this.onReply,
+    required this.viewModel,
   });
 
-  final VoidCallback? onLike;
-  final VoidCallback? onReply;
-  final Post post;
+  final PostViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -159,8 +152,8 @@ class PostFooter extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
       children: [
-        LikeButton(post: post, onLike: onLike),
-        ReplyButton(post: post, onReply: onReply),
+        LikeButton(viewModel: viewModel),
+        ReplyButton(viewModel: viewModel),
       ],
     );
   }
@@ -169,18 +162,14 @@ class PostFooter extends StatelessWidget {
 class PostFeed extends StatelessWidget {
   const PostFeed({
     super.key,
-    required this.post,
-    this.onLike,
-    this.onReply,
+    required this.viewModel,
     this.replyIndent = 0,
     this.shadowColor = Colors.grey,
   });
 
-  final Post post;
+  final PostViewModel viewModel;
   final int replyIndent;
   final Color shadowColor;
-  final VoidCallback? onLike;
-  final VoidCallback? onReply;
 
   @override
   Widget build(BuildContext context) {
@@ -211,12 +200,10 @@ class PostFeed extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 8,
           children: [
-            PostHeader(post: post),
-            Text(extractContext(post)),
+            PostHeader(post: viewModel.post),
+            Text(extractContext(viewModel.post)),
             PostFooter(
-              post: post,
-              onLike: onLike,
-              onReply: onReply,
+              viewModel: viewModel,
             ),
           ],
         ),

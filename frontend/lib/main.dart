@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/post_thread/view_model/post_thread_viewmodel.dart';
 import 'package:frontend/ui/post_thread/widgets/post_thread_screen.dart';
-import 'ui/post/view_model/post_viewmodel.dart';
-import 'ui/post/widgets/post_screen.dart';
+import 'ui/create/view_model/create_viewmodel.dart';
+import 'ui/create/widgets/create_screen.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -69,9 +69,9 @@ class MainApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/create',
-          builder: (context, state) => PostScreen(
+          builder: (context, state) => CreateScreen(
             title: 'Boshi',
-            viewModel: PostViewModel(
+            viewModel: CreateViewModel(
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),

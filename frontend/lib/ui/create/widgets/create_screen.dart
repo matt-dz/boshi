@@ -10,13 +10,13 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/logger/logger.dart';
 
-import '../view_model/post_viewmodel.dart';
+import '../view_model/create_viewmodel.dart';
 
-class PostScreen extends StatelessWidget {
-  const PostScreen({super.key, required this.title, required this.viewModel});
+class CreateScreen extends StatelessWidget {
+  const CreateScreen({super.key, required this.title, required this.viewModel});
 
   final String title;
-  final PostViewModel viewModel;
+  final CreateViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class PostScreen extends StatelessWidget {
       body: Column(
         children: [
           Header(title: title),
-          Expanded(child: PostForm(viewModel: viewModel)),
+          Expanded(child: CreateForm(viewModel: viewModel)),
           Footer(),
         ],
       ),
@@ -32,16 +32,16 @@ class PostScreen extends StatelessWidget {
   }
 }
 
-class PostForm extends StatefulWidget {
-  const PostForm({super.key, required this.viewModel});
+class CreateForm extends StatefulWidget {
+  const CreateForm({super.key, required this.viewModel});
 
-  final PostViewModel viewModel;
+  final CreateViewModel viewModel;
 
   @override
-  State<PostForm> createState() => _PostFormState();
+  State<CreateForm> createState() => _CreateFormState();
 }
 
-class _PostFormState extends State<PostForm> {
+class _CreateFormState extends State<CreateForm> {
   final formKey = GlobalKey<ShadFormState>();
   bool _titleExists = false;
   bool _contentExists = false;

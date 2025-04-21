@@ -1,24 +1,23 @@
 import 'package:atproto/atproto.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/material.dart';
-import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
-import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/internal/logger/logger.dart';
 import 'package:frontend/internal/result/result.dart';
-import 'package:frontend/ui/home/widgets/post.dart';
+import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
+import 'package:frontend/ui/post/widgets/post.dart';
 import 'package:frontend/ui/reply/view_model/reply_viewmodel.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-void showReplyDialog(BuildContext context, Post parent, VoidCallback? onLike) {
-  showDialog(
+Future<Result<void>> showReplyDialog(
+  BuildContext context,
+  PostViewModel parentViewModel,
+) async {
+  return await showDialog(
     context: context,
     builder: (_) => ReplyWidget(
       viewModel: ReplyViewModel(
-        atProtoRepository: context.read<AtProtoRepository>(),
-        parent: parent,
-        onLike: onLike,
+        parentViewModel: parentViewModel,
       ),
     ),
   );
@@ -107,8 +106,7 @@ class _ReplyWidgetState extends State<ReplyWidget> {
               builder: (context, _) {
                 return PostFeed(
                   key: Key(widget.viewModel.parent.post.cid),
-                  post: widget.viewModel.parent,
-                  onLike: widget.viewModel.onLike,
+                  viewModel: widget.viewModel.parentViewModel,
                 );
               },
             ),

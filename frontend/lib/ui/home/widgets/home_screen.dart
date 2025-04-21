@@ -9,9 +9,9 @@ import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/internal/exceptions/format.dart';
-import 'package:frontend/ui/reply/widgets/reply_view.dart';
+import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
+import 'package:frontend/ui/post/widgets/post.dart';
 import 'package:provider/provider.dart';
-import 'post.dart';
 
 import '../view_model/home_viewmodel.dart';
 
@@ -30,23 +30,10 @@ class FeedView extends StatelessWidget {
             for (final post in feed)
               PostFeed(
                 key: Key(post.post.cid),
-                post: post,
-                onLike: () {
-                  if (post.post.isLiked) {
-                    viewModel.removeLike.execute(post);
-                    return;
-                  }
-                  viewModel.addLike.execute(post);
-                },
-                onReply: () {
-                  showReplyDialog(context, post, () {
-                    if (post.post.isLiked) {
-                      viewModel.removeLike.execute(post);
-                      return;
-                    }
-                    viewModel.addLike.execute(post);
-                  });
-                },
+                viewModel: PostViewModel(
+                  atProtoRepository: context.read<AtProtoRepository>(),
+                  post: post,
+                ),
               ),
           ],
         ),
