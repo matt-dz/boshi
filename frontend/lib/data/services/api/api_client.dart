@@ -458,8 +458,8 @@ class ApiClient {
         if (subject is! Map) {
           throw Exception('Invalid value: $value');
         }
-        final likedPostUri = subject['uri'];
-        if (likedPostUri == uri) {
+        final likedPostUri = subject['uri'] as String;
+        if (likedPostUri == uri.toString()) {
           logger.d('Deleting like record');
           final res = await bluesky.atproto.repo.deleteRecord(
             uri: record.uri,
