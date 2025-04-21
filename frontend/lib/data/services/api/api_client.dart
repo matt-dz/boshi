@@ -109,7 +109,8 @@ class ApiClient {
 
     try {
       final Map<String, dynamic> decoded = json.decode(userResponse.body);
-      decoded['handle'] = aka.first;
+      decoded['handle'] = aka.first as String;
+      logger.d('User decoded: $decoded');
       final User user = User.fromJson(decoded);
       return Result.ok(user);
     } on Exception catch (error) {
