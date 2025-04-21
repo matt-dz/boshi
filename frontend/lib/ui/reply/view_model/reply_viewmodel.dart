@@ -29,6 +29,7 @@ class ReplyViewModel extends ChangeNotifier {
   final Post _parent;
 
   String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
+  Post get parent => _parent;
 
   Future<Result<void>> _createReply(bsky.PostRecord reply) async {
     try {
