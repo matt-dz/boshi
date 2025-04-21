@@ -430,14 +430,18 @@ class ApiClient {
     bool like,
   ) async {
     if (like) {
+      logger.d('Sending like request');
       final res = await bluesky.feed.like(cid: cid, uri: uri);
+      logger.d('Received response: $res');
       if (res.status.code > 299) {
         throw HttpException(res.status.message);
       }
       return Result.ok(null);
     }
 
+    logger.d('Deleting like record');
     final res = await bluesky.atproto.repo.deleteRecord(uri: uri);
+    logger.d('Received response: $res');
     if (res.status.code > 299) {
       throw HttpException(res.status.message);
     }

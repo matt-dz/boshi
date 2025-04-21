@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:frontend/ui/core/ui/header.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
+import 'package:frontend/ui/models/like/like.dart';
 import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/exceptions/format.dart';
@@ -11,8 +12,9 @@ import 'post.dart';
 import '../view_model/home_viewmodel.dart';
 
 class FeedView extends StatelessWidget {
-  const FeedView({super.key, required this.feed});
+  const FeedView({super.key, required this.feed, required this.viewModel});
 
+  final HomeViewModel viewModel;
   final List<Post> feed;
 
   @override
@@ -25,6 +27,16 @@ class FeedView extends StatelessWidget {
               PostFeed(
                 key: Key(post.cid),
                 post: post,
+                onLike: () {
+                  viewModel.toggleLike.execute(
+                    Like(
+                      cid: post.cid,
+                      uri: post.uri.toString(),
+                      like: !post.likedByUser,
+                    ),
+                  );
+                },
+                onReply: () {},
               ),
           ],
         ),
@@ -61,7 +73,8 @@ class HomeScreen extends StatelessWidget {
                   }
 
                   return FeedView(
-                    feed: (viewModel.load.result! as Ok).value as List<Post>,
+                    feed: viewModel.feed,
+                    viewModel: viewModel,
                   );
                 },
               ),

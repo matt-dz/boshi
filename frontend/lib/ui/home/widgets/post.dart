@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:frontend/domain/models/post/post.dart';
@@ -73,14 +74,21 @@ class PostHeader extends StatelessWidget {
 }
 
 class LikeButton extends StatelessWidget {
-  const LikeButton({super.key, required this.liked, required this.likes});
+  const LikeButton({
+    super.key,
+    required this.liked,
+    required this.likes,
+    required this.onLike,
+  });
+
   final bool liked;
   final int likes;
+  final VoidCallback onLike;
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: () {},
+      onPressed: onLike,
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
@@ -92,8 +100,8 @@ class LikeButton extends StatelessWidget {
         spacing: 4,
         children: [
           Icon(
-            liked ? PhosphorIconsRegular.heart : PhosphorIconsFill.heart,
-            color: liked ? Colors.black : Colors.red,
+            liked ? PhosphorIconsFill.heart : PhosphorIconsRegular.heart,
+            color: liked ? Colors.red : Colors.black,
             size: 20,
           ),
           Text(
@@ -110,13 +118,19 @@ class LikeButton extends StatelessWidget {
 }
 
 class ReplyButton extends StatelessWidget {
-  const ReplyButton({super.key, required this.numReplies});
+  const ReplyButton({
+    super.key,
+    required this.numReplies,
+    required this.onReply,
+  });
+
   final int numReplies;
+  final VoidCallback onReply;
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: () {},
+      onPressed: onReply,
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
@@ -145,8 +159,15 @@ class ReplyButton extends StatelessWidget {
 }
 
 class PostFooter extends StatelessWidget {
-  const PostFooter({super.key, required this.post});
+  const PostFooter({
+    super.key,
+    required this.post,
+    required this.onLike,
+    required this.onReply,
+  });
 
+  final VoidCallback onLike;
+  final VoidCallback onReply;
   final Post post;
 
   @override
@@ -155,8 +176,8 @@ class PostFooter extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
       children: [
-        LikeButton(likes: post.likes, liked: post.likedByUser),
-        ReplyButton(numReplies: post.numReplies),
+        LikeButton(likes: post.likes, liked: post.likedByUser, onLike: onLike),
+        ReplyButton(numReplies: post.numReplies, onReply: onReply),
       ],
     );
   }
@@ -166,6 +187,8 @@ class PostFeed extends StatelessWidget {
   const PostFeed({
     super.key,
     required this.post,
+    required this.onLike,
+    required this.onReply,
     this.replyIndent = 0,
     this.shadowColor = Colors.grey,
   });
@@ -173,6 +196,8 @@ class PostFeed extends StatelessWidget {
   final Post post;
   final int replyIndent;
   final Color shadowColor;
+  final VoidCallback onLike;
+  final VoidCallback onReply;
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +230,11 @@ class PostFeed extends StatelessWidget {
           children: [
             PostHeader(post: post),
             Text(post.content),
-            PostFooter(post: post),
+            PostFooter(
+              post: post,
+              onLike: onLike,
+              onReply: onReply,
+            ),
           ],
         ),
       ),

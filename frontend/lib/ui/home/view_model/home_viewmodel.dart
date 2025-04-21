@@ -7,6 +7,7 @@ import 'package:frontend/ui/models/like/like.dart';
 
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 /// ViewModel for the Feed page
 class HomeViewModel extends ChangeNotifier {
@@ -23,11 +24,19 @@ class HomeViewModel extends ChangeNotifier {
   late final Command0 load;
   late final Command1 toggleLike;
   late final Command1 updateReactionCount;
+  List<Post> _posts = [];
   final AtProtoRepository _atProtoRepository;
+
+  List<Post> get feed => _posts;
 
   Future<Result> _load() async {
     try {
-      return await _atProtoRepository.getFeed();
+      final result = await _atProtoRepository.getFeed();
+      if (result is Ok<List<Post>>) {
+        _posts = result.value;
+        logger.d(_posts);
+      }
+      return result;
     } finally {
       notifyListeners();
     }
@@ -40,7 +49,21 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<Result<void>> _toggleLike(Like like) async {
     try {
-      return await _atProtoRepository.toggleLike(like.uri, like.cid, like.like);
+      final result =
+          await _atProtoRepository.toggleLike(like.uri, like.cid, like.like);
+      if (result is Ok) {
+        _posts = _posts.map((post) {
+          if (post.uri.toString() == like.uri) {
+            return post.copyWith(
+              likedByUser: like.like,
+              likes: post.likes + (like.like ? 1 : -1),
+            );
+          }
+          return post;
+        }).toList();
+        logger.d('Post updated: $_posts');
+      }
+      return result;
     } finally {
       notifyListeners();
     }
