@@ -1,17 +1,19 @@
-import 'package:bluesky/bluesky.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
+import 'package:frontend/ui/post/widgets/post.dart';
+import 'package:frontend/ui/post_thread/view_model/post_thread_viewmodel.dart';
 
 class RepliesWidget extends StatelessWidget {
   const RepliesWidget({
     super.key,
-    this.replies,
+    required this.viewModel,
   });
 
-  final List<PostThreadView>? replies;
+  final PostThreadViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
-    if (replies == null || replies!.isEmpty) {
+    if (viewModel.replies.isEmpty) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: const [
@@ -25,6 +27,19 @@ class RepliesWidget extends StatelessWidget {
         ],
       );
     }
-    return Text('Not yet implemented');
+
+    return ListView.builder(
+      itemCount: viewModel.replies.length,
+      itemBuilder: (context, index) {
+        final reply = viewModel.replies[index];
+        return PostFeed(
+          key: Key(reply.post.cid),
+          viewModel: PostViewModel(
+            atProtoRepository: viewModel.atProtoRepository,
+            post: reply,
+          ),
+        );
+      },
+    );
   }
 }

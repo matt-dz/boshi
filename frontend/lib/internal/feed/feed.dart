@@ -14,7 +14,8 @@ String extractTitle(Post post) {
 
 String extractContext(Post post) {
   final titleEnd = post.post.record.facets?[0].index.byteEnd;
-  return post.post.record.text.substring(titleEnd == null ? 0 : titleEnd + 1);
+  return post.post.record.text
+      .substring(titleEnd == null || titleEnd == 0 ? 0 : titleEnd + 1);
 }
 
 String timeSincePosting(Post post) {

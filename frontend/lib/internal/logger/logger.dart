@@ -4,7 +4,6 @@ class AppLogger extends Logger {
   static final Logger _logger = Logger(
     printer: PrettyPrinter(),
     output: null,
-    // filter: _AlwaysLogFilter(),
   );
 
   static Logger get instance => _logger;

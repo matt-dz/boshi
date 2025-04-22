@@ -113,6 +113,10 @@ class ApiClient {
       queryParameters: {'user_id': dids},
     );
 
+    if (!EnvironmentConfig.prod) {
+      return Result.ok([mockUser]);
+    }
+
     logger.d('Sending request');
     final response = await http.get(requestUri);
 
@@ -172,8 +176,18 @@ class ApiClient {
     bsky.PostRecord reply,
   ) async {
     logger.d('Creating reply');
-    final xrpcResponse = await bluesky.feed
-        .post(text: reply.text, tags: ['boshi.reply'], reply: reply.reply);
+    final xrpcResponse = await bluesky.feed.post(
+        text: reply.text,
+        tags: ['boshi.reply'],
+        facets: [
+          bsky.Facet(
+            index: bsky.ByteSlice(byteStart: 0, byteEnd: 0),
+            features: [
+              bsky.FacetFeature.tag(data: bsky.FacetTag(tag: 'boshi'))
+            ],
+          ),
+        ],
+        reply: reply.reply);
 
     if (xrpcResponse.status != HttpStatus.ok) {
       return Result.error(
@@ -189,13 +203,18 @@ class ApiClient {
     bsky.Bluesky bluesky,
     AtUri url,
   ) async {
-    logger.d('Creating reply');
+    logger.d('getting post thread');
+
+    if (!EnvironmentConfig.prod) {
+      return Result.ok(mockGetPostThreadResult);
+    }
+
     final xrpcResponse = await bluesky.feed.getPostThread(uri: url);
 
     if (xrpcResponse.status != HttpStatus.ok) {
       return Result.error(
         HttpException(
-          'Failed to create a reply record with status: ${xrpcResponse.status}',
+          'Failed to get post thread with status: ${xrpcResponse.status}',
         ),
       );
     }

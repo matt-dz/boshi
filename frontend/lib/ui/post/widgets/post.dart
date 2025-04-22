@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/internal/feed/feed.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/internal/logger/logger.dart';
@@ -62,7 +63,7 @@ class LikeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: viewModel.toggleLike.execute,
+      onPressed: viewModel.disableLike ? null : viewModel.toggleLike.execute,
       style: Theme.of(context).outlinedButtonTheme.style,
       child: Row(
         spacing: 4,
@@ -102,7 +103,11 @@ class ReplyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: () => viewModel.handleReply.execute(context),
+      onPressed: viewModel.disableReply
+          ? null
+          : () => context.go(
+                '/post/${Uri.encodeComponent(viewModel.post.post.uri.toString())}',
+              ),
       style: Theme.of(context).outlinedButtonTheme.style,
       child: Row(
         spacing: 4,
