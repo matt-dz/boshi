@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:frontend/ui/post/widgets/post.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend/ui/post_thread/view_model/post_thread_viewmodel.dart';
 
 class RepliesWidget extends StatelessWidget {
-  const RepliesWidget({
-    super.key,
-    required this.replies,
-  });
+  const RepliesWidget(
+      {super.key, required this.replies, required this.viewModel});
 
   final List<Post> replies;
+  final PostThreadViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +36,7 @@ class RepliesWidget extends StatelessWidget {
               PostFeed(
                 key: Key(post.post.cid),
                 viewModel: PostViewModel(
-                  atProtoRepository: context.read<AtProtoRepository>(),
+                  atProtoRepository: viewModel.atProtoRepository,
                   post: post,
                 ),
               ),
@@ -46,6 +44,5 @@ class RepliesWidget extends StatelessWidget {
         ),
       ],
     );
-    ;
   }
 }

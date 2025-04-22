@@ -28,6 +28,7 @@ class PostThreadViewModel extends ChangeNotifier {
   late Post _post;
   late List<Post> _replies;
 
+  AtProtoRepository get atProtoRepository => _atProtoRepository;
   Post get post => _post;
   List<Post> get replies => _replies;
 

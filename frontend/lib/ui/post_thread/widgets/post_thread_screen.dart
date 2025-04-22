@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/ui/core/ui/header.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
@@ -9,7 +8,6 @@ import 'package:frontend/internal/exceptions/format.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:frontend/ui/post/widgets/post.dart';
 import 'package:frontend/ui/post_thread/widgets/replies.dart';
-import 'package:provider/provider.dart';
 
 import '../view_model/post_thread_viewmodel.dart';
 
@@ -49,11 +47,14 @@ class PostThreadScreen extends StatelessWidget {
                     children: [
                       PostFeed(
                         viewModel: PostViewModel(
-                          atProtoRepository: context.read<AtProtoRepository>(),
+                          atProtoRepository: viewModel.atProtoRepository,
                           post: viewModel.post,
                         ),
                       ),
-                      RepliesWidget(replies: viewModel.replies),
+                      RepliesWidget(
+                        replies: viewModel.replies,
+                        viewModel: viewModel,
+                      ),
                     ],
                   ),
                 ),
