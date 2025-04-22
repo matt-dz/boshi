@@ -15,12 +15,10 @@ import '../view_model/post_thread_viewmodel.dart';
 class PostThreadScreen extends StatelessWidget {
   const PostThreadScreen({
     super.key,
-    required this.title,
     required this.viewModel,
   });
 
   final PostThreadViewModel viewModel;
-  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +26,17 @@ class PostThreadScreen extends StatelessWidget {
       child: Scaffold(
         body: Column(
           children: [
-            Header(title: title),
+            Header(),
             Expanded(
               child: ListenableBuilder(
                 listenable: viewModel,
                 builder: (context, _) {
                   if (viewModel.load.running) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    );
                   } else if (viewModel.load.error) {
                     final result = viewModel.load.result! as Error;
                     return ErrorScreen(
@@ -43,21 +45,26 @@ class PostThreadScreen extends StatelessWidget {
                     );
                   }
 
-                  return Column(
-                    children: [
-                      PostFeed(
-                        viewModel: PostViewModel(
-                          post: viewModel.post,
-                          atProtoRepository: viewModel.atProtoRepository,
-                        ),
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: 450),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PostFeed(
+                            viewModel: PostViewModel(
+                              post: viewModel.post,
+                              atProtoRepository: viewModel.atProtoRepository,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          ReplyInputWidget(viewModel: viewModel),
+                          Flexible(
+                            child: RepliesWidget(viewModel: viewModel),
+                          ),
+                        ],
                       ),
-                      ReplyInputWidget(viewModel: viewModel),
-                      Expanded(
-                        child: RepliesWidget(
-                          viewModel: viewModel,
-                        ),
-                      ),
-                    ],
+                    ),
                   );
                 },
               ),

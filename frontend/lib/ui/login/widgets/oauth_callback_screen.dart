@@ -46,7 +46,9 @@ class _OAuthCallbackState extends State<OAuthCallback> {
     if (_loading) {
       return const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            color: Colors.white,
+          ),
         ),
       );
     }

@@ -20,6 +20,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<ShadFormState>();
+  final _disabledColor = Color(0xFFC3CAEB);
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +28,16 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Center(
         child: ShadCard(
           width: 350,
-          title: const Text('Boshi Log In'),
-          description: const Text('Use your identity to sign in with OAuth'),
+          title: Text(
+            'Boshi Log In',
+            style: Theme.of(context).primaryTextTheme.headlineLarge,
+          ),
+          description: Text(
+            'Use your identity to sign in with OAuth',
+            style: Theme.of(context).textTheme.labelSmall,
+          ),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          border: Border.all(color: Theme.of(context).focusColor),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: ShadForm(
@@ -38,19 +47,34 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   ShadInputFormField(
+                    decoration: ShadDecoration(
+                      color: Colors.black26,
+                      border:
+                          ShadBorder.all(color: Theme.of(context).focusColor),
+                      secondaryFocusedBorder:
+                          ShadBorder.all(color: Theme.of(context).focusColor),
+                    ),
+                    cursorColor:
+                        Theme.of(context).primaryTextTheme.bodySmall?.color,
+                    style: Theme.of(context).primaryTextTheme.bodySmall,
                     textAlign: TextAlign.center,
                     id: 'auth_provider',
-                    label: const Center(
+                    label: Center(
                       child: Text(
                         'Account Provider',
-                        style: TextStyle(height: 0.2),
+                        style: Theme.of(context).primaryTextTheme.labelMedium,
                       ),
                     ),
                     initialValue: 'bsky.social',
-                    description: const Center(
+                    description: Center(
                       child: Text(
                         'Choose your account provider.',
-                        style: TextStyle(height: 0.2),
+                        style: Theme.of(context)
+                            .primaryTextTheme
+                            .labelSmall
+                            ?.copyWith(
+                              color: _disabledColor,
+                            ),
                       ),
                     ),
                     validator: (v) {
@@ -64,10 +88,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 32),
                   ShadInputFormField(
                     id: 'identity',
-                    label: const Text('Identity'),
-                    placeholder: const Text('Enter your identity'),
-                    description: const Text(
+                    style: Theme.of(context).primaryTextTheme.bodySmall,
+                    decoration: ShadDecoration(
+                      color: Colors.black26,
+                      border: ShadBorder.all(color: const Color(0xAA7DD3FC)),
+                      secondaryFocusedBorder:
+                          ShadBorder.all(color: const Color(0xAA7DD3FC)),
+                    ),
+                    cursorColor:
+                        Theme.of(context).primaryTextTheme.bodySmall?.color,
+                    label: Text(
+                      'Identity',
+                      style: Theme.of(context).primaryTextTheme.labelMedium,
+                    ),
+                    placeholder: Text(
+                      'Enter your identity',
+                      style: Theme.of(context).primaryTextTheme.bodySmall,
+                    ),
+                    description: Text(
                       'Login with any identifier on the atprotocol',
+                      style: Theme.of(context)
+                          .primaryTextTheme
+                          .labelSmall
+                          ?.copyWith(
+                            color: _disabledColor,
+                          ),
                     ),
                     validator: (v) {
                       if (v.isEmpty) {
@@ -78,6 +123,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
                   ShadButton(
+                    backgroundColor: const Color(0xFF38BDF8),
+                    hoverBackgroundColor: const Color(0xDF38BDF8),
                     child: const Text('Log in'),
                     onPressed: () async {
                       if (formKey.currentState!.saveAndValidate()) {

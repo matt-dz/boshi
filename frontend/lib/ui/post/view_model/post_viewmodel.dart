@@ -2,13 +2,14 @@ import 'package:atproto/core.dart';
 import 'package:flutter/material.dart';
 
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
+import 'package:frontend/internal/feed/feed.dart';
 
 import 'package:frontend/domain/models/post/post.dart';
 
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
 
-/// ViewModel for the Feed page
+/// ViewModel for the PostViewModel screen
 class PostViewModel extends ChangeNotifier {
   PostViewModel({
     required AtProtoRepository atProtoRepository,
@@ -18,7 +19,8 @@ class PostViewModel extends ChangeNotifier {
   })  : _atProtoRepository = atProtoRepository,
         _post = post,
         _disableReply = disableReply,
-        _disableLike = disableLike {
+        _disableLike = disableLike,
+        _title = extractTitle(post) {
     toggleLike = Command0(_toggleLike);
   }
 
@@ -28,12 +30,16 @@ class PostViewModel extends ChangeNotifier {
   final Post _post;
   final bool _disableReply;
   final bool _disableLike;
+  final String _title;
 
   AtProtoRepository get atProtoRepository => _atProtoRepository;
   String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
   Post get post => _post;
   bool get disableReply => _disableReply;
   bool get disableLike => _disableLike;
+
+  bool get isReply => _title.isEmpty;
+  bool get isPost => _title.isNotEmpty;
 
   Future<Result<void>> _toggleLike() async {
     try {

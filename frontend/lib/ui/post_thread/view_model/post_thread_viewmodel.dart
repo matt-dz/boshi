@@ -13,7 +13,7 @@ import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
 import 'package:frontend/internal/logger/logger.dart';
 
-/// ViewModel for the Feed page
+/// ViewModel for the PostThread screen
 class PostThreadViewModel extends ChangeNotifier {
   PostThreadViewModel({
     required AtProtoRepository atProtoRepository,

@@ -11,6 +11,7 @@ class Error extends StatelessWidget {
     return SizedBox(
       width: 350,
       child: Text(
+        textAlign: TextAlign.center,
         message,
         style: TextStyle(
           color: color ?? Colors.red,

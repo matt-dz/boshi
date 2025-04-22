@@ -20,24 +20,52 @@ class ReplyInputWidget extends StatefulWidget {
 
 class _ReplyInputWidgetState extends State<ReplyInputWidget> {
   final _formKey = GlobalKey<ShadFormState>();
-  final TextEditingController _controller = TextEditingController();
-  bool _validState() {
-    return _controller.text.isNotEmpty;
+  final TextEditingController _replyController = TextEditingController();
+
+  bool _replyEmpty = true;
+
+  void _onReply() async {
+    final result = await widget.viewModel.createReply.execute(
+      bsky.PostRecord(
+        text: _replyController.text,
+        reply: bsky.ReplyRef(
+          parent: StrongRef(
+            cid: widget.viewModel.post.post.cid,
+            uri: widget.viewModel.post.post.uri,
+          ),
+          root: widget.viewModel.post.root ??
+              StrongRef(
+                uri: widget.viewModel.post.post.uri,
+                cid: widget.viewModel.post.post.cid,
+              ),
+        ),
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    switch (result) {
+      case Ok<void>():
+        logger.d('Successfully created reply');
+        _formKey.currentState?.reset();
+        _replyController.clear();
+      case Error():
+        logger.e('Error creating reply with: $result');
+    }
   }
 
   @override
   void initState() {
     super.initState();
-
-    _controller.addListener(_validState);
-    _controller.addListener(() {
-      setState(() {}); // Triggers UI rebuild for button enabled state
+    _replyController.addListener(() {
+      setState(() {
+        _replyEmpty = _replyController.text.isEmpty;
+      });
     });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _replyController.dispose();
     super.dispose();
   }
 
@@ -51,55 +79,71 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
           Expanded(
             child: Form(
               key: _formKey,
-              child: ShadInputFormField(
-                controller: _controller,
-                placeholder: Text(
-                  'Thoughts?',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).disabledColor,
-                      ),
-                ),
-                decoration: ShadDecoration(
-                  border: ShadBorder.none,
-                  disableSecondaryBorder: true,
+              child: TextField(
+                controller: _replyController,
+                minLines: 1,
+                maxLines: 4,
+                cursorColor:
+                    Theme.of(context).primaryTextTheme.bodySmall?.color,
+                style: Theme.of(context).primaryTextTheme.bodySmall,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xFF223C48),
+                  contentPadding: EdgeInsets.all(12),
+                  isDense: true,
+                  hintStyle:
+                      Theme.of(context).primaryTextTheme.bodySmall?.copyWith(
+                            color: Color(0xFFC3CAEB),
+                          ),
+                  hintText: 'Thoughts?',
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      width: 2,
+                      color: Theme.of(context).focusColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      width: 2,
+                      color: Theme.of(context).focusColor,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-          ShadButton.ghost(
-            height: 30,
-            width: 120,
-            enabled: _validState(),
-            onPressed: () async {
-              final result = await widget.viewModel.createReply.execute(
-                bsky.PostRecord(
-                  text: _controller.text,
-                  reply: bsky.ReplyRef(
-                    parent: StrongRef(
-                      cid: widget.viewModel.post.post.cid,
-                      uri: widget.viewModel.post.post.uri,
-                    ),
-                    root: widget.viewModel.post.root ??
-                        StrongRef(
-                          uri: widget.viewModel.post.post.uri,
-                          cid: widget.viewModel.post.post.cid,
-                        ),
+          const SizedBox(width: 10),
+          OutlinedButton(
+            style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+                  fixedSize: WidgetStateProperty.resolveWith(
+                    (_) => const Size(64, 32),
                   ),
-                  createdAt: DateTime.now(),
+                  shape: WidgetStateProperty.resolveWith((states) {
+                    return RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    );
+                  }),
+                  side: WidgetStateProperty.resolveWith((states) {
+                    return BorderSide(
+                      width: 2,
+                      color: states.contains(WidgetState.disabled)
+                          ? Color(0xFF636363)
+                          : Color(0xffa0cafa),
+                    );
+                  }),
+                  backgroundColor: WidgetStateProperty.resolveWith((states) {
+                    return states.contains(WidgetState.disabled)
+                        ? Color(0xFF434343)
+                        : Color(0xff63a0eb);
+                  }),
                 ),
-              );
-
-              switch (result) {
-                case Ok<void>():
-                  logger.d('Successfully created reply');
-                  _formKey.currentState?.reset();
-                  _controller.clear();
-                case Error():
-                  logger.e('Error creating reply with: $result');
-              }
-            },
-            child: const Text('Reply'),
+            onPressed: _replyEmpty ? null : _onReply,
+            child: Text(
+              'Reply',
+              style: Theme.of(context).primaryTextTheme.labelSmall,
+            ),
           ),
         ],
       ),

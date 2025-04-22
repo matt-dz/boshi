@@ -12,12 +12,10 @@ import '../view_model/profile_viewmodel.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     super.key,
-    required this.title,
     required this.viewModel,
   });
 
   final ProfileViewModel viewModel;
-  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +23,17 @@ class ProfileScreen extends StatelessWidget {
       child: Scaffold(
         body: Column(
           children: [
-            Header(title: title),
+            Header(),
             Expanded(
               child: ListenableBuilder(
                 listenable: viewModel,
                 builder: (context, _) {
                   if (viewModel.load.running) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    );
                   } else if (viewModel.load.error) {
                     final result = viewModel.load.result! as Error;
                     return ErrorScreen(
@@ -41,26 +43,38 @@ class ProfileScreen extends StatelessWidget {
                   }
 
                   return Padding(
-                    padding: const EdgeInsets.only(top: 16),
+                    padding: const EdgeInsets.only(top: 16, bottom: 16),
                     child: Column(
+                      spacing: 4,
                       children: [
                         Text(
-                          'Welcome back ${viewModel.user.handle!}!',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          textAlign: TextAlign.center,
+                          'Welcome back',
+                          style:
+                              Theme.of(context).primaryTextTheme.headlineLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          textAlign: TextAlign.center,
+                          viewModel.user.handle!,
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .headlineMedium
+                              ?.copyWith(
+                                color: Theme.of(context).focusColor,
+                              ),
                         ),
                         Text(
                           viewModel.user.school,
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                color: Colors.orange,
+                              ),
                         ),
-                        const Spacer(),
                         TextButton(
-                          style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
+                          style: Theme.of(context).textButtonTheme.style,
                           onPressed: () async {
                             await viewModel.logout.execute();
                             if (context.mounted) {
