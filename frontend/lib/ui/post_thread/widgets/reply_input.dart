@@ -72,33 +72,31 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
             width: 120,
             enabled: _validState(),
             onPressed: () async {
-              if (_validState()) {
-                final result = await widget.viewModel.createReply.execute(
-                  bsky.PostRecord(
-                    text: _controller.text,
-                    reply: bsky.ReplyRef(
-                      parent: StrongRef(
-                        cid: widget.viewModel.post.post.cid,
-                        uri: widget.viewModel.post.post.uri,
-                      ),
-                      root: widget.viewModel.post.root ??
-                          StrongRef(
-                            uri: widget.viewModel.post.post.uri,
-                            cid: widget.viewModel.post.post.cid,
-                          ),
+              final result = await widget.viewModel.createReply.execute(
+                bsky.PostRecord(
+                  text: _controller.text,
+                  reply: bsky.ReplyRef(
+                    parent: StrongRef(
+                      cid: widget.viewModel.post.post.cid,
+                      uri: widget.viewModel.post.post.uri,
                     ),
-                    createdAt: DateTime.now(),
+                    root: widget.viewModel.post.root ??
+                        StrongRef(
+                          uri: widget.viewModel.post.post.uri,
+                          cid: widget.viewModel.post.post.cid,
+                        ),
                   ),
-                );
+                  createdAt: DateTime.now(),
+                ),
+              );
 
-                switch (result) {
-                  case Ok<void>():
-                    logger.d('Successfully created reply');
-                    _formKey.currentState?.reset();
-                    _controller.clear();
-                  case Error():
-                    logger.e('Error creating reply with: $result');
-                }
+              switch (result) {
+                case Ok<void>():
+                  logger.d('Successfully created reply');
+                  _formKey.currentState?.reset();
+                  _controller.clear();
+                case Error():
+                  logger.e('Error creating reply with: $result');
               }
             },
             child: const Text('Reply'),
