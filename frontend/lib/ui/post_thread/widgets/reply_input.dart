@@ -114,32 +114,35 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
               ),
             ),
           ),
-          const SizedBox(width: 10),
-          OutlinedButton(
-            style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
-              shape: WidgetStateProperty.resolveWith((states) {
-                return RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                );
-              }),
-              side: WidgetStateProperty.resolveWith((states) {
-                return BorderSide(
-                  width: 2,
-                  color: states.contains(WidgetState.disabled)
-                      ? Color(0xFF636363)
-                      : Color(0xffa0cafa),
-                );
-              }),
-              backgroundColor: WidgetStateProperty.resolveWith((states) {
-                return states.contains(WidgetState.disabled)
-                    ? Color(0xFF434343)
-                    : Color(0xff63a0eb);
-              }),
-            ),
-            onPressed: _replyEmpty ? null : _onReply,
-            child: Text(
-              'Reply',
-              style: Theme.of(context).primaryTextTheme.labelSmall,
+          SizedBox(width: 8),
+          Flexible(
+            flex: 0,
+            child: OutlinedButton(
+              style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+                shape: WidgetStateProperty.resolveWith((states) {
+                  return RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  );
+                }),
+                side: WidgetStateProperty.resolveWith((states) {
+                  return BorderSide(
+                    width: 2,
+                    color: states.contains(WidgetState.disabled)
+                        ? Color(0xFF636363)
+                        : Color(0xffa0cafa),
+                  );
+                }),
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  return states.contains(WidgetState.disabled)
+                      ? Color(0xFF434343)
+                      : Color(0xff63a0eb);
+                }),
+              ),
+              onPressed: _replyEmpty ? null : _onReply,
+              child: Text(
+                'Reply',
+                style: Theme.of(context).primaryTextTheme.labelSmall,
+              ),
             ),
           ),
         ],
