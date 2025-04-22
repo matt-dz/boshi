@@ -65,7 +65,7 @@ class PostThreadViewModel extends ChangeNotifier {
               );
               _replies = extractRepliesFromPostThread(
                 StrongRef(cid: threadView.post.cid, uri: threadView.post.uri),
-                StrongRef(cid: threadView.post.cid, uri: threadView.post.uri),
+                getRootFromPostThread(threadView),
                 threadView.replies,
                 users.value,
               );
