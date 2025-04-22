@@ -73,7 +73,6 @@ class ProfileScreen extends StatelessWidget {
                                 color: Colors.orange,
                               ),
                         ),
-                        const Spacer(),
                         TextButton(
                           style: Theme.of(context).textButtonTheme.style,
                           onPressed: () async {

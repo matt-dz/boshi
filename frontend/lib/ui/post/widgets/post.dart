@@ -71,7 +71,11 @@ class LikeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: viewModel.disableLike ? null : viewModel.toggleLike.execute,
-      style: Theme.of(context).outlinedButtonTheme.style,
+      style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+            padding: WidgetStateProperty.resolveWith(
+              (state) => EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            ),
+          ),
       child: Row(
         spacing: 4,
         children: [
@@ -119,7 +123,11 @@ class ReplyButton extends StatelessWidget {
                 '/post/$encodedUri',
               );
             },
-      style: Theme.of(context).outlinedButtonTheme.style,
+      style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+            padding: WidgetStateProperty.resolveWith(
+              (state) => EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            ),
+          ),
       child: Row(
         spacing: 4,
         children: [
@@ -153,7 +161,6 @@ class PostFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      spacing: 16,
       children: [
         LikeButton(viewModel: viewModel),
         ReplyButton(viewModel: viewModel),
