@@ -123,71 +123,78 @@ class MainApp extends StatelessWidget {
     return ShadApp.materialRouter(
       materialThemeBuilder: (context, theme) {
         return theme.copyWith(
-          scaffoldBackgroundColor: Color(0xFF2E2C3A),
-          iconTheme: IconThemeData(color: Color(0xFF6C7086)),
-          primaryIconTheme: IconThemeData(color: Color(0xFFF4F4F9)),
-          dividerColor: Color(0xFFC9C9D9),
-          disabledColor: Color(0xFF6C7086),
+          scaffoldBackgroundColor: const Color(0xFF2E2C3A),
+          iconTheme: IconThemeData(color: const Color(0xFF6C7086)),
+          primaryIconTheme: IconThemeData(color: const Color(0xFFF4F4F9)),
+          dividerColor: const Color(0xFFC9C9D9),
+          disabledColor: const Color(0xFF6C7086),
+          textTheme: TextTheme(
+            labelSmall: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w300,
+              color: const Color(0xFF6C7086),
+            ),
+          ),
           primaryTextTheme: TextTheme(
             headlineLarge: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
             headlineMedium: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
             headlineSmall: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w300,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
             displayLarge: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
             displayMedium: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w400,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
             displaySmall: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
             bodyLarge: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
             bodyMedium: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
             bodySmall: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
             labelLarge: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
             labelMedium: TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFFF4F4F9),
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFFF4F4F9),
             ),
             labelSmall: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w300,
-              color: Color(0xFFF4F4F9),
+              color: const Color(0xFFF4F4F9),
             ),
           ),
           textButtonTheme: TextButtonThemeData(
@@ -229,7 +236,7 @@ class MainApp extends StatelessWidget {
                 return Colors.white;
               }),
               padding: WidgetStateProperty.resolveWith((state) {
-                return EdgeInsets.fromLTRB(8, 12, 8, 12);
+                return EdgeInsets.all(16);
               }),
               minimumSize: WidgetStateProperty.resolveWith((states) {
                 return Size.zero;

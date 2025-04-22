@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:frontend/internal/exceptions/format.dart';
 import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
@@ -104,7 +103,7 @@ class _CreateFormState extends State<CreateForm> {
                           OutlinedButton(
                             style: Theme.of(context).outlinedButtonTheme.style,
                             onPressed: () {
-                              context.pop();
+                              context.go('/');
                             },
                             child: Text(
                               'Cancel',
