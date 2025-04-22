@@ -2,8 +2,10 @@ import 'package:atproto/atproto.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
+import 'package:frontend/internal/logger/logger.dart';
 
 StrongRef getRootFromPostThread(bsky.PostThreadViewRecord post) {
+  logger.d(post.parent);
   return post.parent == null
       ? StrongRef(cid: post.post.cid, uri: post.post.uri)
       : post.parent!.maybeWhen(
