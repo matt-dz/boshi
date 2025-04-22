@@ -41,20 +41,23 @@ class PostThreadScreen extends StatelessWidget {
                       onRefresh: viewModel.reload,
                     );
                   }
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      PostFeed(
-                        viewModel: PostViewModel(
-                          atProtoRepository: viewModel.atProtoRepository,
-                          post: viewModel.post,
+
+                  return Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        PostFeed(
+                          viewModel: PostViewModel(
+                            atProtoRepository: viewModel.atProtoRepository,
+                            post: viewModel.post,
+                          ),
                         ),
-                      ),
-                      RepliesWidget(
-                        replies: viewModel.replies,
-                        viewModel: viewModel,
-                      ),
-                    ],
+                        RepliesWidget(
+                          replies: viewModel.replies,
+                          viewModel: viewModel,
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),

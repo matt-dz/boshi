@@ -37,12 +37,12 @@ class RepliesWidget extends StatelessWidget {
       children: [
         Column(
           children: [
-            for (final post in replies)
+            for (final reply in replies)
               PostFeed(
                 // key: Key(post.post.cid),
                 viewModel: PostViewModel(
                   atProtoRepository: viewModel.atProtoRepository,
-                  post: post,
+                  post: reply,
                 ),
               ),
           ],
