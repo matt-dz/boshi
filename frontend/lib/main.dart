@@ -3,6 +3,7 @@ import 'package:frontend/ui/post_thread/view_model/post_thread_viewmodel.dart';
 import 'package:frontend/ui/post_thread/widgets/post_thread_screen.dart';
 import 'ui/create/view_model/create_viewmodel.dart';
 import 'ui/create/widgets/create_screen.dart';
+import 'package:frontend/ui/profile/view_model/profile_viewmodel.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +12,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'ui/login/widgets/login_screen.dart';
 import 'ui/login/widgets/oauth_callback_screen.dart';
 import 'ui/login/view_model/login_viewmodel.dart';
+import 'ui/profile/widgets/profile_screen.dart';
 
 import 'ui/home/view_model/home_viewmodel.dart';
 import 'ui/home/widgets/home_screen.dart';
@@ -53,6 +55,15 @@ class MainApp extends StatelessWidget {
           builder: (context, state) => HomeScreen(
             title: 'Boshi',
             viewModel: HomeViewModel(
+              atProtoRepository: context.read<AtProtoRepository>(),
+            ),
+          ),
+        ),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => ProfileScreen(
+            title: 'Boshi',
+            viewModel: ProfileViewModel(
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),

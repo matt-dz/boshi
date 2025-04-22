@@ -8,6 +8,7 @@ abstract class User with _$User {
   const factory User({
     required String did,
     required String school,
+    String? handle,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);

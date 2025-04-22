@@ -2,11 +2,6 @@ import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/domain/models/user/user.dart';
 
-var mockUser = User(
-  did: 'bafyreievgu2ty7qbiaaom5zhmkznsnajuzideek3lo7e65dwqlrvrxnmo4',
-  school: 'University of Florida',
-);
-
 var mockPost = bsky.Post(
   record: bsky.PostRecord(
     text: 'What is Lorem Ipsum?\nLorem Ipsum is simply dummy text of the '
@@ -34,6 +29,12 @@ var mockPost = bsky.Post(
   uri: AtUri('did:web:discover.bsky.app'),
   cid: 'bafyreievgu2ty7qbiaaom5zhmkznsnajuzideek3lo7e65dwqlrvrxnmo4',
   indexedAt: DateTime.now(),
+);
+
+var mockUser = User(
+  did: 'did:plc:pqlrhvmhtthnggkr6ws7mpms',
+  handle: 'pensir.bsky.social',
+  school: 'University of Florida',
 );
 
 var mockGetFeedResult = bsky.Feed(

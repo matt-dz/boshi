@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:atproto/atproto.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
@@ -51,6 +52,7 @@ List<Post> convertFeedToDomainPosts(
           author: User(
             did: feedView.post.author.did,
             school: user.single.school,
+            handle: user.single.handle,
           ),
         );
       })
@@ -95,4 +97,13 @@ Future<AtUri?> retrieveLikeUri(
 
   logger.d('Searching next page');
   return retrieveLikeUri(atp, uri, did, response.data.cursor);
+}
+
+Future<String> resolveHandle(bsky.Bluesky bluesky, String did) async {
+  logger.d('Resolving handle for $did');
+  final profile = await bluesky.actor.getProfile(actor: did);
+  if (profile.status.code > 299) {
+    throw HttpException(profile.status.message);
+  }
+  return profile.data.handle;
 }

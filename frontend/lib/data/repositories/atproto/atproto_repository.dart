@@ -256,6 +256,7 @@ class AtProtoRepository extends ChangeNotifier {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException('getUsers'));
     }
+
     final usersResult = await _apiClient.getUsers(dids);
     return usersResult;
   }
@@ -265,12 +266,12 @@ class AtProtoRepository extends ChangeNotifier {
       return Result.error(OAuthUnauthorizedException());
     }
 
-    final String? userDid = atProto?.oAuthSession?.sub;
+    final String? userDid = atProto!.oAuthSession?.sub;
 
     if (userDid == null) {
       return Result.error(OAuthUnauthorizedException());
     }
-    final userResult = await _apiClient.getUser(userDid);
+    final userResult = await _apiClient.getUser(bluesky!, userDid);
 
     switch (userResult) {
       case Ok<User>():
@@ -310,6 +311,7 @@ class AtProtoRepository extends ChangeNotifier {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
     }
+
     try {
       logger.d('Removing like');
       return await _apiClient.removeLike(
@@ -318,6 +320,21 @@ class AtProtoRepository extends ChangeNotifier {
         uri,
         did,
       );
+    } on Exception catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      return Result.error(Exception(e));
+    }
+  }
+
+  Future<Result<void>> logout() async {
+    try {
+      await _apiClient.logout();
+      atProto = null;
+      bluesky = null;
+      clientMetadata = null;
+      initialized = false;
+      return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
     } catch (e) {
