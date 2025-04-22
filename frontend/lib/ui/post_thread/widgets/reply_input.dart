@@ -91,7 +91,6 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
                   filled: true,
                   fillColor: const Color(0xFF223C48),
                   contentPadding: EdgeInsets.all(12),
-                  isDense: true,
                   hintStyle:
                       Theme.of(context).primaryTextTheme.bodySmall?.copyWith(
                             color: Color(0xFFC3CAEB),
