@@ -19,12 +19,16 @@ class PostViewModel extends ChangeNotifier {
     bool? disableReply,
   })  : _atProtoRepository = atProtoRepository,
         _post = post {
-    toggleLike = Command0(_toggleLike);
-    handleReply = Command1<void, BuildContext>(_handleReply);
+    if (disableReply == null || disableReply == false) {
+      handleReply = Command1<void, BuildContext>(_handleReply);
+    }
+    if (disableLike == null || disableLike == false) {
+      toggleLike = Command0(_toggleLike);
+    }
   }
 
-  late final Command0 toggleLike;
-  late final Command1 handleReply;
+  Command0? toggleLike;
+  Command1? handleReply;
 
   final AtProtoRepository _atProtoRepository;
   final Post _post;

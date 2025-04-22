@@ -68,7 +68,7 @@ class LikeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: viewModel.toggleLike.execute,
+      onPressed: viewModel.toggleLike?.execute,
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
@@ -110,7 +110,7 @@ class ReplyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: () => viewModel.handleReply.execute(context),
+      onPressed: () => viewModel.handleReply?.execute(context),
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
