@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/domain/models/post/post.dart';
-import 'package:frontend/internal/logger/logger.dart';
 
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
-import 'package:frontend/ui/reply/widgets/reply_view.dart';
 
 /// ViewModel for the Feed page
 class PostViewModel extends ChangeNotifier {
@@ -18,41 +16,23 @@ class PostViewModel extends ChangeNotifier {
     bool? disableLike,
     bool? disableReply,
   })  : _atProtoRepository = atProtoRepository,
-        _post = post {
-    if (disableReply == null || disableReply == false) {
-      handleReply = Command1<void, BuildContext>(_handleReply);
-    }
+        _post = post,
+        _disableReply = disableReply {
     if (disableLike == null || disableLike == false) {
       toggleLike = Command0(_toggleLike);
     }
   }
 
   Command0? toggleLike;
-  Command1? handleReply;
 
   final AtProtoRepository _atProtoRepository;
   final Post _post;
+  final bool? _disableReply;
 
   AtProtoRepository get atProtoRepository => _atProtoRepository;
   String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
   Post get post => _post;
-
-  Future<Result<void>> _handleReply(BuildContext context) async {
-    try {
-      final replyResult = await showReplyDialog(context, this);
-      switch (replyResult) {
-        case Ok<void>():
-          _post.post = _post.post.copyWith(
-            replyCount: _post.post.replyCount + 1,
-          );
-        case Error<void>():
-          logger.d('did not create reply');
-      }
-      return replyResult;
-    } finally {
-      notifyListeners();
-    }
-  }
+  bool? get disableReply => _disableReply;
 
   Future<Result<void>> _toggleLike() async {
     try {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/internal/feed/feed.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -110,9 +111,12 @@ class ReplyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: viewModel.handleReply == null
-          ? null
-          : () => viewModel.handleReply!.execute(context),
+      onPressed:
+          viewModel.disableReply == null || viewModel.disableReply == false
+              ? () => context.go(
+                    '/post/${Uri.encodeComponent(viewModel.post.post.uri.toString())}',
+                  )
+              : null,
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
