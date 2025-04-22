@@ -84,12 +84,10 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
 
                 switch (result) {
                   case Ok<void>():
-                    logger.e('Successfully created post');
-                    if (context.mounted) {
-                      context.pop(result);
-                    }
+                    logger.e('Successfully created reply');
+                    formKey.currentState!.setInternalFieldValue('content', '');
                   case Error():
-                    logger.e('Error creating post with: $result');
+                    logger.e('Error creating reply with: $result');
                 }
               }
             },
