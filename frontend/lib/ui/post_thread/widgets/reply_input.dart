@@ -118,6 +118,9 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
             flex: 0,
             child: OutlinedButton(
               style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+                padding: WidgetStateProperty.resolveWith((states) {
+                  return EdgeInsets.zero;
+                }),
                 minimumSize: WidgetStateProperty.resolveWith((states) {
                   return const Size(64, 48);
                 }),
