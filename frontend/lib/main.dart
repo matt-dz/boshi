@@ -124,8 +124,67 @@ class MainApp extends StatelessWidget {
       materialThemeBuilder: (context, theme) {
         return theme.copyWith(
           scaffoldBackgroundColor: Color(0xFF2E2C3A),
-          iconTheme: IconThemeData(color: Color(0xFFF4F4F9)),
+          iconTheme: IconThemeData(color: Color(0xFF6C7086)),
+          primaryIconTheme: IconThemeData(color: Color(0xFFF4F4F9)),
           dividerColor: Color(0xFFC9C9D9),
+          primaryTextTheme: TextTheme(
+            displayLarge: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFFF4F4F9),
+            ),
+            displayMedium: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFFF4F4F9),
+            ),
+            displaySmall: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFFF4F4F9),
+            ),
+            bodyMedium: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFFF4F4F9),
+            ),
+            labelLarge: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFFF4F4F9),
+            ),
+            labelMedium: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFFF4F4F9),
+            ),
+            labelSmall: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w300,
+              color: Color(0xFFF4F4F9),
+            ),
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          outlinedButtonTheme: OutlinedButtonThemeData(
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              side: BorderSide(color: Colors.transparent),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
         );
       },
       routerConfig: router,

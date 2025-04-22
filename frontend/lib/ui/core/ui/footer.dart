@@ -28,7 +28,11 @@ class Footer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(PhosphorIconsRegular.house, size: _iconSize),
+                      icon: Icon(
+                        PhosphorIconsRegular.house,
+                        size: _iconSize,
+                        color: Theme.of(context).primaryIconTheme.color,
+                      ),
                       onPressed: () {
                         context.go('/');
                       },
@@ -40,6 +44,7 @@ class Footer extends StatelessWidget {
                       icon: Icon(
                         PhosphorIconsRegular.plusCircle,
                         size: _iconSize,
+                        color: Theme.of(context).primaryIconTheme.color,
                       ),
                       onPressed: () {
                         context.go('/create');
@@ -49,7 +54,11 @@ class Footer extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(PhosphorIconsRegular.user, size: _iconSize),
+                      icon: Icon(
+                        PhosphorIconsRegular.user,
+                        size: _iconSize,
+                        color: Theme.of(context).primaryIconTheme.color,
+                      ),
                       onPressed: () {
                         context.go('/profile');
                       },

@@ -3,6 +3,7 @@ import 'package:frontend/internal/feed/feed.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:frontend/domain/models/post/post.dart';
+import 'package:frontend/internal/logger/logger.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class PostHeader extends StatelessWidget {
@@ -27,18 +28,15 @@ class PostHeader extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: post.author.school,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style:
+                        Theme.of(context).primaryTextTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: Colors.orangeAccent,
+                            ),
                   ),
                   TextSpan(
                     text: '・ ${timeSincePosting(post)}',
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w300,
-                    ),
+                    style: Theme.of(context).primaryTextTheme.labelSmall,
                   ),
                 ],
               ),
@@ -47,10 +45,7 @@ class PostHeader extends StatelessWidget {
         ),
         Text(
           extractTitle(post),
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+          style: Theme.of(context).primaryTextTheme.labelLarge,
         ),
       ],
     );
@@ -69,13 +64,7 @@ class LikeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: viewModel.toggleLike.execute,
-      style: OutlinedButton.styleFrom(
-        padding: EdgeInsets.zero,
-        side: BorderSide(color: Colors.transparent),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
+      style: Theme.of(context).outlinedButtonTheme.style,
       child: Row(
         spacing: 4,
         children: [
@@ -83,15 +72,18 @@ class LikeButton extends StatelessWidget {
             viewModel.post.post.isLiked
                 ? PhosphorIconsFill.heart
                 : PhosphorIconsRegular.heart,
-            color: viewModel.post.post.isLiked ? Colors.red : Colors.black,
+            color: viewModel.post.post.isLiked
+                ? Colors.red
+                : Theme.of(context).iconTheme.color,
             size: 20,
           ),
           Text(
             '${viewModel.post.post.likeCount}',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-            ),
+            style: Theme.of(context).primaryTextTheme.labelMedium?.copyWith(
+                  color: viewModel.post.post.isLiked
+                      ? Colors.red
+                      : Theme.of(context).iconTheme.color,
+                ),
           ),
         ],
       ),
@@ -111,26 +103,20 @@ class ReplyButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: () => viewModel.handleReply.execute(context),
-      style: OutlinedButton.styleFrom(
-        padding: EdgeInsets.zero,
-        side: BorderSide(color: Colors.transparent),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
+      style: Theme.of(context).outlinedButtonTheme.style,
       child: Row(
         spacing: 4,
         children: [
           Icon(
-            LucideIcons.messageCircle,
+            PhosphorIconsRegular.chatCircle,
+            color: Theme.of(context).iconTheme.color,
             size: 20,
           ),
           Text(
             '${viewModel.post.post.replyCount}',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-            ),
+            style: Theme.of(context).primaryTextTheme.labelMedium?.copyWith(
+                  color: Theme.of(context).iconTheme.color,
+                ),
           ),
         ],
       ),
@@ -150,7 +136,7 @@ class PostFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      spacing: 8,
+      spacing: 16,
       children: [
         LikeButton(viewModel: viewModel),
         ReplyButton(viewModel: viewModel),
@@ -173,45 +159,40 @@ class PostFeed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(8 + replyIndent * 50, 16, 8, 16),
-      child: Container(
-        padding: EdgeInsets.all(8),
-        width: 450,
-        constraints: BoxConstraints(minWidth: 350, maxHeight: 250),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(
-            Radius.circular(10),
+    logger.d('PostFeed build');
+    return Container(
+      padding: EdgeInsets.all(8),
+      constraints: BoxConstraints(minWidth: 350, maxHeight: 250),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).dividerColor,
           ),
-          border: Border.all(
-            color: Colors.grey.shade400,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: shadowColor,
-              blurRadius: 4,
-              offset: Offset(0, 2),
-            ),
-          ],
         ),
-        child: ListenableBuilder(
-          listenable: viewModel,
-          builder: (context, _) {
-            return Column(
+      ),
+      child: ListenableBuilder(
+        listenable: viewModel,
+        builder: (context, _) {
+          return SizedBox(
+            width: 450,
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 0,
+              spacing: 4,
               children: [
                 PostHeader(post: viewModel.post),
-                Text(extractContext(viewModel.post)),
+                Text(
+                  extractContext(viewModel.post),
+                  style: Theme.of(context).primaryTextTheme.bodyMedium,
+                ),
+                const SizedBox(height: 4),
                 PostFooter(
                   viewModel: viewModel,
                 ),
               ],
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
