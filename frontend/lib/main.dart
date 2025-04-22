@@ -128,6 +128,21 @@ class MainApp extends StatelessWidget {
           primaryIconTheme: IconThemeData(color: Color(0xFFF4F4F9)),
           dividerColor: Color(0xFFC9C9D9),
           primaryTextTheme: TextTheme(
+            headlineLarge: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFFF4F4F9),
+            ),
+            headlineMedium: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.normal,
+              color: Color(0xFFF4F4F9),
+            ),
+            headlineSmall: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.normal,
+              color: Color(0xFFF4F4F9),
+            ),
             displayLarge: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,

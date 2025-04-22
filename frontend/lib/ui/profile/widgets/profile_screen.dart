@@ -39,18 +39,18 @@ class ProfileScreen extends StatelessWidget {
                   }
 
                   return Padding(
-                    padding: const EdgeInsets.only(top: 16),
+                    padding: const EdgeInsets.only(top: 16, bottom: 16),
                     child: Column(
                       children: [
                         Text(
                           'Welcome back ${viewModel.user.handle!}!',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style:
+                              Theme.of(context).primaryTextTheme.headlineLarge,
                         ),
                         Text(
                           viewModel.user.school,
+                          style:
+                              Theme.of(context).primaryTextTheme.headlineSmall,
                         ),
                         const Spacer(),
                         TextButton(
