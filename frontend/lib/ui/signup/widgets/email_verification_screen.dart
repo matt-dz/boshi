@@ -234,100 +234,6 @@ class _VerificationForm extends State<VerificationForm> {
         ),
       ],
     );
-
-    // return ShadForm(
-    //   key: _formKey,
-    //   child: Column(
-    //     mainAxisAlignment: MainAxisAlignment.center,
-    //     mainAxisSize: MainAxisSize.min,
-    //     children: [
-    //       ShadInputOTPFormField(
-    //         enabled: formEnabled,
-    //         id: verificationInputId,
-    //         maxLength: 6,
-    //         label: Center(
-    //           child: Padding(
-    //             padding: EdgeInsets.only(bottom: 8),
-    //             child: Text(
-    //               'Verification Code',
-    //               style: Theme.of(context).primaryTextTheme.labelMedium,
-    //             ),
-    //           ),
-    //         ),
-    //         inputFormatters: const [
-    //           _VerificationInputFormatter(),
-    //         ],
-    //         description: Padding(
-    //           padding: EdgeInsets.only(top: 8),
-    //           child: Row(
-    //             mainAxisSize: MainAxisSize.max,
-    //             mainAxisAlignment: MainAxisAlignment.center,
-    //             children: [
-    //               Flexible(
-    //                 child: Text(
-    //                   'Code sent to ${widget.email}.\n'
-    //                   'Be sure to check your spam folder.',
-    //                   textAlign: TextAlign.center,
-    //                   style: Theme.of(context).primaryTextTheme.bodySmall,
-    //                 ),
-    //               ),
-    //             ],
-    //           ),
-    //         ),
-    //         children: [
-    //           Spacer(),
-    //           ShadInputOTPGroup(
-    //             children: [
-    //               inputSlot,
-    //               inputSlot,
-    //               inputSlot,
-    //             ],
-    //           ),
-    //           Icon(size: 24, LucideIcons.dot),
-    //           ShadInputOTPGroup(
-    //             children: [
-    //               inputSlot,
-    //               inputSlot,
-    //               inputSlot,
-    //             ],
-    //           ),
-    //           Spacer(),
-    //         ],
-    //       ),
-    //       SizedBox(height: 8),
-    //       ErrorController(message: _errMsg),
-    //       SizedBox(height: 8),
-    //       TextButton(
-    //         style: Theme.of(context).textButtonTheme.style?.copyWith(
-    //           side: WidgetStateProperty.resolveWith((states) {
-    //             return BorderSide(
-    //               width: 2,
-    //               color: states.contains(WidgetState.disabled)
-    //                   ? Color(0xFF636363)
-    //                   : Color(0xffa0cafa),
-    //             );
-    //           }),
-    //           backgroundColor: WidgetStateProperty.resolveWith((states) {
-    //             return states.contains(WidgetState.disabled)
-    //                 ? Color(0xFF434343)
-    //                 : Color(0xff63a0eb);
-    //           }),
-    //         ),
-    //         // onPressed: (_codeEmpty || !formEnabled) ? null : _onSubmit,
-    //         child: Text(
-    //           'Enter',
-    //           style: Theme.of(context).primaryTextTheme.bodySmall,
-    //         ),
-    //       ),
-    //       SizedBox(height: 8),
-    //       TTLController(
-    //         ttl: (widget.viewModel.load.result! as Ok).value,
-    //         viewModel: widget.viewModel,
-    //         email: widget.email,
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 }
 
@@ -414,7 +320,9 @@ class TTLTimer extends StatelessWidget {
     }
     return Text(
       'Request again in $secondsMsg',
-      style: Theme.of(context).primaryTextTheme.bodySmall,
+      style: Theme.of(context).primaryTextTheme.bodySmall?.copyWith(
+            color: Colors.grey.shade400,
+          ),
     );
   }
 }
@@ -477,18 +385,12 @@ class _RequestCodeButtonState extends State<RequestCodeButton> {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: widget.viewModel.resendCode.running ? null : _handleResendCode,
-      style: TextButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      ),
+      style: Theme.of(context).textButtonTheme.style,
       child: Text(
         'Request again',
-        style: TextStyle(
-          color: Colors.black,
-          decoration: TextDecoration.underline,
-        ),
+        style: Theme.of(context).primaryTextTheme.bodySmall?.copyWith(
+              decoration: TextDecoration.underline,
+            ),
       ),
     );
   }
