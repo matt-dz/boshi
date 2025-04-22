@@ -93,9 +93,12 @@ class PostThreadViewModel extends ChangeNotifier {
     }
   }
 
-  void reload() {
-    load.execute();
-    notifyListeners();
+  void reload() async {
+    try {
+      await load.execute();
+    } finally {
+      notifyListeners();
+    }
   }
 
   Future<Result<void>> _createReply(bsky.PostRecord reply) async {
@@ -108,9 +111,10 @@ class PostThreadViewModel extends ChangeNotifier {
         case Error<void>():
           logger.e('Error creating reply: ${createReplyResult.error}');
       }
+      await load.execute();
       return createReplyResult;
     } finally {
-      reload();
+      notifyListeners();
     }
   }
 }
