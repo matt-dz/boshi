@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/internal/feed/feed.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -68,7 +69,7 @@ class LikeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: viewModel.toggleLike.execute,
+      onPressed: viewModel.toggleLike?.execute,
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
@@ -110,7 +111,11 @@ class ReplyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: () => viewModel.handleReply.execute(context),
+      onPressed: viewModel.disableReply
+          ? null
+          : () => context.go(
+                '/post/${Uri.encodeComponent(viewModel.post.post.uri.toString())}',
+              ),
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
@@ -177,7 +182,7 @@ class PostFeed extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(8 + replyIndent * 50, 16, 8, 16),
       child: Container(
         padding: EdgeInsets.all(8),
-        width: 450,
+        // width: 450,
         constraints: BoxConstraints(minWidth: 350, maxHeight: 250),
         decoration: BoxDecoration(
           color: Colors.white,

@@ -1,7 +1,13 @@
+import 'dart:collection';
+
+import 'package:atproto/atproto.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/foundation.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
+import 'package:frontend/domain/models/post/post.dart';
+import 'package:frontend/domain/models/user/user.dart';
+import 'package:frontend/internal/feed/post_thread.dart';
 
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
@@ -19,12 +25,16 @@ class PostThreadViewModel extends ChangeNotifier {
   }
 
   late final Command0 load;
-  late final Command1<void, bsky.PostRecord> createReply;
+  late final Command1 createReply;
   final AtProtoRepository _atProtoRepository;
   final String _rootUrl;
 
-  bsky.PostThreadViewRecord? _thread;
-  bsky.PostThreadViewRecord? get thread => _thread;
+  late Post _post;
+  late List<Post> _replies;
+
+  AtProtoRepository get atProtoRepository => _atProtoRepository;
+  Post get post => _post;
+  UnmodifiableListView<Post> get replies => UnmodifiableListView(_replies);
 
   Future<Result> _load() async {
     try {
@@ -33,11 +43,38 @@ class PostThreadViewModel extends ChangeNotifier {
           await _atProtoRepository.getPostThread(AtUri.parse(_rootUrl));
       switch (postThreadResult) {
         case Ok<bsky.PostThread>():
-          _thread =
+          final threadView =
               postThreadResult.value.thread.whenOrNull(record: (data) => data);
-          if (_thread == null) {
+
+          if (threadView == null) {
             return Result.error(Exception("Couldn't verify thread"));
           }
+
+          final Set<String> dids = {};
+          extractDidsFromPostThread(threadView, dids);
+
+          final users = await _atProtoRepository.getUsers(dids.toList());
+
+          switch (users) {
+            case Ok<List<User>>():
+              _post = Post(
+                bskyPost: threadView.post,
+                author: users.value.firstWhere(
+                  (user) => user.did == threadView.post.author.did,
+                ),
+              );
+              _replies = extractRepliesFromPostThread(
+                StrongRef(cid: threadView.post.cid, uri: threadView.post.uri),
+                StrongRef(cid: threadView.post.cid, uri: threadView.post.uri),
+                threadView.replies,
+                users.value,
+              );
+
+            case Error<List<User>>():
+              logger.e('Failed to fetch users from post thread');
+              return Result.error(Exception('Failed to fetch users'));
+          }
+
         case Error<bsky.PostThread>():
           logger.e('Error loading feed: ${postThreadResult.error}');
       }

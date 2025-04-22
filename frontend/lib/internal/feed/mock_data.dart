@@ -40,3 +40,18 @@ var mockUser = User(
 var mockGetFeedResult = bsky.Feed(
   feed: List.from([bsky.FeedView(post: mockPost)]),
 );
+
+var mockPostThreadViewRecord = bsky.PostThreadView.record(
+  data: bsky.PostThreadViewRecord(
+    post: mockPost,
+  ),
+);
+
+var mockGetPostThreadResult = bsky.PostThread(
+  thread: bsky.PostThreadView.record(
+    data: bsky.PostThreadViewRecord(
+      post: mockPost,
+      replies: [mockPostThreadViewRecord, mockPostThreadViewRecord],
+    ),
+  ),
+);
