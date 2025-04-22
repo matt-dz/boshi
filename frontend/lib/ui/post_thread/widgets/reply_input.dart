@@ -143,11 +143,16 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
                       : Color(0xff63a0eb);
                 }),
               ),
-              onPressed: _replyEmpty ? null : _onReply,
+              onPressed: (widget.viewModel.createReply.running || _replyEmpty)
+                  ? null
+                  : _onReply,
               child: Text(
                 'Reply',
                 style: Theme.of(context).primaryTextTheme.labelSmall?.copyWith(
-                      color: _replyEmpty ? Colors.grey.shade600 : null,
+                      color:
+                          (widget.viewModel.createReply.running || _replyEmpty)
+                              ? Colors.grey.shade600
+                              : null,
                     ),
               ),
             ),
