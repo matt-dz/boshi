@@ -32,6 +32,7 @@ func resolveSchoolFromEmail(addr string) (string, error) {
 	params.Set("domain", domain)
 	base.RawQuery = params.Encode()
 
+	log.Debug("sending request for university", slog.String("domain", domain))
 	resp, err := http.Get(base.String())
 	if err != nil {
 		return "", err

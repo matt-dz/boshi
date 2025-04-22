@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/internal/feed/feed.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
@@ -110,9 +112,13 @@ class ReplyButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: viewModel.disableReply
           ? null
-          : () => context.go(
-                '/post/${Uri.encodeComponent(viewModel.post.post.uri.toString())}',
-              ),
+          : () {
+              final encodedUri = base64Url
+                  .encode(utf8.encode(viewModel.post.post.uri.toString()));
+              context.go(
+                '/post/$encodedUri',
+              );
+            },
       style: Theme.of(context).outlinedButtonTheme.style,
       child: Row(
         spacing: 4,
