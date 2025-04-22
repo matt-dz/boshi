@@ -195,7 +195,7 @@ class ApiClient {
     if (xrpcResponse.status != HttpStatus.ok) {
       return Result.error(
         HttpException(
-          'Failed to create a reply record with status: ${xrpcResponse.status}',
+          'Failed to get post thread with status: ${xrpcResponse.status}',
         ),
       );
     }

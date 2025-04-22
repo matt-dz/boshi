@@ -1,17 +1,17 @@
-import 'package:bluesky/bluesky.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/domain/models/post/post.dart';
 
 class RepliesWidget extends StatelessWidget {
   const RepliesWidget({
     super.key,
-    this.replies,
+    required this.replies,
   });
 
-  final List<PostThreadView>? replies;
+  final List<Post> replies;
 
   @override
   Widget build(BuildContext context) {
-    if (replies == null || replies!.isEmpty) {
+    if (replies.isEmpty) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: const [
