@@ -8,6 +8,7 @@ import 'package:frontend/internal/exceptions/format.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:frontend/ui/post/widgets/post.dart';
 import 'package:frontend/ui/post_thread/widgets/replies.dart';
+import 'package:frontend/ui/post_thread/widgets/reply_input.dart';
 
 import '../view_model/post_thread_viewmodel.dart';
 
@@ -42,22 +43,21 @@ class PostThreadScreen extends StatelessWidget {
                     );
                   }
 
-                  return Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        PostFeed(
-                          viewModel: PostViewModel(
-                            atProtoRepository: viewModel.atProtoRepository,
-                            post: viewModel.post,
-                          ),
+                  return Column(
+                    children: [
+                      PostFeed(
+                        viewModel: PostViewModel(
+                          post: viewModel.post,
+                          atProtoRepository: viewModel.atProtoRepository,
                         ),
-                        RepliesWidget(
-                          replies: viewModel.replies,
+                      ),
+                      ReplyInputWidget(viewModel: viewModel),
+                      Expanded(
+                        child: RepliesWidget(
                           viewModel: viewModel,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   );
                 },
               ),

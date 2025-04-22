@@ -179,7 +179,7 @@ class PostFeed extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(8 + replyIndent * 50, 16, 8, 16),
       child: Container(
         padding: EdgeInsets.all(8),
-        width: 450,
+        // width: 450,
         constraints: BoxConstraints(minWidth: 350, maxHeight: 250),
         decoration: BoxDecoration(
           color: Colors.white,

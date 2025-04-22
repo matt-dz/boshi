@@ -21,9 +21,11 @@ class PostThreadViewModel extends ChangeNotifier {
   })  : _atProtoRepository = atProtoRepository,
         _rootUrl = rootUrl {
     load = Command0(_load)..execute();
+    createReply = Command1<void, bsky.PostRecord>(_createReply);
   }
 
   late final Command0 load;
+  late final Command1 createReply;
   final AtProtoRepository _atProtoRepository;
   final String _rootUrl;
 

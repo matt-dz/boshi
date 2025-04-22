@@ -9,45 +9,40 @@ import 'package:frontend/ui/post_thread/view_model/post_thread_viewmodel.dart';
 class RepliesWidget extends StatelessWidget {
   const RepliesWidget({
     super.key,
-    required this.replies,
     required this.viewModel,
   });
 
-  final UnmodifiableListView<Post> replies;
   final PostThreadViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
-    if (replies.isEmpty) {
+    if (viewModel.replies.isEmpty) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: const [
-          Text(
-            'No posts yet!',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          // Text(
+          //   'No posts yet!',
+          //   style: TextStyle(
+          //     fontSize: 24,
+          //     fontWeight: FontWeight.bold,
+          //   ),
+          // ),
         ],
       );
     }
 
-    return ListView(
-      children: [
-        Column(
-          children: [
-            for (final reply in replies)
-              PostFeed(
-                // key: Key(post.post.cid),
-                viewModel: PostViewModel(
-                  atProtoRepository: viewModel.atProtoRepository,
-                  post: reply,
-                ),
-              ),
-          ],
-        ),
-      ],
+    return ListView.builder(
+      itemCount: viewModel.replies.length,
+      itemBuilder: (context, index) {
+        final reply = viewModel.replies[index];
+        return PostFeed(
+          key: Key(reply.post.cid),
+          viewModel: PostViewModel(
+            atProtoRepository: viewModel.atProtoRepository,
+            post: reply,
+          ),
+        );
+      },
     );
   }
 }
