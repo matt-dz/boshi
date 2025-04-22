@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/post_thread/view_model/post_thread_viewmodel.dart';
 import 'package:frontend/ui/post_thread/widgets/post_thread_screen.dart';
@@ -74,7 +76,11 @@ class MainApp extends StatelessWidget {
             title: 'Boshi',
             viewModel: PostThreadViewModel(
               atProtoRepository: context.read<AtProtoRepository>(),
-              rootUrl: state.pathParameters['rooturl']!,
+              rootUrl: utf8.decode(
+                base64Url.decode(
+                  state.pathParameters['rooturl']!,
+                ),
+              ),
             ),
           ),
         ),
