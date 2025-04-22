@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
-import 'package:frontend/ui/post/widgets/post.dart';
+import 'package:frontend/ui/post/widgets/post_with_replies.dart';
 import 'package:frontend/ui/post_thread/view_model/post_thread_viewmodel.dart';
 
 class RepliesWidget extends StatelessWidget {
@@ -32,7 +32,7 @@ class RepliesWidget extends StatelessWidget {
       itemCount: viewModel.replies.length,
       itemBuilder: (context, index) {
         final reply = viewModel.replies[index];
-        return PostFeed(
+        return PostWithRepliesWidget(
           key: Key(reply.post.cid),
           viewModel: PostViewModel(
             atProtoRepository: viewModel.atProtoRepository,

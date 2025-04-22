@@ -209,7 +209,7 @@ class ApiClient {
       return Result.ok(mockGetPostThreadResult);
     }
 
-    final xrpcResponse = await bluesky.feed.getPostThread(uri: url);
+    final xrpcResponse = await bluesky.feed.getPostThread(uri: url, depth: 2);
 
     if (xrpcResponse.status != HttpStatus.ok) {
       return Result.error(
