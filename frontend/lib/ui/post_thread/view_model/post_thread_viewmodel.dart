@@ -66,6 +66,7 @@ class PostThreadViewModel extends ChangeNotifier {
               );
             case Error<List<User>>():
               logger.e('Failed to fetch users from post thread');
+              return Result.error(Exception('Failed to fetch users'));
           }
 
         case Error<bsky.PostThread>():
