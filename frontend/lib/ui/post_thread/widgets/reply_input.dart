@@ -30,6 +30,9 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
     super.initState();
 
     _controller.addListener(_validState);
+    _controller.addListener(() {
+      setState(() {}); // Triggers UI rebuild for button enabled state
+    });
   }
 
   @override
@@ -91,6 +94,7 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
                 switch (result) {
                   case Ok<void>():
                     logger.e('Successfully created reply');
+                    _formKey.currentState?.reset();
                     _controller.clear();
                   case Error():
                     logger.e('Error creating reply with: $result');
