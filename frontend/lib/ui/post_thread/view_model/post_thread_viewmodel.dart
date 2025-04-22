@@ -68,10 +68,6 @@ class PostThreadViewModel extends ChangeNotifier {
                 users.value,
               );
 
-              for (final reply in _replies) {
-                logger.d(reply.post.cid);
-              }
-
             case Error<List<User>>():
               logger.e('Failed to fetch users from post thread');
               return Result.error(Exception('Failed to fetch users'));

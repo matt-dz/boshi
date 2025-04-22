@@ -25,24 +25,23 @@ class PostThreadScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: ListenableBuilder(
-          listenable: viewModel,
-          builder: (context, _) {
-            if (viewModel.load.running) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (viewModel.load.error) {
-              final result = viewModel.load.result! as Error;
-              return ErrorScreen(
-                message: formatExceptionMsg(result.error),
-                onRefresh: viewModel.reload,
-              );
-            }
-
-            return Column(
-              children: [
-                Header(title: title),
-                Expanded(
-                  child: Column(
+        body: Column(
+          children: [
+            Header(title: title),
+            Expanded(
+              child: ListenableBuilder(
+                listenable: viewModel,
+                builder: (context, _) {
+                  if (viewModel.load.running) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (viewModel.load.error) {
+                    final result = viewModel.load.result! as Error;
+                    return ErrorScreen(
+                      message: formatExceptionMsg(result.error),
+                      onRefresh: viewModel.reload,
+                    );
+                  }
+                  return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       PostFeed(
@@ -56,12 +55,12 @@ class PostThreadScreen extends StatelessWidget {
                         viewModel: viewModel,
                       ),
                     ],
-                  ),
-                ),
-                Footer(),
-              ],
-            );
-          },
+                  );
+                },
+              ),
+            ),
+            Footer(),
+          ],
         ),
       ),
     );

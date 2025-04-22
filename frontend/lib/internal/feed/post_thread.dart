@@ -28,8 +28,8 @@ List<Post> extractRepliesFromPostThread(
     return replies;
   }
 
-  replyRecords.forEach(
-    (reply) => reply.whenOrNull(
+  for (final reply in replyRecords) {
+    reply.whenOrNull(
       record: (replyRecord) {
         final newPost = Post(
           author: users
@@ -45,10 +45,9 @@ List<Post> extractRepliesFromPostThread(
           ),
         );
         replies.add(newPost);
-        return;
       },
-    ),
-  );
+    );
+  }
 
   return replies;
 }
