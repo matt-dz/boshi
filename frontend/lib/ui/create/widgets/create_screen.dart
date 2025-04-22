@@ -57,25 +57,23 @@ class _CreateFormState extends State<CreateForm> {
   }
 
   void _post() async {
-    if (_formKey.currentState!.saveAndValidate()) {
-      final result = await widget.viewModel.createPost.execute(
-        (
-          _formKey.currentState!.value['title'],
-          _formKey.currentState!.value['content']
-        ),
-      );
+    final result = await widget.viewModel.createPost.execute(
+      (
+        _titleController.text,
+        _contentController.text,
+      ),
+    );
 
-      switch (result) {
-        case Ok<void>():
-          logger.e('Successfully created post');
-          if (mounted) {
-            context.go('/');
-          }
-          return;
-        case Error():
-          logger.e('Error creating post in: $result');
-          return;
-      }
+    switch (result) {
+      case Ok<void>():
+        logger.e('Successfully created post');
+        if (mounted) {
+          context.go('/');
+        }
+        return;
+      case Error():
+        logger.e('Error creating post in: $result');
+        return;
     }
   }
 
