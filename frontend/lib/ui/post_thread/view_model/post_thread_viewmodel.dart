@@ -57,12 +57,19 @@ class PostThreadViewModel extends ChangeNotifier {
 
           switch (users) {
             case Ok<List<User>>():
-              _replies = extractRepliesFromPostThread(
+              final repliesToSort = extractRepliesFromPostThread(
                 StrongRef(cid: threadView.post.cid, uri: threadView.post.uri),
                 getRootFromPostThread(threadView),
                 threadView.replies,
                 users.value,
               );
+              repliesToSort.sort(
+                (Post a, Post b) => b.post.indexedAt.compareTo(
+                  a.post.indexedAt,
+                ),
+              );
+              _replies = repliesToSort;
+
               _post = Post(
                 bskyPost: threadView.post,
                 author: users.value.firstWhere(
