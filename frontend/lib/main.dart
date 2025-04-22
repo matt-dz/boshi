@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/profile/view_model/profile_viewmodel.dart';
 import 'ui/post/view_model/post_viewmodel.dart';
 import 'ui/post/widgets/post_screen.dart';
 
@@ -9,6 +10,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'ui/login/widgets/login_screen.dart';
 import 'ui/login/widgets/oauth_callback_screen.dart';
 import 'ui/login/view_model/login_viewmodel.dart';
+import 'ui/profile/widgets/profile_screen.dart';
 
 import 'ui/home/view_model/home_viewmodel.dart';
 import 'ui/home/widgets/home_screen.dart';
@@ -51,6 +53,15 @@ class MainApp extends StatelessWidget {
           builder: (context, state) => HomeScreen(
             title: 'Boshi',
             viewModel: HomeViewModel(
+              atProtoRepository: context.read<AtProtoRepository>(),
+            ),
+          ),
+        ),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => ProfileScreen(
+            title: 'Boshi',
+            viewModel: ProfileViewModel(
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
           ),

@@ -3,8 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'package:frontend/internal/logger/logger.dart';
-
 class Footer extends StatelessWidget {
   const Footer({super.key});
 
@@ -49,7 +47,7 @@ class Footer extends StatelessWidget {
                     IconButton(
                       icon: Icon(PhosphorIconsRegular.user, size: _iconSize),
                       onPressed: () {
-                        logger.d('person pressed!');
+                        context.go('/profile');
                       },
                     ),
                   ],

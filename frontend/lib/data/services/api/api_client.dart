@@ -75,27 +75,35 @@ class ApiClient {
     return Result.ok(xrpcResponse.data);
   }
 
-  Future<Result<User>> getUser(String did) async {
+  Future<Result<User>> getUser(bsky.Bluesky bluesky, String did) async {
     logger.d('Sending GET request for User $did');
+
+    if (!EnvironmentConfig.prod) {
+      return Result.ok(mockUser);
+    }
 
     final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
     final Uri requestUri = hostUri.replace(pathSegments: ['user', did]);
+    final userResponse = await http.get(requestUri);
 
-    final response = await http.get(requestUri);
-
-    if (response.statusCode == 400) {
-      return Result.error(
-        Exception('Failed to get user, missing user_ids'),
+    if (userResponse.statusCode == 400) {
+      return throw HttpException('Failed to get user, missing user_ids');
+    } else if (userResponse.statusCode == 404) {
+      return throw UserNotFoundException();
+    } else if (userResponse.statusCode > 299) {
+      return throw HttpException(
+        'Failed to get user with status: ${userResponse.statusCode}',
       );
-    } else if (response.statusCode == 404) {
-      return Result.error(UserNotFoundException());
     }
 
     try {
-      final decoded = json.decode(response.body);
-      final User result = User.fromJson(decoded);
-      return Result.ok(result);
+      final Map<String, dynamic> decoded = json.decode(userResponse.body);
+      decoded['handle'] = await resolveHandle(bluesky, did);
+      logger.d('User decoded: $decoded');
+      final User user = User.fromJson(decoded);
+      return Result.ok(user);
     } on Exception catch (error) {
+      logger.e('Failed to get user: $error');
       return Result.error(error);
     }
   }
@@ -124,17 +132,9 @@ class ApiClient {
 
     try {
       logger.d('Decoding response: ${response.body}');
-      final decoded = json.decode(response.body);
-      if (decoded is! Map) {
-        throw Exception('Invalid response: ${response.body}');
-      }
-      final users = decoded['users'];
-      if (users is! List) {
-        throw Exception('Invalid response: ${response.body}');
-      }
-      return Result.ok(
-        users.map((user) => User.fromJson(user)).toList(),
-      );
+      final decoded = json.decode(response.body) as Map<String, Object?>;
+      final users = decoded['users']! as List;
+      return Result.ok(users.map((user) => User.fromJson(user)).toList());
     } on Exception catch (error) {
       logger.e('Failed to decode response. error=$error');
       return Result.error(error);
@@ -151,7 +151,6 @@ class ApiClient {
     post_request.Post post,
   ) async {
     logger.d('Creating post');
-
     final xrpcResponse = await bluesky.feed.post(
       text: '${post.title}\n${post.content}',
       tags: List.from(['boshi.post']),
@@ -469,5 +468,10 @@ class ApiClient {
       logger.e('Request failed. error=$e');
       return Result.error(e);
     }
+  }
+
+  Future<void> logout() async {
+    final prefs = SharedPreferencesAsync();
+    await prefs.clear();
   }
 }
