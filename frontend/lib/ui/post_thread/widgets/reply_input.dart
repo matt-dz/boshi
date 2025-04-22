@@ -93,7 +93,7 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
 
                 switch (result) {
                   case Ok<void>():
-                    logger.e('Successfully created reply');
+                    logger.d('Successfully created reply');
                     _formKey.currentState?.reset();
                     _controller.clear();
                   case Error():
