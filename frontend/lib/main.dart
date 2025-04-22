@@ -223,7 +223,7 @@ class MainApp extends StatelessWidget {
             ),
             labelSmall: TextStyle(
               fontSize: 12,
-              fontWeight: FontWeight.w300,
+              fontWeight: FontWeight.w400,
               color: const Color(0xFFF4F4F9),
             ),
           ),
