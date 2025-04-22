@@ -17,22 +17,23 @@ class PostViewModel extends ChangeNotifier {
     bool disableReply = false,
   })  : _atProtoRepository = atProtoRepository,
         _post = post,
-        _disableReply = disableReply {
-    if (!disableLike) {
-      toggleLike = Command0(_toggleLike);
-    }
+        _disableReply = disableReply,
+        _disableLike = disableLike {
+    toggleLike = Command0(_toggleLike);
   }
 
-  Command0? toggleLike;
+  late final Command0 toggleLike;
 
   final AtProtoRepository _atProtoRepository;
   final Post _post;
   final bool _disableReply;
+  final bool _disableLike;
 
   AtProtoRepository get atProtoRepository => _atProtoRepository;
   String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
   Post get post => _post;
   bool get disableReply => _disableReply;
+  bool get disableLike => _disableLike;
 
   Future<Result<void>> _toggleLike() async {
     try {

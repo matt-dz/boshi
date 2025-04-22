@@ -69,7 +69,7 @@ class LikeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: viewModel.toggleLike?.execute,
+      onPressed: viewModel.disableLike ? null : viewModel.toggleLike.execute,
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
