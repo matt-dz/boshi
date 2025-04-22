@@ -207,14 +207,14 @@ var mockGetFeedResult = bsky.Feed(
 
 var mockPostThreadViewRecord = bsky.PostThreadView.record(
   data: bsky.PostThreadViewRecord(
-    post: mockPost,
+    post: mockPost1,
   ),
 );
 
 var mockGetPostThreadResult = bsky.PostThread(
   thread: bsky.PostThreadView.record(
     data: bsky.PostThreadViewRecord(
-      post: mockPost,
+      post: mockPost1,
       replies: [mockPostThreadViewRecord, mockPostThreadViewRecord],
     ),
   ),

@@ -26,7 +26,7 @@ class PostThreadScreen extends StatelessWidget {
       child: Scaffold(
         body: Column(
           children: [
-            Header(title: title),
+            Header(),
             Expanded(
               child: ListenableBuilder(
                 listenable: viewModel,
