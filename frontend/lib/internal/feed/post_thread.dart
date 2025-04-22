@@ -5,7 +5,7 @@ import 'package:frontend/domain/models/user/user.dart';
 
 void extractDidsFromPostThread(
   bsky.PostThreadViewRecord postThread,
-  List<String> dids,
+  Set<String> dids,
 ) {
   dids.add(postThread.post.author.did);
 
