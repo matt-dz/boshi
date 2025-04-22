@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:atproto/atproto.dart';
 import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
@@ -30,7 +32,7 @@ class PostThreadViewModel extends ChangeNotifier {
 
   AtProtoRepository get atProtoRepository => _atProtoRepository;
   Post get post => _post;
-  List<Post> get replies => _replies;
+  UnmodifiableListView<Post> get replies => UnmodifiableListView(_replies);
 
   Future<Result> _load() async {
     try {
