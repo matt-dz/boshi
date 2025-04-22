@@ -83,13 +83,6 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
                 controller: _replyController,
                 minLines: 1,
                 maxLines: 4,
-                // placeholder: Text(
-                //   'Thoughts?',
-                //   style: Theme.of(context).primaryTextTheme.bodySmall?.copyWith(
-                //         fontWeight: FontWeight.bold,
-                //         color: Theme.of(context).disabledColor,
-                //       ),
-                // ),
                 cursorColor:
                     Theme.of(context).primaryTextTheme.bodySmall?.color,
                 style: Theme.of(context).primaryTextTheme.bodySmall,

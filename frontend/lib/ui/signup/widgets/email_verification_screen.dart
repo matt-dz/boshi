@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/internal/exceptions/already_verified_exception.dart';
 import 'dart:async';
+import 'package:pinput/pinput.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:frontend/ui/models/verification_code/verification_code.dart';
@@ -45,7 +46,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             case CodeNotFoundException():
               context.go('/signup');
             default:
-              print(err.error);
               return ErrorScreen(
                 message: formatExceptionMsg(err.error),
                 onRefresh: widget.viewModel.reload,
@@ -58,6 +58,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               child: widget.viewModel.load.completed
                   ? ShadCard(
                       width: 400,
+                      backgroundColor:
+                          Theme.of(context).scaffoldBackgroundColor,
+                      border: Border.all(color: Theme.of(context).focusColor),
                       child: VerificationForm(
                         viewModel: widget.viewModel,
                         email: widget.email,
@@ -89,124 +92,235 @@ class VerificationForm extends StatefulWidget {
 class _VerificationForm extends State<VerificationForm> {
   final _formKey = GlobalKey<ShadFormState>();
   String? _errMsg;
+  final _codeController = TextEditingController();
+  bool _codeEmpty = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _codeController.addListener(() {
+      setState(() {
+        _codeEmpty = _codeController.text.isEmpty;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onSubmit(String code) async {
+    if (code.contains(' ')) {
+      setState(() {
+        _errMsg = 'Must fill all fields of code';
+      });
+      return;
+    }
+    final result = await widget.viewModel.verifyCode.execute(
+      VerificationCode(
+        code: code,
+        email: widget.email,
+      ),
+    );
+
+    if (!context.mounted) {
+      return;
+    }
+
+    switch (result) {
+      case Error():
+        if (result.error is AlreadyVerifiedException) {
+          if (mounted) {
+            context.go('/');
+          }
+        }
+        setState(() {
+          _errMsg = formatExceptionMsg(result.error);
+        });
+        return;
+      case Ok():
+        if (mounted) {
+          context.go('/');
+        }
+        return;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final formEnabled = !(widget.viewModel.verifyCode.running ||
         widget.viewModel.verifyCode.completed);
-    return ShadForm(
-      key: _formKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ShadInputOTPFormField(
-            enabled: formEnabled,
-            id: verificationInputId,
-            maxLength: 6,
-            label: const Center(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 8),
-                child: Text(
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                  'Verification Code',
-                ),
-              ),
+
+    final defaultPinTheme = PinTheme(
+      width: 40,
+      height: 40,
+      textStyle: Theme.of(context).primaryTextTheme.bodyMedium,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white),
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+
+    final focusedPinTheme = defaultPinTheme.copyWith(
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).focusColor),
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+
+    final inputSlot = ShadInputOTPGroup(
+      children: [
+        ShadInputOTPSlot(
+          style: Theme.of(context).primaryTextTheme.bodyMedium,
+          decoration: ShadDecoration(
+            labelStyle: Theme.of(context).primaryTextTheme.bodyMedium,
+            focusedBorder: ShadBorder(
+              top: ShadBorderSide(color: Theme.of(context).focusColor),
+              bottom: ShadBorderSide(color: Theme.of(context).focusColor),
+              left: ShadBorderSide(color: Theme.of(context).focusColor),
+              right: ShadBorderSide(color: Theme.of(context).focusColor),
             ),
+          ),
+        ),
+      ],
+    );
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      spacing: 8,
+      children: [
+        Text(
+          'Verification Code',
+          style: Theme.of(context)
+              .primaryTextTheme
+              .labelLarge
+              ?.copyWith(fontSize: 24),
+        ),
+        Text(
+          'Code sent to ${widget.email}.\n'
+          'Be sure to check your spam folder.',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).primaryTextTheme.bodySmall,
+        ),
+        const SizedBox(height: 4),
+        Center(
+          child: Pinput(
             inputFormatters: const [
               _VerificationInputFormatter(),
             ],
-            description: Padding(
-              padding: EdgeInsets.only(top: 8),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Text(
-                      'Code sent to ${widget.email}.\n'
-                      'Be sure to check your spam folder.',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
+            length: 6,
+            defaultPinTheme: defaultPinTheme,
+            focusedPinTheme: focusedPinTheme,
+            cursor: Container(
+              color: Colors.white,
+              width: 2,
+              height: 24,
             ),
-            children: const [
-              Spacer(),
-              ShadInputOTPGroup(
-                children: [
-                  ShadInputOTPSlot(),
-                  ShadInputOTPSlot(),
-                  ShadInputOTPSlot(),
-                ],
-              ),
-              Icon(size: 24, LucideIcons.dot),
-              ShadInputOTPGroup(
-                children: [
-                  ShadInputOTPSlot(),
-                  ShadInputOTPSlot(),
-                  ShadInputOTPSlot(),
-                ],
-              ),
-              Spacer(),
-            ],
+            animationCurve: Curves.linear,
+            animationDuration: Duration.zero,
+            onCompleted: _onSubmit,
           ),
-          SizedBox(height: 8),
-          ErrorController(message: _errMsg),
-          SizedBox(height: 8),
-          ShadButton(
-            enabled: formEnabled,
-            width: double.infinity,
-            child: Text('Enter'),
-            onPressed: () async {
-              if (_formKey.currentState!.saveAndValidate()) {
-                final String? code =
-                    _formKey.currentState!.value[verificationInputId];
-                if (code == null || code.contains(' ')) {
-                  setState(() {
-                    _errMsg = 'Must fill all fields of code';
-                  });
-                  return;
-                }
-                final result = await widget.viewModel.verifyCode.execute(
-                  VerificationCode(
-                    code: code,
-                    email: widget.email,
-                  ),
-                );
-
-                if (!context.mounted) {
-                  return;
-                }
-
-                switch (result) {
-                  case Error():
-                    if (result.error is AlreadyVerifiedException) {
-                      context.go('/');
-                    }
-                    setState(() {
-                      _errMsg = formatExceptionMsg(result.error);
-                    });
-                    return;
-                  case Ok():
-                    context.go('/');
-                    return;
-                }
-              }
-            },
-          ),
-          SizedBox(height: 8),
-          TTLController(
-            ttl: (widget.viewModel.load.result! as Ok).value,
-            viewModel: widget.viewModel,
-            email: widget.email,
-          ),
-        ],
-      ),
+        ),
+        Center(child: ErrorController(message: _errMsg)),
+      ],
     );
+
+    // return ShadForm(
+    //   key: _formKey,
+    //   child: Column(
+    //     mainAxisAlignment: MainAxisAlignment.center,
+    //     mainAxisSize: MainAxisSize.min,
+    //     children: [
+    //       ShadInputOTPFormField(
+    //         enabled: formEnabled,
+    //         id: verificationInputId,
+    //         maxLength: 6,
+    //         label: Center(
+    //           child: Padding(
+    //             padding: EdgeInsets.only(bottom: 8),
+    //             child: Text(
+    //               'Verification Code',
+    //               style: Theme.of(context).primaryTextTheme.labelMedium,
+    //             ),
+    //           ),
+    //         ),
+    //         inputFormatters: const [
+    //           _VerificationInputFormatter(),
+    //         ],
+    //         description: Padding(
+    //           padding: EdgeInsets.only(top: 8),
+    //           child: Row(
+    //             mainAxisSize: MainAxisSize.max,
+    //             mainAxisAlignment: MainAxisAlignment.center,
+    //             children: [
+    //               Flexible(
+    //                 child: Text(
+    //                   'Code sent to ${widget.email}.\n'
+    //                   'Be sure to check your spam folder.',
+    //                   textAlign: TextAlign.center,
+    //                   style: Theme.of(context).primaryTextTheme.bodySmall,
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //         children: [
+    //           Spacer(),
+    //           ShadInputOTPGroup(
+    //             children: [
+    //               inputSlot,
+    //               inputSlot,
+    //               inputSlot,
+    //             ],
+    //           ),
+    //           Icon(size: 24, LucideIcons.dot),
+    //           ShadInputOTPGroup(
+    //             children: [
+    //               inputSlot,
+    //               inputSlot,
+    //               inputSlot,
+    //             ],
+    //           ),
+    //           Spacer(),
+    //         ],
+    //       ),
+    //       SizedBox(height: 8),
+    //       ErrorController(message: _errMsg),
+    //       SizedBox(height: 8),
+    //       TextButton(
+    //         style: Theme.of(context).textButtonTheme.style?.copyWith(
+    //           side: WidgetStateProperty.resolveWith((states) {
+    //             return BorderSide(
+    //               width: 2,
+    //               color: states.contains(WidgetState.disabled)
+    //                   ? Color(0xFF636363)
+    //                   : Color(0xffa0cafa),
+    //             );
+    //           }),
+    //           backgroundColor: WidgetStateProperty.resolveWith((states) {
+    //             return states.contains(WidgetState.disabled)
+    //                 ? Color(0xFF434343)
+    //                 : Color(0xff63a0eb);
+    //           }),
+    //         ),
+    //         // onPressed: (_codeEmpty || !formEnabled) ? null : _onSubmit,
+    //         child: Text(
+    //           'Enter',
+    //           style: Theme.of(context).primaryTextTheme.bodySmall,
+    //         ),
+    //       ),
+    //       SizedBox(height: 8),
+    //       TTLController(
+    //         ttl: (widget.viewModel.load.result! as Ok).value,
+    //         viewModel: widget.viewModel,
+    //         email: widget.email,
+    //       ),
+    //     ],
+    //   ),
+    // );
   }
 }
 
@@ -284,9 +398,15 @@ class TTLTimer extends StatelessWidget {
     }
 
     if (minutesMsg.isNotEmpty) {
-      return Text('Request again in $minutesMsg and $secondsMsg');
+      return Text(
+        'Request again in $minutesMsg and $secondsMsg',
+        style: Theme.of(context).primaryTextTheme.bodySmall,
+      );
     }
-    return Text('Request again in $secondsMsg');
+    return Text(
+      'Request again in $secondsMsg',
+      style: Theme.of(context).primaryTextTheme.bodySmall,
+    );
   }
 }
 

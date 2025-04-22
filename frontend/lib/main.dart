@@ -78,6 +78,7 @@ class MainApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/create',
+          redirect: rootRouteGuard,
           builder: (context, state) => CreateScreen(
             viewModel: CreateViewModel(
               atProtoRepository: context.read<AtProtoRepository>(),
@@ -128,7 +129,8 @@ class MainApp extends StatelessWidget {
           iconTheme: IconThemeData(color: const Color(0xFF6C7086)),
           primaryIconTheme: IconThemeData(color: const Color(0xFFF4F4F9)),
           dividerColor: const Color(0xFFC9C9D9),
-          disabledColor: const Color(0xFF6C7086),
+          disabledColor: const Color(0xFF434343),
+          indicatorColor: const Color(0xFF636363),
           textTheme: TextTheme(
             labelSmall: TextStyle(
               fontSize: 12,
@@ -159,7 +161,7 @@ class MainApp extends StatelessWidget {
             ),
             displayMedium: TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w500,
               color: const Color(0xFFF4F4F9),
             ),
             displaySmall: TextStyle(

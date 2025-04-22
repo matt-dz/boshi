@@ -70,6 +70,17 @@ class _SignupForm extends State<SignupForm> {
   final _formKey = GlobalKey<FormState>();
   String? _errMsg;
   final _emailController = TextEditingController();
+  bool _emailEmpty = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(() {
+      setState(() {
+        _emailEmpty = _emailController.text.isEmpty;
+      });
+    });
+  }
 
   @override
   void dispose() {
@@ -114,7 +125,12 @@ class _SignupForm extends State<SignupForm> {
         widget.viewModel.addEmail.completed);
     return ShadCard(
       width: 400,
-      title: const Text('Enter University Email'),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      border: Border.all(color: Theme.of(context).focusColor),
+      title: Text(
+        'Enter University Email',
+        style: Theme.of(context).primaryTextTheme.labelLarge,
+      ),
       description: const Text('We use your university email '
           'to verify your student status. Be sure to check your spam folder.'),
       child: Padding(
@@ -124,8 +140,35 @@ class _SignupForm extends State<SignupForm> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ShadInputFormField(
-                placeholder: Text('w.clayton@ufl.edu'),
+              TextField(
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xFF223C48),
+                  contentPadding: EdgeInsets.all(12),
+                  isDense: true,
+                  hintStyle: Theme.of(context)
+                      .primaryTextTheme
+                      .bodySmall
+                      ?.copyWith(color: Color(0xff6f748c)),
+                  hintText: 'w.clayton@ufl.edu',
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      width: 2,
+                      color: Theme.of(context).focusColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      width: 2,
+                      color: Theme.of(context).focusColor,
+                    ),
+                  ),
+                ),
+                style: Theme.of(context).primaryTextTheme.bodySmall,
+                cursorColor:
+                    Theme.of(context).primaryTextTheme.bodySmall?.color,
                 controller: _emailController,
                 enabled: formEnabled,
                 keyboardType: TextInputType.emailAddress,
@@ -133,10 +176,27 @@ class _SignupForm extends State<SignupForm> {
               const SizedBox(height: 8),
               ErrorController(message: _errMsg),
               const SizedBox(height: 8),
-              ShadButton(
-                enabled: formEnabled,
-                onPressed: _onSignup,
-                child: const Text('Enter'),
+              TextButton(
+                onPressed: (_emailEmpty || !formEnabled) ? null : _onSignup,
+                style: Theme.of(context).textButtonTheme.style?.copyWith(
+                  side: WidgetStateProperty.resolveWith((states) {
+                    return BorderSide(
+                      width: 2,
+                      color: states.contains(WidgetState.disabled)
+                          ? Color(0xFF636363)
+                          : Color(0xffa0cafa),
+                    );
+                  }),
+                  backgroundColor: WidgetStateProperty.resolveWith((states) {
+                    return states.contains(WidgetState.disabled)
+                        ? Color(0xFF434343)
+                        : Color(0xff63a0eb);
+                  }),
+                ),
+                child: Text(
+                  'Enter',
+                  style: Theme.of(context).primaryTextTheme.bodySmall,
+                ),
               ),
             ],
           ),
