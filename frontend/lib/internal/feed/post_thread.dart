@@ -22,7 +22,7 @@ List<Post> extractRepliesFromPostThread(
   List<bsky.PostThreadView>? replyRecords,
   List<User> users,
 ) {
-  final replies = List<Post>.empty();
+  final replies = List<Post>.empty(growable: true);
 
   if (replyRecords == null) {
     return replies;
