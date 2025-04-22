@@ -110,7 +110,9 @@ class ReplyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: () => viewModel.handleReply?.execute(context),
+      onPressed: viewModel.handleReply == null
+          ? null
+          : () => viewModel.handleReply!.execute(context),
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
