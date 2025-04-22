@@ -17,7 +17,7 @@ class PostWithRepliesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final replies = viewModel.post.replies?.map(
-      (reply) => PostFeed(
+      (reply) => PostWithRepliesWidget(
         viewModel: PostViewModel(
           atProtoRepository: viewModel.atProtoRepository,
           post: reply,
