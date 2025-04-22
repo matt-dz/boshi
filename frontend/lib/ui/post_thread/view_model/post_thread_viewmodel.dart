@@ -103,7 +103,7 @@ class PostThreadViewModel extends ChangeNotifier {
       }
       return createReplyResult;
     } finally {
-      notifyListeners();
+      reload();
     }
   }
 }
