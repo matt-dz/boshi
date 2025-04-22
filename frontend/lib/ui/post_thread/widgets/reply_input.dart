@@ -1,6 +1,5 @@
 import 'package:atproto/atproto.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/data/models/requests/add_email/add_email.dart';
 import 'package:frontend/internal/logger/logger.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/ui/post_thread/view_model/post_thread_viewmodel.dart';
@@ -120,28 +119,28 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
             flex: 0,
             child: OutlinedButton(
               style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
-                    fixedSize: WidgetStateProperty.resolveWith(
-                      (_) => const Size(64, 32),
-                    ),
-                    shape: WidgetStateProperty.resolveWith((states) {
-                      return RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      );
-                    }),
-                    side: WidgetStateProperty.resolveWith((states) {
-                      return BorderSide(
-                        width: 2,
-                        color: states.contains(WidgetState.disabled)
-                            ? Color(0xFF636363)
-                            : Color(0xffa0cafa),
-                      );
-                    }),
-                    backgroundColor: WidgetStateProperty.resolveWith((states) {
-                      return states.contains(WidgetState.disabled)
-                          ? Color(0xFF434343)
-                          : Color(0xff63a0eb);
-                    }),
-                  ),
+                maximumSize: WidgetStateProperty.resolveWith((states) {
+                  return const Size(48, 24);
+                }),
+                shape: WidgetStateProperty.resolveWith((states) {
+                  return RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  );
+                }),
+                side: WidgetStateProperty.resolveWith((states) {
+                  return BorderSide(
+                    width: 2,
+                    color: states.contains(WidgetState.disabled)
+                        ? Color(0xFF636363)
+                        : Color(0xffa0cafa),
+                  );
+                }),
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  return states.contains(WidgetState.disabled)
+                      ? Color(0xFF434343)
+                      : Color(0xff63a0eb);
+                }),
+              ),
               onPressed: _replyEmpty ? null : _onReply,
               child: Text(
                 'Reply',
