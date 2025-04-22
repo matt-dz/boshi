@@ -120,7 +120,7 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
             child: OutlinedButton(
               style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
                 maximumSize: WidgetStateProperty.resolveWith((states) {
-                  return const Size(48, 24);
+                  return const Size(64, 32);
                 }),
                 shape: WidgetStateProperty.resolveWith((states) {
                   return RoundedRectangleBorder(
