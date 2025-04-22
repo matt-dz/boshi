@@ -66,7 +66,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         email: widget.email,
                       ),
                     )
-                  : CircularProgressIndicator(),
+                  : CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
             ),
           ),
         );

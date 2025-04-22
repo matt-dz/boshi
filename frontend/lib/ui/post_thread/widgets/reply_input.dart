@@ -93,7 +93,7 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
                   isDense: true,
                   hintStyle:
                       Theme.of(context).primaryTextTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).disabledColor,
+                            color: Color(0xFFC3CAEB),
                           ),
                   hintText: 'Thoughts?',
                   enabledBorder: OutlineInputBorder(

@@ -44,6 +44,7 @@ class _CreateFormState extends State<CreateForm> {
   final _formKey = GlobalKey<ShadFormState>();
   bool _titleExists = false;
   bool _contentExists = false;
+  final _disabledColor = Color(0xFFC3CAEB);
 
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
@@ -86,7 +87,11 @@ class _CreateFormState extends State<CreateForm> {
           listenable: widget.viewModel,
           builder: (context, _) {
             if (widget.viewModel.load.running) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              );
             } else if (widget.viewModel.load.error) {
               final result = widget.viewModel.load.result! as Error;
               return ErrorScreen(
@@ -176,7 +181,7 @@ class _CreateFormState extends State<CreateForm> {
                                     .primaryTextTheme
                                     .bodyLarge
                                     ?.copyWith(
-                                      color: Theme.of(context).disabledColor,
+                                      color: _disabledColor,
                                     ),
                                 hintText: 'Title',
                                 border: InputBorder.none,
@@ -200,7 +205,7 @@ class _CreateFormState extends State<CreateForm> {
                                     .primaryTextTheme
                                     .bodyMedium
                                     ?.copyWith(
-                                      color: Theme.of(context).disabledColor,
+                                      color: _disabledColor,
                                     ),
                                 hintText: 'Speak your truth...',
                                 border: InputBorder.none,

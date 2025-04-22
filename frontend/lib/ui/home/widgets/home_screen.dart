@@ -60,7 +60,11 @@ class HomeScreen extends StatelessWidget {
                 listenable: viewModel,
                 builder: (context, _) {
                   if (viewModel.load.running) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    );
                   } else if (viewModel.load.error) {
                     final result = viewModel.load.result! as Error;
                     return ErrorScreen(
