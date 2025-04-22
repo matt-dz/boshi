@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:frontend/internal/exceptions/format.dart';
 import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
@@ -40,9 +41,35 @@ class CreateForm extends StatefulWidget {
 }
 
 class _CreateFormState extends State<CreateForm> {
-  final formKey = GlobalKey<ShadFormState>();
+  final _formKey = GlobalKey<ShadFormState>();
   bool _titleExists = false;
   bool _contentExists = false;
+
+  final _titleController = TextEditingController();
+  final _contentController = TextEditingController();
+
+  void _post() async {
+    if (_formKey.currentState!.saveAndValidate()) {
+      final result = await widget.viewModel.createPost.execute(
+        (
+          _formKey.currentState!.value['title'],
+          _formKey.currentState!.value['content']
+        ),
+      );
+
+      switch (result) {
+        case Ok<void>():
+          logger.e('Successfully created post');
+          if (mounted) {
+            context.go('/');
+          }
+          return;
+        case Error():
+          logger.e('Error creating post in: $result');
+          return;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +92,8 @@ class _CreateFormState extends State<CreateForm> {
               child: Padding(
                 padding: EdgeInsets.only(top: 24, bottom: 16),
                 child: ShadCard(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  border: Border.all(color: const Color(0xFF7DD3FC)),
                   width: 400,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,42 +101,35 @@ class _CreateFormState extends State<CreateForm> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ShadButton.ghost(
-                            height: 30,
-                            width: 120,
+                          OutlinedButton(
+                            style: Theme.of(context).outlinedButtonTheme.style,
                             onPressed: () {
-                              context.go('/');
+                              context.pop();
                             },
-                            child: const Text('Cancel'),
+                            child: Text(
+                              'Cancel',
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .labelMedium,
+                            ),
                           ),
-                          ShadButton.ghost(
-                            height: 30,
-                            width: 120,
-                            enabled: _titleExists && _contentExists,
-                            onPressed: () async {
-                              if (formKey.currentState!.saveAndValidate()) {
-                                final result =
-                                    await widget.viewModel.createPost.execute(
-                                  (
-                                    formKey.currentState!.value['title'],
-                                    formKey.currentState!.value['content']
-                                  ),
-                                );
-
-                                switch (result) {
-                                  case Ok<void>():
-                                    logger.e('Successfully created post');
-                                    if (context.mounted) {
-                                      context.go('/');
-                                    }
-                                    return;
-                                  case Error():
-                                    logger.e('Error creating post in: $result');
-                                    return;
-                                }
-                              }
-                            },
-                            child: const Text('Post'),
+                          OutlinedButton(
+                            style: Theme.of(context).outlinedButtonTheme.style,
+                            onPressed:
+                                _titleExists && _contentExists ? _post : null,
+                            child: Text(
+                              'Post',
+                              style: _titleExists && _contentExists
+                                  ? Theme.of(context)
+                                      .primaryTextTheme
+                                      .labelMedium
+                                  : Theme.of(context)
+                                      .primaryTextTheme
+                                      .labelMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context).disabledColor,
+                                      ),
+                            ),
                           ),
                         ],
                       ),
@@ -115,69 +137,73 @@ class _CreateFormState extends State<CreateForm> {
                       Center(
                         child: Column(
                           children: [
-                            Text('Posting as'),
+                            Text(
+                              'Posting as',
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .headlineMedium,
+                            ),
                             Text(
                               widget.viewModel.user?.school ??
                                   'School not found',
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .headlineSmall,
                             ),
                           ],
                         ),
                       ),
-                      ShadForm(
-                        key: formKey,
+                      Form(
+                        key: _formKey,
                         child: Column(
                           children: [
-                            ShadInputFormField(
-                              id: 'title',
-                              placeholder: Text(
-                                'Title',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .copyWith(
-                                      fontWeight: FontWeight.bold,
+                            TextField(
+                              cursorColor: Theme.of(context)
+                                  .primaryTextTheme
+                                  .bodyLarge
+                                  ?.color,
+                              style:
+                                  Theme.of(context).primaryTextTheme.bodyLarge,
+                              decoration: InputDecoration(
+                                hintStyle: Theme.of(context)
+                                    .primaryTextTheme
+                                    .bodyLarge
+                                    ?.copyWith(
                                       color: Theme.of(context).disabledColor,
                                     ),
+                                hintText: 'Title',
+                                border: InputBorder.none,
                               ),
-                              decoration: ShadDecoration(
-                                border: ShadBorder.none,
-                                disableSecondaryBorder: true,
-                              ),
-                              validator: (String value) {
-                                if (value.isEmpty) {
-                                  return "What's the title to your truth?";
-                                }
-                                return null;
+                              onChanged: (value) {
+                                setState(() {
+                                  _titleExists = value.isNotEmpty;
+                                });
                               },
-                              onChanged: (String title) => setState(() {
-                                _titleExists = title.isNotEmpty;
-                              }),
+                              controller: _titleController,
                             ),
-                            ShadInputFormField(
-                              id: 'content',
-                              placeholder: Text(
-                                'Speak your truth...',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                      fontWeight: FontWeight.bold,
+                            TextField(
+                              cursorColor: Theme.of(context)
+                                  .primaryTextTheme
+                                  .bodyMedium
+                                  ?.color,
+                              style:
+                                  Theme.of(context).primaryTextTheme.bodyMedium,
+                              decoration: InputDecoration(
+                                hintStyle: Theme.of(context)
+                                    .primaryTextTheme
+                                    .bodyMedium
+                                    ?.copyWith(
                                       color: Theme.of(context).disabledColor,
                                     ),
+                                hintText: 'Speak your truth...',
+                                border: InputBorder.none,
                               ),
-                              decoration: ShadDecoration(
-                                border: ShadBorder.none,
-                                disableSecondaryBorder: true,
-                              ),
-                              validator: (String value) {
-                                if (value.isEmpty) {
-                                  return "Don't you want to speak your truth?";
-                                }
-                                return null;
+                              onChanged: (value) {
+                                setState(() {
+                                  _contentExists = value.isNotEmpty;
+                                });
                               },
-                              onChanged: (String content) => setState(() {
-                                _contentExists = content.isNotEmpty;
-                              }),
+                              controller: _contentController,
                             ),
                           ],
                         ),

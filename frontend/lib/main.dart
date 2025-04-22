@@ -127,6 +127,7 @@ class MainApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Color(0xFF6C7086)),
           primaryIconTheme: IconThemeData(color: Color(0xFFF4F4F9)),
           dividerColor: Color(0xFFC9C9D9),
+          disabledColor: Color(0xFF6C7086),
           primaryTextTheme: TextTheme(
             headlineLarge: TextStyle(
               fontSize: 24,
@@ -135,12 +136,12 @@ class MainApp extends StatelessWidget {
             ),
             headlineMedium: TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.normal,
+              fontWeight: FontWeight.bold,
               color: Color(0xFFF4F4F9),
             ),
             headlineSmall: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.normal,
+              fontSize: 16,
+              fontWeight: FontWeight.w300,
               color: Color(0xFFF4F4F9),
             ),
             displayLarge: TextStyle(
@@ -155,11 +156,21 @@ class MainApp extends StatelessWidget {
             ),
             displaySmall: TextStyle(
               fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFFF4F4F9),
+            ),
+            bodyLarge: TextStyle(
+              fontSize: 16,
               fontWeight: FontWeight.w400,
               color: Color(0xFFF4F4F9),
             ),
             bodyMedium: TextStyle(
               fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFFF4F4F9),
+            ),
+            bodySmall: TextStyle(
+              fontSize: 12,
               fontWeight: FontWeight.w400,
               color: Color(0xFFF4F4F9),
             ),
@@ -190,15 +201,48 @@ class MainApp extends StatelessWidget {
             ),
           ),
           outlinedButtonTheme: OutlinedButtonThemeData(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.fromLTRB(8, 12, 8, 12),
-              minimumSize: Size.zero,
-              side: BorderSide(color: Colors.transparent),
+            style: ButtonStyle(
+              textStyle: WidgetStateProperty.resolveWith<TextStyle>((states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  );
+                }
+                return TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                );
+              }),
+              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.hovered)) {
+                  return Colors.black26;
+                }
+                return Colors.transparent;
+              }),
+              foregroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return Colors.black;
+                }
+                return Colors.white;
+              }),
+              padding: WidgetStateProperty.resolveWith((state) {
+                return EdgeInsets.fromLTRB(8, 12, 8, 12);
+              }),
+              minimumSize: WidgetStateProperty.resolveWith((states) {
+                return Size.zero;
+              }),
+              side: WidgetStateProperty.resolveWith((states) {
+                return BorderSide(color: Colors.transparent);
+              }),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+              shape: WidgetStateProperty.resolveWith((status) {
+                return RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                );
+              }),
             ),
           ),
         );
