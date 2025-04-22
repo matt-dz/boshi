@@ -3,6 +3,8 @@ import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/domain/models/user/user.dart';
 
 var mockPost1 = bsky.Post(
+  likeCount: 43,
+  replyCount: 12,
   record: bsky.PostRecord(
     text: 'What is Lorem Ipsum?\nLorem Ipsum is simply dummy text of the '
         'printing and typesetting industry. Lorem Ipsum has been the '
@@ -32,6 +34,8 @@ var mockPost1 = bsky.Post(
 );
 
 var mockPost2 = bsky.Post(
+  likeCount: 75,
+  replyCount: 4,
   record: bsky.PostRecord(
     text: 'What is Lorem Ipsum?\nLorem Ipsum is simply dummy text of the '
         'printing and typesetting industry. Lorem Ipsum has been the '
@@ -61,6 +65,8 @@ var mockPost2 = bsky.Post(
 );
 
 var mockPost3 = bsky.Post(
+  likeCount: 85858,
+  replyCount: 5830,
   record: bsky.PostRecord(
     text: 'What is Lorem Ipsum?\nLorem Ipsum is simply dummy text of the '
         'printing and typesetting industry. Lorem Ipsum has been the '
@@ -90,6 +96,8 @@ var mockPost3 = bsky.Post(
 );
 
 var mockPost4 = bsky.Post(
+  likeCount: 8,
+  replyCount: 0,
   record: bsky.PostRecord(
     text: 'What is Lorem Ipsum?\nLorem Ipsum is simply dummy text of the '
         'printing and typesetting industry. Lorem Ipsum has been the '
@@ -119,6 +127,8 @@ var mockPost4 = bsky.Post(
 );
 
 var mockPost5 = bsky.Post(
+  likeCount: 32,
+  replyCount: 8,
   record: bsky.PostRecord(
     text: 'What is Lorem Ipsum?\nLorem Ipsum is simply dummy text of the '
         'printing and typesetting industry. Lorem Ipsum has been the '
@@ -148,6 +158,8 @@ var mockPost5 = bsky.Post(
 );
 
 var mockPost6 = bsky.Post(
+  likeCount: 43,
+  replyCount: 12,
   record: bsky.PostRecord(
     text: 'What is Lorem Ipsum?\nLorem Ipsum is simply dummy text of the '
         'printing and typesetting industry. Lorem Ipsum has been the '

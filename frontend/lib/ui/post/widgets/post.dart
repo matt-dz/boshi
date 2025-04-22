@@ -4,7 +4,6 @@ import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/internal/logger/logger.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 class PostHeader extends StatelessWidget {
   const PostHeader({
@@ -80,6 +79,7 @@ class LikeButton extends StatelessWidget {
           Text(
             '${viewModel.post.post.likeCount}',
             style: Theme.of(context).primaryTextTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
                   color: viewModel.post.post.isLiked
                       ? Colors.red
                       : Theme.of(context).iconTheme.color,
@@ -115,6 +115,7 @@ class ReplyButton extends StatelessWidget {
           Text(
             '${viewModel.post.post.replyCount}',
             style: Theme.of(context).primaryTextTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
                   color: Theme.of(context).iconTheme.color,
                 ),
           ),
@@ -180,12 +181,17 @@ class PostFeed extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 4,
               children: [
-                PostHeader(post: viewModel.post),
-                Text(
-                  extractContext(viewModel.post),
-                  style: Theme.of(context).primaryTextTheme.bodyMedium,
+                Padding(
+                  padding: EdgeInsets.only(left: 8, right: 8),
+                  child: PostHeader(post: viewModel.post),
                 ),
-                const SizedBox(height: 4),
+                Padding(
+                  padding: EdgeInsets.only(left: 8, right: 8),
+                  child: Text(
+                    extractContext(viewModel.post),
+                    style: Theme.of(context).primaryTextTheme.bodyMedium,
+                  ),
+                ),
                 PostFooter(
                   viewModel: viewModel,
                 ),

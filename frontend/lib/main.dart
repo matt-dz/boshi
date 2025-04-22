@@ -175,8 +175,9 @@ class MainApp extends StatelessWidget {
             ),
           ),
           outlinedButtonTheme: OutlinedButtonThemeData(
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.fromLTRB(8, 12, 8, 12),
               minimumSize: Size.zero,
               side: BorderSide(color: Colors.transparent),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
