@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-
-import 'package:frontend/internal/logger/logger.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Header extends StatelessWidget {
   const Header({super.key});
@@ -16,14 +16,16 @@ class Header extends StatelessWidget {
             style: TextButton.styleFrom(backgroundColor: Colors.transparent),
             child: Text(
               'Boshi',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
+              style: GoogleFonts.monoton(
+                fontSize: 32,
+                fontWeight: FontWeight.w400,
                 color: Color(0xFFC9C9D9),
               ),
             ),
             onPressed: () {
-              logger.d('Boshi pressed!');
+              if (context.mounted) {
+                context.go('/');
+              }
             },
           ),
         ),

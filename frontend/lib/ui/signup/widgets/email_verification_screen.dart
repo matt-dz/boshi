@@ -224,7 +224,12 @@ class _VerificationForm extends State<VerificationForm> {
             onCompleted: _onSubmit,
           ),
         ),
-        Center(child: ErrorController(message: _errMsg)),
+        ErrorController(message: _errMsg),
+        TTLController(
+          ttl: (widget.viewModel.load.result! as Ok).value,
+          viewModel: widget.viewModel,
+          email: widget.email,
+        ),
       ],
     );
 
@@ -400,7 +405,9 @@ class TTLTimer extends StatelessWidget {
     if (minutesMsg.isNotEmpty) {
       return Text(
         'Request again in $minutesMsg and $secondsMsg',
-        style: Theme.of(context).primaryTextTheme.bodySmall,
+        style: Theme.of(context).primaryTextTheme.bodySmall?.copyWith(
+              color: Colors.grey.shade400,
+            ),
       );
     }
     return Text(
