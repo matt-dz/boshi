@@ -3,6 +3,15 @@ import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
 
+StrongRef getRootFromPostThread(bsky.PostThreadViewRecord post) {
+  return post.parent == null
+      ? StrongRef(cid: post.post.cid, uri: post.post.uri)
+      : post.parent!.maybeWhen(
+          record: (parent) => getRootFromPostThread(parent),
+          orElse: () => StrongRef(cid: post.post.cid, uri: post.post.uri),
+        );
+}
+
 void extractDidsFromPostThread(
   bsky.PostThreadViewRecord postThread,
   Set<String> dids,

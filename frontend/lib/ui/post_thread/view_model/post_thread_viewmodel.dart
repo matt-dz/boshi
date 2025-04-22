@@ -57,17 +57,26 @@ class PostThreadViewModel extends ChangeNotifier {
 
           switch (users) {
             case Ok<List<User>>():
+              final repliesToSort = extractRepliesFromPostThread(
+                StrongRef(cid: threadView.post.cid, uri: threadView.post.uri),
+                getRootFromPostThread(threadView),
+                threadView.replies,
+                users.value,
+              );
+              repliesToSort.sort(
+                (Post a, Post b) => b.post.indexedAt.compareTo(
+                  a.post.indexedAt,
+                ),
+              );
+              _replies = repliesToSort;
+
               _post = Post(
                 bskyPost: threadView.post,
                 author: users.value.firstWhere(
                   (user) => user.did == threadView.post.author.did,
                 ),
-              );
-              _replies = extractRepliesFromPostThread(
-                StrongRef(cid: threadView.post.cid, uri: threadView.post.uri),
-                StrongRef(cid: threadView.post.cid, uri: threadView.post.uri),
-                threadView.replies,
-                users.value,
+                replies: _replies,
+                root: getRootFromPostThread(threadView),
               );
 
             case Error<List<User>>():
@@ -85,7 +94,7 @@ class PostThreadViewModel extends ChangeNotifier {
   }
 
   void reload() {
-    load = Command0(_load)..execute();
+    load.execute();
     notifyListeners();
   }
 
@@ -95,13 +104,13 @@ class PostThreadViewModel extends ChangeNotifier {
       final createReplyResult = await _atProtoRepository.createReply(reply);
       switch (createReplyResult) {
         case Ok<void>():
-          logger.d('Successfully created post');
+          logger.d('Successfully created reply');
         case Error<void>():
-          logger.e('Error creating post: ${createReplyResult.error}');
+          logger.e('Error creating reply: ${createReplyResult.error}');
       }
       return createReplyResult;
     } finally {
-      notifyListeners();
+      reload();
     }
   }
 }
