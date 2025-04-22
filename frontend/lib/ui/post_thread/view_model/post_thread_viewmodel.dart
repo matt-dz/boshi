@@ -45,7 +45,7 @@ class PostThreadViewModel extends ChangeNotifier {
             return Result.error(Exception("Couldn't verify thread"));
           }
 
-          final dids = List<String>.empty();
+          final dids = List<String>.empty(growable: true);
           extractDidsFromPostThread(threadView, dids);
 
           final users = await _atProtoRepository.getUsers(dids);
