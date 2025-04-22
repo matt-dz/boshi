@@ -16,13 +16,10 @@ class RepliesWidget extends StatelessWidget {
     if (viewModel.replies.isEmpty) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
+        children: [
           Text(
             'No posts yet!',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(context).primaryTextTheme.labelLarge,
           ),
         ],
       );
