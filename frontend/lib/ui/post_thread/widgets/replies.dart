@@ -18,8 +18,8 @@ class RepliesWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'No posts yet!',
-            style: Theme.of(context).primaryTextTheme.labelLarge,
+            'No content yet!',
+            style: Theme.of(context).primaryTextTheme.displayLarge,
           ),
         ],
       );
