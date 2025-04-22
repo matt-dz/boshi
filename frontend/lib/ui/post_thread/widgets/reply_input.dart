@@ -4,7 +4,6 @@ import 'package:frontend/internal/logger/logger.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/ui/post_thread/view_model/post_thread_viewmodel.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
-import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class ReplyInputWidget extends StatefulWidget {
@@ -20,8 +19,24 @@ class ReplyInputWidget extends StatefulWidget {
 }
 
 class _ReplyInputWidgetState extends State<ReplyInputWidget> {
-  final formKey = GlobalKey<ShadFormState>();
-  bool _contentExists = false;
+  final _formKey = GlobalKey<ShadFormState>();
+  final TextEditingController _controller = TextEditingController();
+  bool _validState() {
+    return _controller.text.isNotEmpty;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller.addListener(_validState);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +46,10 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
       child: Row(
         children: [
           Expanded(
-            child: ShadForm(
-              key: formKey,
+            child: Form(
+              key: _formKey,
               child: ShadInputFormField(
-                id: 'content',
+                controller: _controller,
                 placeholder: Text(
                   'Thoughts?',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -46,27 +61,18 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
                   border: ShadBorder.none,
                   disableSecondaryBorder: true,
                 ),
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return "Don't you want to speak your truth?";
-                  }
-                  return null;
-                },
-                onChanged: (String content) => setState(() {
-                  _contentExists = content.isNotEmpty;
-                }),
               ),
             ),
           ),
           ShadButton.ghost(
             height: 30,
             width: 120,
-            enabled: _contentExists,
+            enabled: _validState(),
             onPressed: () async {
-              if (formKey.currentState!.saveAndValidate()) {
+              if (_validState()) {
                 final result = await widget.viewModel.createReply.execute(
                   bsky.PostRecord(
-                    text: formKey.currentState!.value['content'],
+                    text: _controller.text,
                     reply: bsky.ReplyRef(
                       parent: StrongRef(
                         cid: widget.viewModel.post.post.cid,
@@ -85,7 +91,7 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
                 switch (result) {
                   case Ok<void>():
                     logger.e('Successfully created reply');
-                    formKey.currentState!.setInternalFieldValue('content', '');
+                    _controller.clear();
                   case Error():
                     logger.e('Error creating reply with: $result');
                 }

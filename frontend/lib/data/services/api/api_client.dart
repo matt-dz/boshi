@@ -203,7 +203,7 @@ class ApiClient {
     bsky.Bluesky bluesky,
     AtUri url,
   ) async {
-    logger.d('Creating reply');
+    logger.d('getting post thread');
 
     if (!EnvironmentConfig.prod) {
       return Result.ok(mockGetPostThreadResult);
