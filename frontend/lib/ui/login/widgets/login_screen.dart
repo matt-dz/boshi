@@ -48,6 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ShadInputFormField(
                     decoration: ShadDecoration(
                       color: Colors.black26,
+                      border: ShadBorder.all(color: const Color(0xAA7DD3FC)),
+                      secondaryFocusedBorder:
+                          ShadBorder.all(color: const Color(0xAA7DD3FC)),
                     ),
                     cursorColor:
                         Theme.of(context).primaryTextTheme.bodySmall?.color,
@@ -86,6 +89,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: Theme.of(context).primaryTextTheme.bodySmall,
                     decoration: ShadDecoration(
                       color: Colors.black26,
+                      border: ShadBorder.all(color: const Color(0xAA7DD3FC)),
+                      secondaryFocusedBorder:
+                          ShadBorder.all(color: const Color(0xAA7DD3FC)),
                     ),
                     cursorColor:
                         Theme.of(context).primaryTextTheme.bodySmall?.color,
