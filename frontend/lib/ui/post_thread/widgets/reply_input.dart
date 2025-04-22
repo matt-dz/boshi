@@ -139,14 +139,21 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
                 }),
                 backgroundColor: WidgetStateProperty.resolveWith((states) {
                   return states.contains(WidgetState.disabled)
-                      ? Color(0xFF434343)
+                      ? Colors.transparent
                       : Color(0xff63a0eb);
                 }),
               ),
-              onPressed: _replyEmpty ? null : _onReply,
+              onPressed: (widget.viewModel.createReply.running || _replyEmpty)
+                  ? null
+                  : _onReply,
               child: Text(
                 'Reply',
-                style: Theme.of(context).primaryTextTheme.labelSmall,
+                style: Theme.of(context).primaryTextTheme.labelSmall?.copyWith(
+                      color:
+                          (widget.viewModel.createReply.running || _replyEmpty)
+                              ? Colors.grey.shade600
+                              : null,
+                    ),
               ),
             ),
           ),

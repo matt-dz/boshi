@@ -131,8 +131,11 @@ class _SignupForm extends State<SignupForm> {
         'Enter University Email',
         style: Theme.of(context).primaryTextTheme.labelLarge,
       ),
-      description: const Text('We use your university email '
-          'to verify your student status. Be sure to check your spam folder.'),
+      description: Text(
+        'We use your university email '
+        'to verify your student status. Be sure to check your spam folder.',
+        style: Theme.of(context).primaryTextTheme.labelSmall,
+      ),
       child: Padding(
         padding: const EdgeInsets.only(top: 16),
         child: Form(
@@ -189,13 +192,17 @@ class _SignupForm extends State<SignupForm> {
                   }),
                   backgroundColor: WidgetStateProperty.resolveWith((states) {
                     return states.contains(WidgetState.disabled)
-                        ? Color(0xFF434343)
+                        ? Colors.transparent
                         : Color(0xff63a0eb);
                   }),
                 ),
                 child: Text(
                   'Enter',
-                  style: Theme.of(context).primaryTextTheme.bodySmall,
+                  style: Theme.of(context).primaryTextTheme.bodySmall?.copyWith(
+                        color: (_emailEmpty || !formEnabled)
+                            ? Colors.grey.shade600
+                            : null,
+                      ),
                 ),
               ),
             ],
