@@ -73,7 +73,7 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(4),
-      constraints: BoxConstraints(minWidth: 350),
+      constraints: BoxConstraints(minWidth: 350, maxHeight: 32),
       child: Row(
         spacing: 8,
         children: [
@@ -119,7 +119,7 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
             child: OutlinedButton(
               style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
                 minimumSize: WidgetStateProperty.resolveWith((states) {
-                  return const Size(64, 40);
+                  return const Size(64, 32);
                 }),
                 shape: WidgetStateProperty.resolveWith((states) {
                   return RoundedRectangleBorder(
