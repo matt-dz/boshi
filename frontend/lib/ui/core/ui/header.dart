@@ -13,6 +13,7 @@ class Header extends StatelessWidget {
         Padding(
           padding: EdgeInsets.fromLTRB(0, 12, 0, 12),
           child: TextButton(
+            style: TextButton.styleFrom(backgroundColor: Colors.transparent),
             child: Text(
               'Boshi',
               style: TextStyle(

@@ -54,11 +54,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         const Spacer(),
                         TextButton(
-                          style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
+                          style: Theme.of(context).textButtonTheme.style,
                           onPressed: () async {
                             await viewModel.logout.execute();
                             if (context.mounted) {

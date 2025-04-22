@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
             style: Theme.of(context).textTheme.labelSmall,
           ),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          border: Border.all(color: const Color(0xFF7DD3FC)),
+          border: Border.all(color: Theme.of(context).focusColor),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: ShadForm(
@@ -48,9 +48,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ShadInputFormField(
                     decoration: ShadDecoration(
                       color: Colors.black26,
-                      border: ShadBorder.all(color: const Color(0xAA7DD3FC)),
+                      border:
+                          ShadBorder.all(color: Theme.of(context).focusColor),
                       secondaryFocusedBorder:
-                          ShadBorder.all(color: const Color(0xAA7DD3FC)),
+                          ShadBorder.all(color: Theme.of(context).focusColor),
                     ),
                     cursorColor:
                         Theme.of(context).primaryTextTheme.bodySmall?.color,
@@ -121,8 +122,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
                   ShadButton(
-                    backgroundColor: Color(0xFF38BDF8),
-                    hoverBackgroundColor: Color(0xDF38BDF8),
+                    backgroundColor: const Color(0xFF38BDF8),
+                    hoverBackgroundColor: const Color(0xDF38BDF8),
                     child: const Text('Log in'),
                     onPressed: () async {
                       if (formKey.currentState!.saveAndValidate()) {

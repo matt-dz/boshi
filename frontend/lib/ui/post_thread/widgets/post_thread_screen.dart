@@ -53,6 +53,7 @@ class PostThreadScreen extends StatelessWidget {
                               atProtoRepository: viewModel.atProtoRepository,
                             ),
                           ),
+                          const SizedBox(height: 4),
                           ReplyInputWidget(viewModel: viewModel),
                           Flexible(
                             child: RepliesWidget(viewModel: viewModel),

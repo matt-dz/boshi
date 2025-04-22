@@ -69,7 +69,13 @@ class SignupForm extends StatefulWidget {
 class _SignupForm extends State<SignupForm> {
   final _formKey = GlobalKey<FormState>();
   String? _errMsg;
-  final emailController = TextEditingController();
+  final _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
 
   void _onSignup() async {
     // Reset error message
@@ -83,7 +89,7 @@ class _SignupForm extends State<SignupForm> {
 
     // Add email
     final result =
-        await widget.viewModel.addEmail.execute(emailController.text);
+        await widget.viewModel.addEmail.execute(_emailController.text);
     if (!mounted) {
       return;
     }
@@ -98,7 +104,7 @@ class _SignupForm extends State<SignupForm> {
     // Navigate to verification screen
     context.go(
       '/signup/verify?email='
-      '${Uri.encodeComponent(emailController.text)}',
+      '${Uri.encodeComponent(_emailController.text)}',
     );
   }
 
@@ -120,7 +126,7 @@ class _SignupForm extends State<SignupForm> {
             children: [
               ShadInputFormField(
                 placeholder: Text('w.clayton@ufl.edu'),
-                controller: emailController,
+                controller: _emailController,
                 enabled: formEnabled,
                 keyboardType: TextInputType.emailAddress,
               ),

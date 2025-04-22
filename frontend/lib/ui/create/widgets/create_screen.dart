@@ -1,3 +1,4 @@
+import 'package:atproto/core.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/internal/exceptions/format.dart';
 import 'package:frontend/ui/core/ui/error_screen.dart';
@@ -46,6 +47,13 @@ class _CreateFormState extends State<CreateForm> {
 
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
 
   void _post() async {
     if (_formKey.currentState!.saveAndValidate()) {
@@ -101,7 +109,7 @@ class _CreateFormState extends State<CreateForm> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           OutlinedButton(
-                            style: Theme.of(context).outlinedButtonTheme.style,
+                            style: Theme.of(context).textButtonTheme.style,
                             onPressed: () {
                               context.go('/');
                             },
@@ -112,8 +120,8 @@ class _CreateFormState extends State<CreateForm> {
                                   .labelMedium,
                             ),
                           ),
-                          OutlinedButton(
-                            style: Theme.of(context).outlinedButtonTheme.style,
+                          TextButton(
+                            style: Theme.of(context).textButtonTheme.style,
                             onPressed:
                                 _titleExists && _contentExists ? _post : null,
                             child: Text(

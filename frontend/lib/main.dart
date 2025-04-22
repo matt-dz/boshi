@@ -124,6 +124,7 @@ class MainApp extends StatelessWidget {
       materialThemeBuilder: (context, theme) {
         return theme.copyWith(
           scaffoldBackgroundColor: const Color(0xFF2E2C3A),
+          focusColor: const Color(0xFF7DD3FC),
           iconTheme: IconThemeData(color: const Color(0xFF6C7086)),
           primaryIconTheme: IconThemeData(color: const Color(0xFFF4F4F9)),
           dividerColor: const Color(0xFFC9C9D9),
@@ -198,13 +199,28 @@ class MainApp extends StatelessWidget {
             ),
           ),
           textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+            style: ButtonStyle(
+              padding: WidgetStateProperty.resolveWith(
+                (states) => EdgeInsets.all(16),
               ),
+              minimumSize:
+                  WidgetStateProperty.resolveWith((states) => Size.zero),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: WidgetStateProperty.resolveWith(
+                (states) => RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              backgroundColor:
+                  WidgetStateProperty.resolveWith<Color?>((states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return Colors.transparent;
+                }
+                if (states.contains(WidgetState.hovered)) {
+                  return Color(0xFF4d4d4d);
+                }
+                return Colors.transparent;
+              }),
             ),
           ),
           outlinedButtonTheme: OutlinedButtonThemeData(
