@@ -168,6 +168,8 @@ class _CreateFormState extends State<CreateForm> {
                         child: Column(
                           children: [
                             TextField(
+                              minLines: 1,
+                              maxLines: 12,
                               cursorColor: Theme.of(context)
                                   .primaryTextTheme
                                   .bodyLarge

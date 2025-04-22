@@ -73,8 +73,9 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(4),
-      constraints: BoxConstraints(minWidth: 350),
+      constraints: BoxConstraints(minWidth: 350, maxHeight: 48),
       child: Row(
+        spacing: 8,
         children: [
           Expanded(
             child: Form(
@@ -90,7 +91,6 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
                   filled: true,
                   fillColor: const Color(0xFF223C48),
                   contentPadding: EdgeInsets.all(12),
-                  isDense: true,
                   hintStyle:
                       Theme.of(context).primaryTextTheme.bodySmall?.copyWith(
                             color: Color(0xFFC3CAEB),
@@ -114,35 +114,40 @@ class _ReplyInputWidgetState extends State<ReplyInputWidget> {
               ),
             ),
           ),
-          const SizedBox(width: 10),
-          OutlinedButton(
-            style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
-                  fixedSize: WidgetStateProperty.resolveWith(
-                    (_) => const Size(64, 32),
-                  ),
-                  shape: WidgetStateProperty.resolveWith((states) {
-                    return RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    );
-                  }),
-                  side: WidgetStateProperty.resolveWith((states) {
-                    return BorderSide(
-                      width: 2,
-                      color: states.contains(WidgetState.disabled)
-                          ? Color(0xFF636363)
-                          : Color(0xffa0cafa),
-                    );
-                  }),
-                  backgroundColor: WidgetStateProperty.resolveWith((states) {
-                    return states.contains(WidgetState.disabled)
-                        ? Color(0xFF434343)
-                        : Color(0xff63a0eb);
-                  }),
-                ),
-            onPressed: _replyEmpty ? null : _onReply,
-            child: Text(
-              'Reply',
-              style: Theme.of(context).primaryTextTheme.labelSmall,
+          Flexible(
+            flex: 0,
+            child: OutlinedButton(
+              style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+                padding: WidgetStateProperty.resolveWith((states) {
+                  return EdgeInsets.zero;
+                }),
+                minimumSize: WidgetStateProperty.resolveWith((states) {
+                  return const Size(64, 48);
+                }),
+                shape: WidgetStateProperty.resolveWith((states) {
+                  return RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  );
+                }),
+                side: WidgetStateProperty.resolveWith((states) {
+                  return BorderSide(
+                    width: 2,
+                    color: states.contains(WidgetState.disabled)
+                        ? Color(0xFF636363)
+                        : Color(0xffa0cafa),
+                  );
+                }),
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  return states.contains(WidgetState.disabled)
+                      ? Color(0xFF434343)
+                      : Color(0xff63a0eb);
+                }),
+              ),
+              onPressed: _replyEmpty ? null : _onReply,
+              child: Text(
+                'Reply',
+                style: Theme.of(context).primaryTextTheme.labelSmall,
+              ),
             ),
           ),
         ],
