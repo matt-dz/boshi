@@ -63,8 +63,8 @@ func GenerateVerificationCode() (string, error) {
 
 func ParseEmail(address string) (string, error) {
 	at := strings.LastIndex(address, "@")
-	if at >= 0 {
+	if at < 0 {
 		return "", errors.New("domain not found in email")
 	}
 	return address[at+1:], nil
-} 
+}

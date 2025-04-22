@@ -18,6 +18,7 @@ import (
 )
 
 func resolveSchoolFromEmail(addr string) (string, error) {
+	log.Debug(addr)
 	domain, err := email.ParseEmail(addr)
 	if err != nil {
 		return "", exceptions.ErrUnknownUniversity
@@ -32,6 +33,7 @@ func resolveSchoolFromEmail(addr string) (string, error) {
 	params.Set("domain", domain)
 	base.RawQuery = params.Encode()
 
+	log.Debug("sending request for university", slog.String("domain", domain))
 	resp, err := http.Get(base.String())
 	if err != nil {
 		return "", err
