@@ -18,7 +18,6 @@ import (
 )
 
 func resolveSchoolFromEmail(addr string) (string, error) {
-	log.Debug(addr)
 	domain, err := email.ParseEmail(addr)
 	if err != nil {
 		return "", exceptions.ErrUnknownUniversity
