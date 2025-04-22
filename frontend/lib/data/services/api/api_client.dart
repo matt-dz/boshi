@@ -108,7 +108,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<List<User>>> getUsers(ATProto atp, List<String> dids) async {
+  Future<Result<List<User>>> getUsers(List<String> dids) async {
     final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
     final Uri requestUri = hostUri.replace(
       pathSegments: ['users'],
