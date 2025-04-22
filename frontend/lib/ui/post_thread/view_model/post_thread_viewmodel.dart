@@ -94,7 +94,7 @@ class PostThreadViewModel extends ChangeNotifier {
   }
 
   void reload() {
-    load = Command0(_load)..execute();
+    load.execute();
     notifyListeners();
   }
 
@@ -104,9 +104,9 @@ class PostThreadViewModel extends ChangeNotifier {
       final createReplyResult = await _atProtoRepository.createReply(reply);
       switch (createReplyResult) {
         case Ok<void>():
-          logger.d('Successfully created post');
+          logger.d('Successfully created reply');
         case Error<void>():
-          logger.e('Error creating post: ${createReplyResult.error}');
+          logger.e('Error creating reply: ${createReplyResult.error}');
       }
       return createReplyResult;
     } finally {
