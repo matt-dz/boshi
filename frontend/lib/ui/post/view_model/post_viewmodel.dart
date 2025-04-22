@@ -13,12 +13,12 @@ class PostViewModel extends ChangeNotifier {
   PostViewModel({
     required AtProtoRepository atProtoRepository,
     required Post post,
-    bool? disableLike,
-    bool? disableReply,
+    bool disableLike = false,
+    bool disableReply = false,
   })  : _atProtoRepository = atProtoRepository,
         _post = post,
         _disableReply = disableReply {
-    if (disableLike == null || disableLike == false) {
+    if (!disableLike) {
       toggleLike = Command0(_toggleLike);
     }
   }
@@ -27,12 +27,12 @@ class PostViewModel extends ChangeNotifier {
 
   final AtProtoRepository _atProtoRepository;
   final Post _post;
-  final bool? _disableReply;
+  final bool _disableReply;
 
   AtProtoRepository get atProtoRepository => _atProtoRepository;
   String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
   Post get post => _post;
-  bool? get disableReply => _disableReply;
+  bool get disableReply => _disableReply;
 
   Future<Result<void>> _toggleLike() async {
     try {

@@ -111,12 +111,11 @@ class ReplyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed:
-          viewModel.disableReply == null || viewModel.disableReply == false
-              ? () => context.go(
-                    '/post/${Uri.encodeComponent(viewModel.post.post.uri.toString())}',
-                  )
-              : null,
+      onPressed: viewModel.disableReply
+          ? null
+          : () => context.go(
+                '/post/${Uri.encodeComponent(viewModel.post.post.uri.toString())}',
+              ),
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.zero,
         side: BorderSide(color: Colors.transparent),
