@@ -62,7 +62,6 @@ class MainApp extends StatelessWidget {
         GoRoute(
           path: '/profile',
           builder: (context, state) => ProfileScreen(
-            title: 'Boshi',
             viewModel: ProfileViewModel(
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
@@ -71,7 +70,6 @@ class MainApp extends StatelessWidget {
         GoRoute(
           path: '/post/:rooturl',
           builder: (context, state) => PostThreadScreen(
-            title: 'Boshi',
             viewModel: PostThreadViewModel(
               atProtoRepository: context.read<AtProtoRepository>(),
               rootUrl: state.pathParameters['rooturl']!,
@@ -81,7 +79,6 @@ class MainApp extends StatelessWidget {
         GoRoute(
           path: '/create',
           builder: (context, state) => CreateScreen(
-            title: 'Boshi',
             viewModel: CreateViewModel(
               atProtoRepository: context.read<AtProtoRepository>(),
             ),
@@ -125,7 +122,11 @@ class MainApp extends StatelessWidget {
 
     return ShadApp.materialRouter(
       materialThemeBuilder: (context, theme) {
-        return theme.copyWith();
+        return theme.copyWith(
+          scaffoldBackgroundColor: Color(0xFF2E2C3A),
+          iconTheme: IconThemeData(color: Color(0xFFF4F4F9)),
+          dividerColor: Color(0xFFC9C9D9),
+        );
       },
       routerConfig: router,
     );

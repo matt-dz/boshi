@@ -13,9 +13,7 @@ import 'package:frontend/internal/logger/logger.dart';
 import '../view_model/create_viewmodel.dart';
 
 class CreateScreen extends StatelessWidget {
-  const CreateScreen({super.key, required this.title, required this.viewModel});
-
-  final String title;
+  const CreateScreen({super.key, required this.viewModel});
   final CreateViewModel viewModel;
 
   @override
@@ -23,7 +21,7 @@ class CreateScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          Header(title: title),
+          Header(),
           Expanded(child: CreateForm(viewModel: viewModel)),
           Footer(),
         ],

@@ -12,12 +12,10 @@ import '../view_model/post_thread_viewmodel.dart';
 class PostThreadScreen extends StatelessWidget {
   const PostThreadScreen({
     super.key,
-    required this.title,
     required this.viewModel,
   });
 
   final PostThreadViewModel viewModel;
-  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +36,7 @@ class PostThreadScreen extends StatelessWidget {
 
             return Column(
               children: [
-                Header(title: title),
+                Header(),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

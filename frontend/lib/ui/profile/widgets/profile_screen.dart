@@ -12,12 +12,10 @@ import '../view_model/profile_viewmodel.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     super.key,
-    required this.title,
     required this.viewModel,
   });
 
   final ProfileViewModel viewModel;
-  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +23,7 @@ class ProfileScreen extends StatelessWidget {
       child: Scaffold(
         body: Column(
           children: [
-            Header(title: title),
+            Header(),
             Expanded(
               child: ListenableBuilder(
                 listenable: viewModel,
