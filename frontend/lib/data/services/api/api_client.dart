@@ -113,6 +113,10 @@ class ApiClient {
       queryParameters: {'user_id': dids},
     );
 
+    if (!EnvironmentConfig.prod) {
+      return Result.ok([mockUser]);
+    }
+
     logger.d('Sending request');
     final response = await http.get(requestUri);
 
@@ -190,6 +194,11 @@ class ApiClient {
     AtUri url,
   ) async {
     logger.d('Creating reply');
+
+    if (!EnvironmentConfig.prod) {
+      return Result.ok(mockGetPostThreadResult);
+    }
+
     final xrpcResponse = await bluesky.feed.getPostThread(uri: url);
 
     if (xrpcResponse.status != HttpStatus.ok) {
