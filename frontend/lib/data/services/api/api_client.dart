@@ -176,8 +176,18 @@ class ApiClient {
     bsky.PostRecord reply,
   ) async {
     logger.d('Creating reply');
-    final xrpcResponse = await bluesky.feed
-        .post(text: reply.text, tags: ['boshi.reply'], reply: reply.reply);
+    final xrpcResponse = await bluesky.feed.post(
+        text: reply.text,
+        tags: ['boshi.reply'],
+        facets: [
+          bsky.Facet(
+            index: bsky.ByteSlice(byteStart: 0, byteEnd: 0),
+            features: [
+              bsky.FacetFeature.tag(data: bsky.FacetTag(tag: 'boshi'))
+            ],
+          ),
+        ],
+        reply: reply.reply);
 
     if (xrpcResponse.status != HttpStatus.ok) {
       return Result.error(
