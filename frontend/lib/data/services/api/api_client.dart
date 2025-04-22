@@ -8,9 +8,7 @@ import 'package:frontend/internal/config/environment.dart';
 import 'package:frontend/internal/exceptions/missing_env.dart';
 import 'package:frontend/internal/feed/feed.dart';
 import 'package:frontend/internal/result/result.dart';
-import 'package:frontend/shared/models/report/report.dart' as boshi_report;
 import 'package:frontend/domain/models/user/user.dart';
-import 'package:frontend/shared/models/post/post.dart' as post_request;
 import 'package:http/http.dart' as http;
 import 'package:frontend/data/models/requests/add_email/add_email.dart';
 import 'package:frontend/data/models/requests/verify_code/verify_code.dart';
@@ -141,22 +139,18 @@ class ApiClient {
     }
   }
 
-  Future<Result<void>> reportPost(boshi_report.Report report) async {
-    logger.d('Reporting post');
-    return Result.ok(null);
-  }
-
   Future<Result<void>> createPost(
     bsky.Bluesky bluesky,
-    post_request.Post post,
+    String title,
+    String content,
   ) async {
     logger.d('Creating post');
     final xrpcResponse = await bluesky.feed.post(
-      text: '${post.title}\n${post.content}',
-      tags: List.from(['boshi.post']),
+      text: '$title\n$content',
+      tags: ['boshi.post'],
       facets: [
         bsky.Facet(
-          index: bsky.ByteSlice(byteStart: 0, byteEnd: post.title.length),
+          index: bsky.ByteSlice(byteStart: 0, byteEnd: title.length),
           features: [bsky.FacetFeature.tag(data: bsky.FacetTag(tag: 'boshi'))],
         ),
       ],
@@ -166,11 +160,47 @@ class ApiClient {
       return Result.ok(null);
     } else {
       return Result.error(
-        Exception(
+        HttpException(
           'Failed to create post record with status: ${xrpcResponse.status}',
         ),
       );
     }
+  }
+
+  Future<Result<void>> createReply(
+    bsky.Bluesky bluesky,
+    bsky.PostRecord reply,
+  ) async {
+    logger.d('Creating reply');
+    final xrpcResponse = await bluesky.feed
+        .post(text: reply.text, tags: ['boshi.reply'], reply: reply.reply);
+
+    if (xrpcResponse.status != HttpStatus.ok) {
+      return Result.error(
+        HttpException(
+          'Failed to create a reply record with status: ${xrpcResponse.status}',
+        ),
+      );
+    }
+    return Result.ok(null);
+  }
+
+  Future<Result<bsky.PostThread>> getPostThread(
+    bsky.Bluesky bluesky,
+    AtUri url,
+  ) async {
+    logger.d('Creating reply');
+    final xrpcResponse = await bluesky.feed.getPostThread(uri: url);
+
+    if (xrpcResponse.status != HttpStatus.ok) {
+      return Result.error(
+        HttpException(
+          'Failed to create a reply record with status: ${xrpcResponse.status}',
+        ),
+      );
+    }
+
+    return Result.ok(xrpcResponse.data);
   }
 
   /// Sends a GET request to the Boshi backend to get

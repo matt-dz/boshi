@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 
 import 'package:frontend/ui/core/ui/header.dart';
 import 'package:frontend/ui/core/ui/footer.dart';
@@ -8,7 +9,9 @@ import 'package:frontend/ui/core/ui/error_screen.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/internal/exceptions/format.dart';
-import 'post.dart';
+import 'package:frontend/ui/post/view_model/post_viewmodel.dart';
+import 'package:frontend/ui/post/widgets/post.dart';
+import 'package:provider/provider.dart';
 
 import '../view_model/home_viewmodel.dart';
 
@@ -27,15 +30,10 @@ class FeedView extends StatelessWidget {
             for (final post in feed)
               PostFeed(
                 key: Key(post.post.cid),
-                post: post,
-                onLike: () {
-                  if (post.post.isLiked) {
-                    viewModel.removeLike.execute(post);
-                    return;
-                  }
-                  viewModel.addLike.execute(post);
-                },
-                onReply: () {},
+                viewModel: PostViewModel(
+                  atProtoRepository: context.read<AtProtoRepository>(),
+                  post: post,
+                ),
               ),
           ],
         ),

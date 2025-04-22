@@ -92,7 +92,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         switch (result) {
                           case Ok<Uri>():
                             try {
-                              if (!await launchUrl(result.value)) {
+                              if (!await launchUrl(
+                                result.value,
+                                webOnlyWindowName: '_self',
+                              )) {
                                 logger.e('Unable to launch url');
                               }
                             } on PlatformException catch (e) {

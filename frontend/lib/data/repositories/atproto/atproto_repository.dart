@@ -5,7 +5,6 @@ import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/internal/exceptions/oauth_unauthorized_exception.dart';
 import 'package:frontend/internal/exceptions/verification_code_already_set_exception.dart';
 import 'package:frontend/internal/exceptions/user_not_found_exception.dart';
-import 'package:frontend/shared/models/post/post.dart';
 import 'package:frontend/domain/models/post/post.dart' as domain_models;
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/feed/feed.dart';
@@ -42,7 +41,7 @@ class AtProtoRepository extends ChangeNotifier {
   late OAuthClient? oAuthClient;
 
   Uri get clientId => _clientId;
-  bool get authorized => atProto != null;
+  bool get authorized => atProto != null && bluesky != null;
 
   Future<void> _initializeOAuthClient() async {
     if (_local) {
@@ -116,11 +115,25 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
-  Future<Result<void>> createPost(Post post) async {
+  Future<Result<void>> createReply(bsky.PostRecord reply) async {
     if (!authorized) {
-      return Result.error(OAuthUnauthorizedException('createPost'));
+      return Result.error(OAuthUnauthorizedException());
     }
-    return await _apiClient.createPost(bluesky!, post);
+    return await _apiClient.createReply(bluesky!, reply);
+  }
+
+  Future<Result<void>> createPost(String title, String content) async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+    return await _apiClient.createPost(bluesky!, title, content);
+  }
+
+  Future<Result<bsky.PostThread>> getPostThread(AtUri postUrl) async {
+    if (!authorized) {
+      return Result.error(OAuthUnauthorizedException());
+    }
+    return await _apiClient.getPostThread(bluesky!, postUrl);
   }
 
   Future<Result<void>> addVerificationEmail(String email) async {
@@ -212,7 +225,7 @@ class AtProtoRepository extends ChangeNotifier {
   }
 
   Future<Result<List<domain_models.Post>>> getFeed() async {
-    if (!authorized || bluesky == null) {
+    if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
     }
 
@@ -272,7 +285,7 @@ class AtProtoRepository extends ChangeNotifier {
     AtUri uri,
     String cid,
   ) async {
-    if (!authorized || bluesky == null) {
+    if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
     }
 
@@ -295,7 +308,7 @@ class AtProtoRepository extends ChangeNotifier {
     String cid,
     String did,
   ) async {
-    if (!authorized || bluesky == null) {
+    if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
     }
 
