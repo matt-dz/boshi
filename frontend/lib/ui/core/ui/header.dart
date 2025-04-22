@@ -19,7 +19,7 @@ class Header extends StatelessWidget {
               style: GoogleFonts.monoton(
                 fontSize: 32,
                 fontWeight: FontWeight.w400,
-                color: Color(0xFFC9C9D9),
+                color: Theme.of(context).focusColor,
               ),
             ),
             onPressed: () {

@@ -20,6 +20,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<ShadFormState>();
+  final _disabledColor = Color(0xFFC3CAEB);
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             .primaryTextTheme
                             .labelSmall
                             ?.copyWith(
-                              color: Theme.of(context).disabledColor,
+                              color: _disabledColor,
                             ),
                       ),
                     ),
@@ -110,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           .primaryTextTheme
                           .labelSmall
                           ?.copyWith(
-                            color: Theme.of(context).disabledColor,
+                            color: _disabledColor,
                           ),
                     ),
                     validator: (v) {

@@ -54,29 +54,38 @@ class MainApp extends StatelessWidget {
           path: '/',
           name: 'home',
           redirect: rootRouteGuard,
-          builder: (context, state) => HomeScreen(
-            title: 'Boshi',
-            viewModel: HomeViewModel(
-              atProtoRepository: context.read<AtProtoRepository>(),
+          pageBuilder: (context, state) => NoTransitionPage(
+            name: 'home',
+            child: HomeScreen(
+              title: 'Boshi',
+              viewModel: HomeViewModel(
+                atProtoRepository: context.read<AtProtoRepository>(),
+              ),
             ),
           ),
         ),
         GoRoute(
           path: '/profile',
-          builder: (context, state) => ProfileScreen(
-            viewModel: ProfileViewModel(
-              atProtoRepository: context.read<AtProtoRepository>(),
+          name: 'profile',
+          pageBuilder: (context, state) => NoTransitionPage(
+            name: 'profile',
+            child: ProfileScreen(
+              viewModel: ProfileViewModel(
+                atProtoRepository: context.read<AtProtoRepository>(),
+              ),
             ),
           ),
         ),
         GoRoute(
           path: '/post/:rooturl',
-          builder: (context, state) => PostThreadScreen(
-            viewModel: PostThreadViewModel(
-              atProtoRepository: context.read<AtProtoRepository>(),
-              rootUrl: utf8.decode(
-                base64Url.decode(
-                  state.pathParameters['rooturl']!,
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: PostThreadScreen(
+              viewModel: PostThreadViewModel(
+                atProtoRepository: context.read<AtProtoRepository>(),
+                rootUrl: utf8.decode(
+                  base64Url.decode(
+                    state.pathParameters['rooturl']!,
+                  ),
                 ),
               ),
             ),
@@ -84,42 +93,54 @@ class MainApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/create',
+          name: 'create',
           redirect: rootRouteGuard,
-          builder: (context, state) => CreateScreen(
-            viewModel: CreateViewModel(
-              atProtoRepository: context.read<AtProtoRepository>(),
+          pageBuilder: (context, state) => NoTransitionPage(
+            name: 'create',
+            child: CreateScreen(
+              viewModel: CreateViewModel(
+                atProtoRepository: context.read<AtProtoRepository>(),
+              ),
             ),
           ),
         ),
         GoRoute(
           path: '/login',
-          builder: (context, state) => LoginScreen(
-            viewModel: LoginViewModel(
-              atProtoRepository: context.read<AtProtoRepository>(),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: LoginScreen(
+              viewModel: LoginViewModel(
+                atProtoRepository: context.read<AtProtoRepository>(),
+              ),
             ),
           ),
         ),
         GoRoute(
           path: '/oauth/callback',
-          builder: (context, state) => OAuthCallback(),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: OAuthCallback(),
+          ),
         ),
         GoRoute(
           path: '/signup',
           redirect: signupRouteGuard,
-          builder: (context, state) => EmailRegisterScreen(
-            viewModel: EmailRegisterViewModel(
-              atProtoRepository: context.read<AtProtoRepository>(),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: EmailRegisterScreen(
+              viewModel: EmailRegisterViewModel(
+                atProtoRepository: context.read<AtProtoRepository>(),
+              ),
             ),
           ),
           routes: [
             GoRoute(
               redirect: verifyEmailRouteGuard,
               path: '/verify',
-              builder: (context, state) => EmailVerificationScreen(
-                viewModel: EmailVerificationViewModel(
-                  atProtoRepository: context.read<AtProtoRepository>(),
+              pageBuilder: (context, state) => NoTransitionPage(
+                child: EmailVerificationScreen(
+                  viewModel: EmailVerificationViewModel(
+                    atProtoRepository: context.read<AtProtoRepository>(),
+                  ),
+                  email: state.uri.queryParameters['email']!,
                 ),
-                email: state.uri.queryParameters['email']!,
               ),
             ),
           ],
