@@ -7,7 +7,7 @@ void extractDidsFromPostThread(
   bsky.PostThreadViewRecord postThread,
   List<String> dids,
 ) {
-  dids.add(postThread.post.uri.toString());
+  dids.add(postThread.post.author.did);
 
   postThread.replies?.forEach(
     (reply) => reply.whenOrNull(
