@@ -16,9 +16,12 @@ class PostHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final title = extractTitle(post);
+    logger.d('title: $title');
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 2,
       children: [
         Row(
           mainAxisSize: MainAxisSize.max,
@@ -43,10 +46,12 @@ class PostHeader extends StatelessWidget {
             ),
           ],
         ),
-        Text(
-          extractTitle(post),
-          style: Theme.of(context).primaryTextTheme.labelLarge,
-        ),
+        title.isNotEmpty
+            ? Text(
+                title,
+                style: Theme.of(context).primaryTextTheme.labelLarge,
+              )
+            : SizedBox.shrink(),
       ],
     );
   }
@@ -172,7 +177,9 @@ class PostFeed extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: Theme.of(context).dividerColor,
+            color: viewModel.isPost
+                ? Theme.of(context).dividerColor
+                : Colors.transparent,
           ),
         ),
       ),

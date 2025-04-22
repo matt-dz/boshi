@@ -41,21 +41,25 @@ class PostThreadScreen extends StatelessWidget {
                     );
                   }
 
-                  return Column(
-                    children: [
-                      PostFeed(
-                        viewModel: PostViewModel(
-                          post: viewModel.post,
-                          atProtoRepository: viewModel.atProtoRepository,
-                        ),
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: 450),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PostFeed(
+                            viewModel: PostViewModel(
+                              post: viewModel.post,
+                              atProtoRepository: viewModel.atProtoRepository,
+                            ),
+                          ),
+                          ReplyInputWidget(viewModel: viewModel),
+                          Flexible(
+                            child: RepliesWidget(viewModel: viewModel),
+                          ),
+                        ],
                       ),
-                      ReplyInputWidget(viewModel: viewModel),
-                      Expanded(
-                        child: RepliesWidget(
-                          viewModel: viewModel,
-                        ),
-                      ),
-                    ],
+                    ),
                   );
                 },
               ),

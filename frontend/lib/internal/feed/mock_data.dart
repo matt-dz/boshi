@@ -188,6 +188,99 @@ var mockPost6 = bsky.Post(
   indexedAt: DateTime.now(),
 );
 
+var mockReply1 = bsky.Post(
+  likeCount: 43,
+  replyCount: 12,
+  record: bsky.PostRecord(
+    text: 'What is Lorem Ipsum?\nLorem Ipsum is simply dummy text of the '
+        'printing and typesetting industry. Lorem Ipsum has been the '
+        "industry's standard dummy text ever since the 1500s, when "
+        'an unknown printer took a galley of type and scrambled it '
+        'to make a type specimen book. It has survived not only '
+        'five centuries, but also the leap into electronic ',
+    facets: [
+      bsky.Facet(
+        index: bsky.ByteSlice(byteStart: 0, byteEnd: 0),
+        features: [
+          bsky.FacetFeature.tag(
+            data: bsky.FacetTag(tag: 'boshi'),
+          ),
+        ],
+      ),
+    ],
+    createdAt: DateTime.now(),
+  ),
+  author: bsky.ActorBasic(
+    did: 'did:plc:pqlrhvmhtthnggkr6ws7mpms',
+    handle: 'bsky.app',
+  ),
+  uri: AtUri('did:web:discover.bsky.app'),
+  cid: 'bafyreievgu2ty7qbiaaom5zhmkznsnajuzideek3lo7e65dwqlrvrxnma4',
+  indexedAt: DateTime.now(),
+);
+
+var mockReply2 = bsky.Post(
+  likeCount: 43,
+  replyCount: 12,
+  record: bsky.PostRecord(
+    text: 'What is Lorem Ipsum?\nLorem Ipsum is simply dummy text of the '
+        'printing and typesetting industry. Lorem Ipsum has been the '
+        "industry's standard dummy text ever since the 1500s, when "
+        'an unknown printer took a galley of type and scrambled it '
+        'to make a type specimen book. It has survived not only '
+        'five centuries, but also the leap into electronic ',
+    facets: [
+      bsky.Facet(
+        index: bsky.ByteSlice(byteStart: 0, byteEnd: 0),
+        features: [
+          bsky.FacetFeature.tag(
+            data: bsky.FacetTag(tag: 'boshi'),
+          ),
+        ],
+      ),
+    ],
+    createdAt: DateTime.now(),
+  ),
+  author: bsky.ActorBasic(
+    did: 'did:plc:pqlrhvmhtthnggkr6ws7mpms',
+    handle: 'bsky.app',
+  ),
+  uri: AtUri('did:web:discover.bsky.app'),
+  cid: 'bafyreievgu2ty7qbiaaom5zhmkznsnajuzideek3lo7e65dwqlrvrxnmb4',
+  indexedAt: DateTime.now(),
+);
+
+var mockReply3 = bsky.Post(
+  likeCount: 43,
+  replyCount: 12,
+  record: bsky.PostRecord(
+    text: 'What is Lorem Ipsum?\nLorem Ipsum is simply dummy text of the '
+        'printing and typesetting industry. Lorem Ipsum has been the '
+        "industry's standard dummy text ever since the 1500s, when "
+        'an unknown printer took a galley of type and scrambled it '
+        'to make a type specimen book. It has survived not only '
+        'five centuries, but also the leap into electronic ',
+    facets: [
+      bsky.Facet(
+        index: bsky.ByteSlice(byteStart: 0, byteEnd: 0),
+        features: [
+          bsky.FacetFeature.tag(
+            data: bsky.FacetTag(tag: 'boshi'),
+          ),
+        ],
+      ),
+    ],
+    createdAt: DateTime.now(),
+  ),
+  author: bsky.ActorBasic(
+    did: 'did:plc:pqlrhvmhtthnggkr6ws7mpms',
+    handle: 'bsky.app',
+  ),
+  uri: AtUri('did:web:discover.bsky.app'),
+  cid: 'bafyreievgu2ty7qbiaaom5zhmkznsnajuzideek3lo7e65dwqlrvrxnmc4',
+  indexedAt: DateTime.now(),
+);
+
 var mockUser = User(
   did: 'did:plc:pqlrhvmhtthnggkr6ws7mpms',
   handle: 'pensir.bsky.social',
@@ -205,9 +298,21 @@ var mockGetFeedResult = bsky.Feed(
   ]),
 );
 
-var mockPostThreadViewRecord = bsky.PostThreadView.record(
+final mockPostThreadViewRecord1 = bsky.PostThreadView.record(
   data: bsky.PostThreadViewRecord(
-    post: mockPost1,
+    post: mockReply1,
+  ),
+);
+
+final mockPostThreadViewRecord2 = bsky.PostThreadView.record(
+  data: bsky.PostThreadViewRecord(
+    post: mockReply2,
+  ),
+);
+
+final mockPostThreadViewRecord3 = bsky.PostThreadView.record(
+  data: bsky.PostThreadViewRecord(
+    post: mockReply3,
   ),
 );
 
@@ -215,7 +320,11 @@ var mockGetPostThreadResult = bsky.PostThread(
   thread: bsky.PostThreadView.record(
     data: bsky.PostThreadViewRecord(
       post: mockPost1,
-      replies: [mockPostThreadViewRecord, mockPostThreadViewRecord],
+      replies: [
+        mockPostThreadViewRecord1,
+        mockPostThreadViewRecord2,
+        mockPostThreadViewRecord3,
+      ],
     ),
   ),
 );
