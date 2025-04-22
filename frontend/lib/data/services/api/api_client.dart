@@ -148,7 +148,7 @@ class ApiClient {
 
     final xrpcResponse = await bluesky.feed.post(
       text: '$title\n$content',
-      tags: List.from(['boshi.post']),
+      tags: ['boshi.post'],
       facets: [
         bsky.Facet(
           index: bsky.ByteSlice(byteStart: 0, byteEnd: title.length),
@@ -161,7 +161,7 @@ class ApiClient {
       return Result.ok(null);
     } else {
       return Result.error(
-        Exception(
+        HttpException(
           'Failed to create post record with status: ${xrpcResponse.status}',
         ),
       );
@@ -173,12 +173,12 @@ class ApiClient {
     bsky.PostRecord reply,
   ) async {
     logger.d('Creating reply');
-    final xrpcResponse = await bluesky.feed.post(
-        text: reply.text, tags: List.from(['boshi.reply']), reply: reply.reply);
+    final xrpcResponse = await bluesky.feed
+        .post(text: reply.text, tags: ['boshi.reply'], reply: reply.reply);
 
     if (xrpcResponse.status != HttpStatus.ok) {
       return Result.error(
-        Exception(
+        HttpException(
           'Failed to create a reply record with status: ${xrpcResponse.status}',
         ),
       );
@@ -188,15 +188,14 @@ class ApiClient {
 
   Future<Result<bsky.PostThread>> getPostThread(
     bsky.Bluesky bluesky,
-    String url,
+    AtUri url,
   ) async {
     logger.d('Creating reply');
-    final xrpcResponse =
-        await bluesky.feed.getPostThread(uri: AtUri.parse(url));
+    final xrpcResponse = await bluesky.feed.getPostThread(uri: url);
 
     if (xrpcResponse.status != HttpStatus.ok) {
       return Result.error(
-        Exception(
+        HttpException(
           'Failed to create a reply record with status: ${xrpcResponse.status}',
         ),
       );

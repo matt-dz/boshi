@@ -1,3 +1,4 @@
+import 'package:atproto/core.dart';
 import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:flutter/foundation.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
@@ -28,7 +29,8 @@ class PostThreadViewModel extends ChangeNotifier {
   Future<Result> _load() async {
     try {
       logger.d('Retrieving post thread');
-      final postThreadResult = await _atProtoRepository.getPostThread(_rootUrl);
+      final postThreadResult =
+          await _atProtoRepository.getPostThread(AtUri.parse(_rootUrl));
       switch (postThreadResult) {
         case Ok<bsky.PostThread>():
           _thread =

@@ -41,7 +41,7 @@ class AtProtoRepository extends ChangeNotifier {
   late OAuthClient? oAuthClient;
 
   Uri get clientId => _clientId;
-  bool get authorized => atProto != null;
+  bool get authorized => atProto != null && bluesky != null;
 
   Future<void> _initializeOAuthClient() async {
     if (_local) {
@@ -129,7 +129,7 @@ class AtProtoRepository extends ChangeNotifier {
     return await _apiClient.createPost(bluesky!, title, content);
   }
 
-  Future<Result<bsky.PostThread>> getPostThread(String postUrl) async {
+  Future<Result<bsky.PostThread>> getPostThread(AtUri postUrl) async {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
     }
@@ -225,7 +225,7 @@ class AtProtoRepository extends ChangeNotifier {
   }
 
   Future<Result<List<domain_models.Post>>> getFeed() async {
-    if (!authorized || bluesky == null) {
+    if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
     }
 
@@ -284,7 +284,7 @@ class AtProtoRepository extends ChangeNotifier {
     AtUri uri,
     String cid,
   ) async {
-    if (!authorized || bluesky == null) {
+    if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
     }
 
@@ -307,7 +307,7 @@ class AtProtoRepository extends ChangeNotifier {
     String cid,
     String did,
   ) async {
-    if (!authorized || bluesky == null) {
+    if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
     }
     try {
