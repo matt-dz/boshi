@@ -6,7 +6,7 @@ import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
 import 'package:frontend/internal/logger/logger.dart';
 
-/// ViewModel for the Feed page
+/// ViewModel for the create screen. 
 class CreateViewModel extends ChangeNotifier {
   CreateViewModel({
     required AtProtoRepository atProtoRepository,
@@ -22,6 +22,7 @@ class CreateViewModel extends ChangeNotifier {
   User? _user;
   User? get user => _user;
 
+	/// Loads the user data from the repository.
   Future<Result> _load() async {
     try {
       logger.d('Retrieving user');
@@ -38,11 +39,16 @@ class CreateViewModel extends ChangeNotifier {
     }
   }
 
+	/// Reloads the user data from the repository.
   void reload() {
     load = Command0(_load)..execute();
     notifyListeners();
   }
 
+	/// Creates a new post with the given values.
+	///
+	/// @param postValues The values for the new post.
+	/// @returns A result indicating the success or failure of the operation.
   Future<Result<void>> _createPost((String, String) postValues) async {
     try {
       logger.d('Creating a post');

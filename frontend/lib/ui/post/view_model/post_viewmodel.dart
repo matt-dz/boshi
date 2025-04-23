@@ -9,7 +9,7 @@ import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
 
-/// ViewModel for the PostViewModel screen
+/// ViewModel for the post screen
 class PostViewModel extends ChangeNotifier {
   PostViewModel({
     required AtProtoRepository atProtoRepository,
@@ -24,23 +24,41 @@ class PostViewModel extends ChangeNotifier {
     toggleLike = Command0(_toggleLike);
   }
 
+	/// The command to toggle the like status of a post.
   late final Command0 toggleLike;
 
+	/// The command to add a like to a post.
   final AtProtoRepository _atProtoRepository;
-  final Post _post;
-  final bool _disableReply;
-  final bool _disableLike;
-  final String _title;
-
   AtProtoRepository get atProtoRepository => _atProtoRepository;
-  String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
+
+	/// The post object from the Bluesky API.
+  final Post _post;
   Post get post => _post;
+
+	/// Whether the reply button should be disabled.
+  final bool _disableReply;
   bool get disableReply => _disableReply;
+
+	/// Whether the like button should be disabled.
+  final bool _disableLike;
   bool get disableLike => _disableLike;
 
+	/// The title of the post.
+  final String _title;
+
+	/// Determine if the post is a reply.
   bool get isReply => _title.isEmpty;
+
+	/// Determine if the post is a post.
   bool get isPost => _title.isNotEmpty;
 
+	/// Retrieve the user's DID from the AT Protocol session.
+  String? get userDid => _atProtoRepository.atProto?.oAuthSession?.sub;
+
+
+	/// Toggle the like status of the post.
+	///
+	/// @returns A [Result] indicating the success or failure of the operation.
   Future<Result<void>> _toggleLike() async {
     try {
       if (_post.post.isLiked) {
@@ -52,6 +70,9 @@ class PostViewModel extends ChangeNotifier {
     }
   }
 
+	/// Remove a like from the post.
+	///
+	/// @returns A [Result] indicating the success or failure of the operation.
   Future<Result<void>> _removeLike() async {
     try {
       if (userDid == null) {
@@ -81,6 +102,9 @@ class PostViewModel extends ChangeNotifier {
     }
   }
 
+	/// Add a like to the post.
+	///
+	/// @returns A [Result] indicating the success or failure of the operation.
   Future<Result<AtUri>> _addLike() async {
     try {
       if (userDid == null) {

@@ -1,3 +1,6 @@
+
+
+/// Exception thrown when a [Command] is already running.
 class CommandAlreadyRunningException implements Exception {
   final String message;
 

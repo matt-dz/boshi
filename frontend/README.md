@@ -1,46 +1,25 @@
 # Boshi Frontend
 
-Boshi frontend built with Flutter.
+Frontend for [Boshi](https://boshi.deguzman.cloud) - the premier anonymous university exclusive social media built on the AT Protocol.
 
-## Dependencies
+## Getting Started
 
-- [Flutter](https://docs.flutter.dev/get-started/install)
-- [entr](https://github.com/eradman/entr)
+Begin by running the command
 
-## Development
+```bash
+cp .env.example .env
+```
 
-To simply run the application in development, run:
+to copy the environment template locally and set the variables accordingly.
+
+**Note**: You must have the [backend](https://github.com/matt-dz/boshi/tree/main/backend) running locally as well.
+
+Then begin the application by running
 
 ```bash
 make run
 ```
 
-This will start the flutter application on chrome and sets up `entr` to hot reload the application whenever a file in `lib/` changes.
+This will load the flutter application with your environment variables in `.env` and setup the application on `127.0.0.1:3000` or wherever you specified the frontend port
 
-## Docker setup
-
-To setup the frontend with Docker, first create the network with the command
-
-```bash
-make docker-network
-```
-
-Next, build the docker image with
-
-```bash
-docker compose build
-```
-
-Finally, run the compose file with
-
-```bash
-make dev
-```
-
-This setup is useful if you would like to test the changes before pushing them to prod.
-
-To stop the services, run
-
-```bash
-make clean
-```
+You can stop the application with `Ctrl + C` or `Q`.

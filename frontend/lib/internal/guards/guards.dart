@@ -6,6 +6,11 @@ import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'package:frontend/internal/logger/logger.dart';
 import 'package:frontend/internal/result/result.dart';
 
+/// Route guards for the application page.
+///
+/// @param context The BuildContext of the current widget.
+/// @param state The GoRouterState of the current route.
+/// @returns A result that indicates the next route to navigate to.
 FutureOr<String?> localRouteGuard(
   BuildContext context,
   GoRouterState state,
@@ -34,6 +39,11 @@ FutureOr<String?> localRouteGuard(
   return '/login';
 }
 
+/// Route guards for the production environment page.
+///
+/// @param context The BuildContext of the current widget.
+/// @param state The GoRouterState of the current route.
+/// @returns A result that indicates the next route to navigate to.
 FutureOr<String?> prodRouteGuard(
   BuildContext context,
   GoRouterState state,
@@ -53,6 +63,11 @@ FutureOr<String?> prodRouteGuard(
   return null;
 }
 
+/// Route guards for the root page.
+///
+/// @param context The BuildContext of the current widget.
+/// @param state The GoRouterState of the current route.
+/// @returns A result that indicates the next route to navigate to.
 FutureOr<String?> rootRouteGuard(
   BuildContext context,
   GoRouterState state,
@@ -73,6 +88,11 @@ FutureOr<String?> rootRouteGuard(
   return null;
 }
 
+/// Route guards for the email verification page.
+///
+/// @param context The BuildContext of the current widget.
+/// @param state The GoRouterState of the current route.
+/// @returns A result that indicates the next route to navigate to.
 FutureOr<String?> verifyEmailRouteGuard(
   BuildContext context,
   GoRouterState state,
@@ -83,6 +103,11 @@ FutureOr<String?> verifyEmailRouteGuard(
   return null;
 }
 
+/// Route guards for the signup page.
+///
+/// @param context The BuildContext of the current widget.
+/// @param state The GoRouterState of the current route.
+/// @returns A result that indicates the next route to navigate to.
 FutureOr<String?> signupRouteGuard(
   BuildContext context,
   GoRouterState state,

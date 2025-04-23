@@ -4,6 +4,7 @@ import 'package:frontend/data/services/api/api_client.dart';
 import 'package:frontend/data/repositories/atproto/atproto_repository.dart';
 import 'environment.dart';
 
+/// Provides the necessary dependencies for the application.
 List<SingleChildWidget> get providers {
   final clientId = EnvironmentConfig.prod
       ? '${EnvironmentConfig.backendBaseURL}/client-metadata.json'

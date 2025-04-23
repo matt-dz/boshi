@@ -1,3 +1,6 @@
+
+
+/// Exception thrown when a verification code is not found.
 class CodeNotFoundException implements Exception {
   final String message;
 

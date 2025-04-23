@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'like.freezed.dart';
 part 'like.g.dart';
 
+/// Class to represent a like action on a post.
 @freezed
 abstract class Like with _$Like {
   factory Like({

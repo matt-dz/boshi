@@ -22,6 +22,7 @@ import 'package:frontend/internal/logger/logger.dart';
 import 'package:frontend/internal/feed/mock_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Set the session variables in the shared preferences
 Future<void> _setSessionVars(
   OAuthSession session,
   SharedPreferencesAsync? prefs,
@@ -43,7 +44,13 @@ Future<void> _setSessionVars(
   );
 }
 
+/// A class that handles API requests to the backend and bluesky service.
 class ApiClient {
+
+	/// A method to retrieve the handle of a user from their DID.
+	///
+	/// @param bluesky The Bluesky instance to use for the request.
+	/// @returns A [Result] containing the feed or an error.
   Future<Result<bsky.Feed>> getFeed(bsky.Bluesky bluesky) async {
     logger.d('Getting Feed');
 
@@ -73,6 +80,11 @@ class ApiClient {
     return Result.ok(xrpcResponse.data);
   }
 
+	/// A method to resolve the user instance from the Bluesky service.
+	///
+	/// @param bluesky The Bluesky instance to use for the request.
+	/// @param did The DID of the user to resolve.
+	/// @returns A [Result] containing the user or an error.
   Future<Result<User>> getUser(bsky.Bluesky bluesky, String did) async {
     logger.d('Sending GET request for User $did');
 
@@ -106,6 +118,11 @@ class ApiClient {
     }
   }
 
+	/// A method to resolve a list of users from their DIDs.
+	///
+	/// @param bluesky The Bluesky instance to use for the request.
+	/// @param did The DID of the user to resolve.
+	/// @returns A [Result] containing the users or an error.
   Future<Result<List<User>>> getUsers(List<String> dids) async {
     final Uri hostUri = Uri.parse(EnvironmentConfig.backendBaseURL);
     final Uri requestUri = hostUri.replace(
@@ -143,6 +160,11 @@ class ApiClient {
     }
   }
 
+	/// A method to create a post on the Bluesky service.
+	///
+	/// @param bluesky The Bluesky instance to use for the request.
+	/// @param did The DID of the user to resolve.
+	/// @returns A [Result] containing the result or an error.
   Future<Result<void>> createPost(
     bsky.Bluesky bluesky,
     String title,
@@ -171,6 +193,11 @@ class ApiClient {
     }
   }
 
+	/// A method to create a reply on the Bluesky service.
+	///
+	/// @param bluesky The Bluesky instance to use for the request.
+	/// @param reply The reply record to create.
+	/// @returns A [Result] containing the result or an error.
   Future<Result<void>> createReply(
     bsky.Bluesky bluesky,
     bsky.PostRecord reply,
@@ -199,6 +226,11 @@ class ApiClient {
     return Result.ok(null);
   }
 
+	/// A method to retrieve the post thread from the Bluesky service.
+	///
+	/// @param bluesky The Bluesky instance to use for the request.
+	/// @param url The URL of the post thread to retrieve.
+	/// @returns A [Result] containing the thread or an error.
   Future<Result<bsky.PostThread>> getPostThread(
     bsky.Bluesky bluesky,
     AtUri url,
@@ -222,8 +254,11 @@ class ApiClient {
     return Result.ok(xrpcResponse.data);
   }
 
-  /// Sends a GET request to the Boshi backend to get
-  /// the OAuth client metadata
+  /// A method to retrieve the OAuth client metadata.
+	///
+	/// @param clientId The client ID of the OAuth client.
+	/// @returns The [OAuthClientMetadata] object containing the metadata.
+	/// @throws OAuthException if the request fails.
   Future<OAuthClientMetadata> getOAuthClientMetadata(
     String clientId,
   ) async {
@@ -241,6 +276,11 @@ class ApiClient {
     return OAuthClientMetadata.fromJson(jsonDecode(response.body));
   }
 
+	/// A method to retrieve the OAuth authorization URI.
+	///
+	/// @param client The OAuth client to use for the request.
+	/// @param identity The identity of the user to authorize.
+	/// @returns A tuple containing the authorization URI and the OAuth context.
   Future<(Uri, OAuthContext)> getOAuthAuthorizationURI(
     OAuthClient client,
     String identity,
@@ -259,6 +299,12 @@ class ApiClient {
     return (uri, context);
   }
 
+	/// A method to generate an OAuth session.
+	///
+	/// @param client The OAuth client to use for the request.
+	/// @param callback The callback URL to use for the request.
+	/// @returns The [OAuthSession] object containing the session information.
+	/// @throws ArgumentError if the OAuth variables are not set.
   Future<OAuthSession> generateSession(
     OAuthClient client,
     String callback,
@@ -306,6 +352,11 @@ class ApiClient {
     return session;
   }
 
+	/// A method to refresh the OAuth session.
+	///
+	/// @param client The OAuth client to use for the request.
+	/// @returns A tuple containing the refreshed session and the ATProto instance.
+	/// @throws ArgumentError if no session is stored.
   Future<(OAuthSession, ATProto)> refreshSession(OAuthClient client) async {
     logger.d('Retrieving shared preferences instance');
     final SharedPreferencesAsync prefs = SharedPreferencesAsync();
@@ -339,6 +390,12 @@ class ApiClient {
     return (refreshedSession, ATProto.fromOAuthSession(refreshedSession));
   }
 
+	/// A method to retrieve the like URI from the Bluesky service.
+	///
+	/// @param atp The ATProto instance to use for the request.
+	/// @param uri The URI of the post to retrieve the like URI for.
+	/// @param did The DID of the user to retrieve the like URI for.
+	/// @returns The [AtUri] object containing the like URI.
   Future<Result<void>> addVerificationEmail(
     String email,
     String authorDID,
@@ -369,6 +426,12 @@ class ApiClient {
     }
   }
 
+	/// A method to confirm the verification code sent to the user's email.
+	///
+	/// @param email The email address to verify.
+	/// @param code The verification code sent to the email address.
+	/// @param authorDID The DID of the user to verify.
+	/// @returns A [Result] containing the verification status or an error.
   Future<Result<void>> confirmVerificationCode(
     String email,
     String code,
@@ -408,6 +471,10 @@ class ApiClient {
     }
   }
 
+	/// A method to retrieve the verification status of a user.
+	///
+	/// @param userDID The DID of the user to verify.
+	/// @returns A [Result] containing the verification status or an error.
   Future<Result<VerificationStatus>> isUserVerified(
     String userDID,
   ) async {
@@ -440,6 +507,10 @@ class ApiClient {
     }
   }
 
+	/// A method to retrieve the time-to-live (TTL) of the verification code.
+	///
+	/// @param userDID The DID of the user to verify.
+	/// @returns A [Result] containing the verification code TTL or an error.
   Future<Result<VerificationCodeTTL>> getVerificationCodeTTL(
     String userDID,
   ) async {
@@ -473,6 +544,12 @@ class ApiClient {
     }
   }
 
+	/// A method to add a like to a post on the Bluesky service.
+	///
+	/// @param bluesky The Bluesky instance to use for the request.
+	/// @param cid The CID of the post to like.
+	/// @param uri The URI of the post to like.
+	/// @returns A [Result] containing the URI of the like or an error.
   Future<Result<AtUri>> addLike(
     bsky.Bluesky bluesky,
     String cid,
@@ -492,6 +569,13 @@ class ApiClient {
     }
   }
 
+	/// A method to remove a like from a post on the Bluesky service.
+	///
+	/// @param atp The ATProto instance to use for the request.
+	/// @param bluesky The Bluesky instance to use for the request.
+	/// @param uri The URI of the post to remove the like from.
+	/// @param did The DID of the user to remove the like from.
+	/// @returns A [Result] containing the result of the operation or an error.
   Future<Result<void>> removeLike(
     ATProto atp,
     bsky.Bluesky bluesky,
@@ -519,6 +603,7 @@ class ApiClient {
     }
   }
 
+	/// A method to logout the user.
   Future<void> logout() async {
     final prefs = SharedPreferencesAsync();
     await prefs.clear();

@@ -15,6 +15,7 @@ import 'package:frontend/internal/logger/logger.dart';
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
 
+/// Repository for managing interactions with the AT Protocol and Bluesky API.
 class AtProtoRepository extends ChangeNotifier {
   AtProtoRepository({
     required Uri clientId,
@@ -28,21 +29,38 @@ class AtProtoRepository extends ChangeNotifier {
         service = 'bsky.social',
         initialized = false;
 
+	/// The PDS service to use for the OAuth flow.
   String service;
   bool initialized;
+
+	/// The OAuth client ID for the application.
   final Uri _clientId;
+
+	/// The API client used to make requests to the AT Protocol and Bluesky API.
   final ApiClient _apiClient;
   final bool _local;
+
+
   late OAuthContext oAuthContext;
+
+	/// The AT Protocol session object.
   atp.ATProto? atProto;
+
+	/// The Bluesky session object.
   bsky.Bluesky? bluesky;
 
+	/// The OAuth client metadata object.
   late OAuthClientMetadata? clientMetadata;
+
+	/// The OAuth client object.
   late OAuthClient? oAuthClient;
 
   Uri get clientId => _clientId;
+
+	/// Determines if the user is authorized
   bool get authorized => atProto != null && bluesky != null;
 
+	/// Initialize the OAuth client with the provided client ID and service.
   Future<void> _initializeOAuthClient() async {
     if (_local) {
       clientMetadata ??= OAuthClientMetadata(
@@ -66,6 +84,11 @@ class AtProtoRepository extends ChangeNotifier {
     initialized = true;
   }
 
+	/// Get the authorization URI for the OAuth flow.
+	///
+	/// @param identity The identity of the user to authorize.
+	/// @param service The PDS service to use for the OAuth flow.
+	/// @returns A Result object containing the result of the operation.
   Future<Result<Uri>> getAuthorizationURI(
     String identity,
     String service,
@@ -86,6 +109,11 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
+	
+	/// Generate a session using the OAuth flow.
+	///
+	/// @param callback The callback URL to redirect to after authorization.
+	/// @returns A Result object containing the result of the operation.
   Future<Result<void>> generateSession(String callback) async {
     try {
       await _initializeOAuthClient();
@@ -101,6 +129,9 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
+	/// Refresh the OAuth session.
+	///
+	/// @returns A Result object containing the result of the operation.
   Future<Result<void>> refreshSession() async {
     try {
       await _initializeOAuthClient();
@@ -115,6 +146,10 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
+	/// Create a new reply using the Bluesky API.
+	///
+	/// @param reply The reply to create.
+	/// @returns A Result object containing the result of the operation.
   Future<Result<void>> createReply(bsky.PostRecord reply) async {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
@@ -122,6 +157,11 @@ class AtProtoRepository extends ChangeNotifier {
     return await _apiClient.createReply(bluesky!, reply);
   }
 
+	/// Create a new post using the Bluesky API.
+	///
+	/// @param title The title of the post.
+	/// @param content The content of the post.
+	/// @returns A Result object containing the result of the operation.
   Future<Result<void>> createPost(String title, String content) async {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
@@ -129,6 +169,10 @@ class AtProtoRepository extends ChangeNotifier {
     return await _apiClient.createPost(bluesky!, title, content);
   }
 
+	/// Get the thread of a post using the Bluesky API.
+	///
+	/// @param postUrl The URL of the post to get the thread for.
+	/// @returns A Result object containing the result of the operation.
   Future<Result<bsky.PostThread>> getPostThread(AtUri postUrl) async {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
@@ -136,6 +180,10 @@ class AtProtoRepository extends ChangeNotifier {
     return await _apiClient.getPostThread(bluesky!, postUrl);
   }
 
+	/// Add a verification email to the user's account.
+	///
+	/// @param email The email address to add.
+	/// @returns A Result object containing the result of the operation.
   Future<Result<void>> addVerificationEmail(String email) async {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
@@ -157,6 +205,10 @@ class AtProtoRepository extends ChangeNotifier {
     return result;
   }
 
+	/// Confirm the verification code sent to the user's email.
+	///
+	/// @param email The email address to confirm.
+	/// @param code The verification code to confirm.
   Future<Result<void>> confirmVerificationCode(
     String email,
     String code,
@@ -179,6 +231,9 @@ class AtProtoRepository extends ChangeNotifier {
     );
   }
 
+	/// Check if the user is verified.
+	///
+	/// @returns A Result object containing the result of the operation.
   Future<Result<bool>> isUserVerified() async {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
@@ -203,6 +258,9 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
+	/// Get the time-to-live (TTL) of the verification code.
+	///
+	/// @returns A Result object containing the result of the operation.
   Future<Result<double>> getVerificationCodeTTL() async {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
@@ -224,6 +282,9 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
+	/// Get the feed of posts from the Bluesky API.
+	///
+	/// @returns A Result object containing the result of the operation.
   Future<Result<List<domain_models.Post>>> getFeed() async {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException());
@@ -252,6 +313,10 @@ class AtProtoRepository extends ChangeNotifier {
     );
   }
 
+	/// Get the users from the Bluesky API.
+	///
+	/// @param dids The list of DIDs to get users for.
+	/// @returns A Result object containing the result of the operation.
   Future<Result<List<User>>> getUsers(List<String> dids) async {
     if (!authorized) {
       return Result.error(OAuthUnauthorizedException('getUsers'));
@@ -281,6 +346,10 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
+	/// Get the profile of a user from the Bluesky API.
+	///
+	/// @param did The DID of the user to get the profile for.
+	/// @returns A Result object containing the result of the operation.
   Future<Result<AtUri>> addLike(
     AtUri uri,
     String cid,
@@ -303,6 +372,12 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
+	/// Remove a like from a post using the Bluesky API.
+	///
+	/// @param uri The URI of the post to remove the like from.
+	/// @param cid The CID of the post to remove the like from.
+	/// @param did The DID of the user to remove the like from.
+	/// @returns A Result object containing the result of the operation.
   Future<Result<void>> removeLike(
     AtUri uri,
     String cid,
@@ -327,6 +402,9 @@ class AtProtoRepository extends ChangeNotifier {
     }
   }
 
+	/// Logout the user from the AT Protocol and Bluesky API.
+	///
+	/// @returns A Result object containing the result of the operation.
   Future<Result<void>> logout() async {
     try {
       await _apiClient.logout();
