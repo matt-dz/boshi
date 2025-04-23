@@ -16,14 +16,21 @@ class ProfileViewModel extends ChangeNotifier {
     logout = Command0(_logout);
   }
 
+	/// The command to load the user profile.
   late Command0 load;
+
+	/// The command to log out the user.
   late final Command0 logout;
 
+	/// The user object representing the logged-in user.
   late final User _user;
-  final AtProtoRepository _atProtoRepository;
-
   User get user => _user;
 
+	/// The repository for interacting with the AT Protocol.
+  final AtProtoRepository _atProtoRepository;
+
+
+	/// Loads the user profile data from the repository.
   Future<Result> _load() async {
     try {
       final userResult = await _atProtoRepository.getUser();
@@ -45,6 +52,7 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+	/// Logs out the user from Boshi.
   Future<Result<void>> _logout() async {
     try {
       return await _atProtoRepository.logout();

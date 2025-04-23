@@ -1,3 +1,6 @@
+
+
+/// Exception thrown when a verification code is already set for a user.
 class VerificationCodeAlreadySetException implements Exception {
   final String message;
 

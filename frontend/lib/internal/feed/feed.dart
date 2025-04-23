@@ -7,17 +7,29 @@ import 'package:frontend/domain/models/user/user.dart';
 import 'package:frontend/internal/logger/logger.dart';
 import 'package:frontend/domain/models/post/post.dart';
 
+/// Extracts the title from a post.
+///
+/// @param post The post to extract the title from.
+/// @returns The title of the post.
 String extractTitle(Post post) {
   final titleEnd = post.post.record.facets?[0].index.byteEnd;
   return post.post.record.text.substring(0, titleEnd);
 }
 
+/// Extracts the context from a post.
+///
+/// @param post The post to extract the context from.
+/// @returns The context of the post.
 String extractContext(Post post) {
   final titleEnd = post.post.record.facets?[0].index.byteEnd;
   return post.post.record.text
       .substring(titleEnd == null || titleEnd == 0 ? 0 : titleEnd + 1);
 }
 
+/// Extracts the content from a post.
+///
+/// @param post The post to extract the content from.
+/// @returns The content of the post.
 String timeSincePosting(Post post) {
   final currentTime = DateTime.now().toUtc();
   final timeDifference = currentTime.difference(post.post.indexedAt.toUtc());
@@ -35,6 +47,11 @@ String timeSincePosting(Post post) {
   }
 }
 
+/// Converts a Bluesky feed to a list of domain posts.
+///
+/// @param feed The Bluesky feed to convert.
+/// @param users The list of users to associate with the posts.
+/// @returns A list of domain posts.
 List<Post> convertFeedToDomainPosts(
   bsky.Feed feed,
   List<User> users,
@@ -61,6 +78,16 @@ List<Post> convertFeedToDomainPosts(
       .toList();
 }
 
+
+/// Retrieves the like URI for a given post.
+///
+/// @param atp The ATProto instance.
+/// @param uri The URI of the post.
+/// @param did The DID of the user.
+/// @param cursor The cursor for pagination.
+/// @returns The URI of the like, or null if not found.
+/// @throws HttpException if the request fails.
+/// @throws Exception if the response is invalid.
 Future<AtUri?> retrieveLikeUri(
   ATProto atp,
   AtUri uri,
@@ -100,6 +127,12 @@ Future<AtUri?> retrieveLikeUri(
   return retrieveLikeUri(atp, uri, did, response.data.cursor);
 }
 
+/// Retrieves the handle for a given DID.
+///
+/// @param bluesky The Bluesky instance.
+/// @param did The DID to resolve.
+/// @returns The handle associated with the DID.
+/// @throws HttpException if the request fails.
 Future<String> resolveHandle(bsky.Bluesky bluesky, String did) async {
   logger.d('Resolving handle for $did');
   final profile = await bluesky.actor.getProfile(actor: did);

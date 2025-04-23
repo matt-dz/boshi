@@ -37,6 +37,7 @@ void main() {
   runApp(MultiProvider(providers: providers, child: const MainApp()));
 }
 
+/// Entry point for the application
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 

@@ -24,18 +24,30 @@ class PostThreadViewModel extends ChangeNotifier {
     createReply = Command1<void, bsky.PostRecord>(_createReply);
   }
 
+	/// The command to load the post thread.
   late final Command0 load;
+
+	/// The command to create a reply to the post thread.
   late final Command1 createReply;
+
+	/// The list of replies to the post thread.
   final AtProtoRepository _atProtoRepository;
+  AtProtoRepository get atProtoRepository => _atProtoRepository;
+
+	/// The URL of the root post in the thread.
   final String _rootUrl;
 
+	/// The post object from the Bluesky API.
   late Post _post;
-  late List<Post> _replies;
-
-  AtProtoRepository get atProtoRepository => _atProtoRepository;
   Post get post => _post;
+
+	/// The list of replies to the post thread.
+  late List<Post> _replies;
   UnmodifiableListView<Post> get replies => UnmodifiableListView(_replies);
 
+	/// Load the post thread data from the repository.
+	///
+	/// @returns A [Result] object containing the loaded data or an error.	
   Future<Result> _load() async {
     try {
       logger.d('Retrieving post thread');
@@ -98,6 +110,11 @@ class PostThreadViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+	/// Creates a reply to the post thread.
+	///
+	/// @param reply The reply to be created.
+	/// @returns A [Result] object indicating the success or 
+	/// failure of the operation.
   Future<Result<void>> _createReply(bsky.PostRecord reply) async {
     try {
       logger.d('Creating a reply');

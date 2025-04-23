@@ -1,3 +1,6 @@
+
+
+/// Exception representing an unauthorized OAuth request.
 class OAuthUnauthorizedException implements Exception {
   final String message;
 

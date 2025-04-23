@@ -4,6 +4,7 @@ import 'package:frontend/internal/logger/logger.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
+/// A widget that displays the footer.
 class Footer extends StatefulWidget {
   const Footer({super.key});
 

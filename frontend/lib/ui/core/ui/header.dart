@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// A widget that displays the header.
 class Header extends StatelessWidget {
   const Header({super.key});
 

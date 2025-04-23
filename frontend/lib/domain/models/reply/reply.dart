@@ -4,6 +4,7 @@ import 'package:frontend/domain/models/user/user.dart';
 
 part 'reply.freezed.dart';
 
+/// Represents a reply in the Bluesky social network.
 @freezed
 abstract class Reply with _$Reply {
   const factory Reply({

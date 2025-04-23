@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'error.dart';
 
+/// A widget that displays an error message and a refresh button.
 class ErrorScreen extends StatelessWidget {
   const ErrorScreen({
     super.key,

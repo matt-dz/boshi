@@ -1,5 +1,6 @@
 import 'package:logger/logger.dart';
 
+/// A logger class that uses the `logger` package to log messages.
 class AppLogger extends Logger {
   static final Logger _logger = Logger(
     printer: PrettyPrinter(),

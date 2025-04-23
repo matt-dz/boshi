@@ -3,6 +3,11 @@ import 'package:bluesky/bluesky.dart' as bsky;
 import 'package:frontend/domain/models/post/post.dart';
 import 'package:frontend/domain/models/user/user.dart';
 
+
+/// Retrieves the root post from a given post thread.
+///
+/// @param post The post thread to retrieve the root from.
+/// @returns The root post as a StrongRef object.
 StrongRef getRootFromPostThread(bsky.PostThreadViewRecord post) {
   return post.parent == null
       ? StrongRef(cid: post.post.cid, uri: post.post.uri)
@@ -12,6 +17,10 @@ StrongRef getRootFromPostThread(bsky.PostThreadViewRecord post) {
         );
 }
 
+/// Extracts the DIDs from a given post thread.
+///
+/// @param postThread The post thread to extract DIDs from.
+/// @param dids The set of DIDs to populate.
 void extractDidsFromPostThread(
   bsky.PostThreadViewRecord postThread,
   Set<String> dids,
@@ -25,6 +34,13 @@ void extractDidsFromPostThread(
   );
 }
 
+/// Extracts the replies from a given post thread.
+///
+/// @param parent The parent post reference.
+/// @param root The root post reference.
+/// @param replyRecords The list of reply records.
+/// @param users The list of users to associate with the replies.
+/// @returns A list of Post objects representing the replies.
 List<Post> extractRepliesFromPostThread(
   StrongRef parent,
   StrongRef root,

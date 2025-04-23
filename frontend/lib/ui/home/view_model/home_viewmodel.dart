@@ -11,7 +11,7 @@ import 'package:frontend/internal/result/result.dart';
 import 'package:frontend/internal/command/command.dart';
 import 'package:frontend/internal/logger/logger.dart';
 
-/// ViewModel for the Feed page
+/// ViewModel for the Home screen
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel({
     required AtProtoRepository atProtoRepository,
@@ -25,12 +25,18 @@ class HomeViewModel extends ChangeNotifier {
   late final Command1 addLike;
   late final Command1 removeLike;
 
+	/// The list of posts in the feed.
   List<Post> _posts = [];
-  User? _user;
-  final AtProtoRepository _atProtoRepository;
 
+	/// The user who is currently logged in.
+  User? _user;
   UnmodifiableListView<Post> get feed => UnmodifiableListView(_posts);
 
+	/// The repository for interacting with the AT Protocol.
+  final AtProtoRepository _atProtoRepository;
+
+
+	/// Loads the user and feed data from the repository.
   Future<Result> _load() async {
     try {
       final userResult = await _atProtoRepository.getUser();
@@ -60,6 +66,10 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+	/// Removes a like from a post.
+	///
+	/// @param post The post to remove the like from.
+	/// @returns A result indicating the success or failure of the operation.
   Future<Result<void>> _removeLike(Post post) async {
     try {
       if (_user == null) {
@@ -93,6 +103,10 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+	/// Adds a like to a post.
+	///
+	/// @param post The post to add the like to.
+	/// @returns A [Result] indicating the success or failure of the operation.
   Future<Result<AtUri>> _addLike(Post post) async {
     try {
       if (_user == null) {
