@@ -1,11 +1,13 @@
+// Package for backend endpoints
+
 package endpoints
 
 import (
-	"boshi-backend/internal/database"
-	"boshi-backend/internal/email"
-	"boshi-backend/internal/exceptions"
-	boshiRedis "boshi-backend/internal/redis"
-	"boshi-backend/internal/sqlc"
+	"boshi-backend.com/internal/database"
+	"boshi-backend.com/internal/email"
+	"boshi-backend.com/internal/exceptions"
+	boshiRedis "boshi-backend.com/internal/redis"
+	"boshi-backend.com/internal/sqlc"
 	"context"
 	"crypto/subtle"
 	"errors"
@@ -24,17 +26,22 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// Email verification code redis key
 const EmailVerficationCodeKey = "email-verification-code"
 
+// Regex for validating DIDs
 var DIDRegex = regexp.MustCompile(`^did:[a-z]+:[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$`)
 
+// Email verification code TTL
 var EmailVerificationCodeTTL = time.Duration(10) * time.Minute
 var pgError *pgconn.PgError
 
+// Generates the redis key for the email verification code
 func generateVerificationRedisKey(email string) string {
 	return fmt.Sprintf("%s:%s", EmailVerficationCodeKey, email)
 }
 
+// Adds an email to the email list
 func AddEmailToEmailList(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	db := database.GetDb(ctx)
@@ -86,6 +93,7 @@ func AddEmailToEmailList(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Creates an email verification code
 func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	db := database.GetDb(ctx)
@@ -198,6 +206,7 @@ func CreateEmailVerificationCode(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Verifies the email verification code
 func VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	db := database.GetDb(ctx)

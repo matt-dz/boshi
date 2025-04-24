@@ -1,4 +1,4 @@
-module boshi-backend
+module boshi-backend.com
 
 go 1.23.0
 

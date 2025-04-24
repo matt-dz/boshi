@@ -1,9 +1,9 @@
 package endpoints
 
 import (
-	"boshi-backend/internal/database"
-	boshiRedis "boshi-backend/internal/redis"
-	"boshi-backend/internal/sqlc"
+	"boshi-backend.com/internal/database"
+	boshiRedis "boshi-backend.com/internal/redis"
+	"boshi-backend.com/internal/sqlc"
 	"context"
 	"encoding/json"
 	"errors"
@@ -13,14 +13,17 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// Response for the user verification status
 type verificationStatusResponse struct {
 	Verified bool `json:"verified"`
 }
 
+// Payload for retrieving a user
 type getCodeExpiryResponse struct {
 	TTL float64 `json:"ttl"`
 }
 
+// Retrieve the verification status of a user
 func GetVerificationStatus(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	logCtx := r.Context()
@@ -56,6 +59,7 @@ func GetVerificationStatus(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Get the TTL of the a user's verification code.
 func GetCodeExpiry(w http.ResponseWriter, r *http.Request) {
 	userId := r.PathValue("user_id")
 
@@ -108,6 +112,7 @@ func GetCodeExpiry(w http.ResponseWriter, r *http.Request) {
 	)
 }
 
+// Get the user by ID
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	db := database.GetDb(ctx)

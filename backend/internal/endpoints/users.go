@@ -1,10 +1,10 @@
 package endpoints
 
 import (
-	"boshi-backend/internal/database"
-	"boshi-backend/internal/email"
-	"boshi-backend/internal/exceptions"
-	"boshi-backend/internal/sqlc"
+	"boshi-backend.com/internal/database"
+	"boshi-backend.com/internal/email"
+	"boshi-backend.com/internal/exceptions"
+	"boshi-backend.com/internal/sqlc"
 	"context"
 	"encoding/json"
 	"errors"
@@ -17,6 +17,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// Resolves the university name from the email address
 func resolveSchoolFromEmail(addr string) (string, error) {
 	domain, err := email.ParseEmail(addr)
 	if err != nil {
@@ -56,6 +57,7 @@ func resolveSchoolFromEmail(addr string) (string, error) {
 	return result[0].Name, nil
 }
 
+// Retrieve a list of users
 func GetUsersByID(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	db := database.GetDb(ctx)

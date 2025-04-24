@@ -1,3 +1,5 @@
+// Package for the logger
+
 package logger
 
 import (
@@ -13,6 +15,7 @@ const (
 	slogFields ctxKey = "slog_fields"
 )
 
+// Struct for the context handler
 type ContextHandler struct {
 	slog.Handler
 }
@@ -58,6 +61,7 @@ func init() {
 	slog.SetDefault(logger)
 }
 
+// Retrieve the logger instance
 func GetLogger() *slog.Logger {
 	return logger
 }
