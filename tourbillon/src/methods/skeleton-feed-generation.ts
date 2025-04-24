@@ -4,6 +4,10 @@ import { AppContext } from '../config'
 import { feedGenAlgos } from '../algos'
 import { AtUri } from '@atproto/syntax'
 
+/**
+ * https://docs.bsky.app/docs/api/app-bsky-feed-get-feed-skeleton
+ * Uses our algorithms of the get feed skeleton method to handle requests to our server
+ */
 export default function (server: Server, ctx: AppContext) {
   server.app.bsky.feed.getFeedSkeleton(async ({ params }) => {
     const feedUri = new AtUri(params.feed)
