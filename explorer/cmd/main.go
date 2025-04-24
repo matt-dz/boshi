@@ -25,6 +25,7 @@ var log = logger.GetLogger()
 var socketUri string
 var firehoseIdentifier string
 
+// Load all environemnt variables before running the project
 func init() {
 	err := godotenv.Load()
 	if err != nil {
@@ -43,10 +44,12 @@ func init() {
 }
 
 const (
-	atpPostLexicon = "app.bsky.feed.post"
-	boshiPostTag = "boshi.post"
+	atpPostLexicon = "app.bsky.feed.post" // Bsky lexicon for posts
+	boshiPostTag = "boshi.post" // Our tag for boshi posts
 )
 
+// To handle an event on the protocol, check to see if it is a bsky post, then a boshi post.
+// If it is, try to store the post in our db.
 func handleEvent(ctx context.Context, event *models.Event) error {
 	// Unmarshal the record if there is one
 	if event.Commit != nil && (event.Commit.Operation == models.CommitOperationCreate || event.Commit.Operation == models.CommitOperationUpdate) {
@@ -65,6 +68,7 @@ func handleEvent(ctx context.Context, event *models.Event) error {
 	return nil
 }
 
+// Attempts to store the given post into our psql db.
 func storePost(
 	ctx context.Context,
 	event *models.Event,
@@ -93,6 +97,8 @@ func storePost(
 	log.Info("Post created", slog.Any("post", returnedPost))
 }
 
+// Connect to the jetstream firehose websocket implementation and create a scheduler
+// which handles the events on the stream.
 func main() {
 	ctx := context.Background()
 	
