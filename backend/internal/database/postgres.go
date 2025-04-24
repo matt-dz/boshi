@@ -1,7 +1,7 @@
 package database
 
 import (
-	"boshi-backend/internal/logger"
+	"boshi-backend.com/internal/logger"
 	"context"
 	"os"
 	"sync"

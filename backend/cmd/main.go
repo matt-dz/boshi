@@ -1,11 +1,13 @@
+/// The main entry point for the Boshi backend server.
+
 package main
 
 import (
-	"boshi-backend/internal/database"
-	"boshi-backend/internal/endpoints"
-	"boshi-backend/internal/logger"
-	"boshi-backend/internal/middleware"
-	"boshi-backend/internal/redis"
+	"boshi-backend.com/internal/database"
+	"boshi-backend.com/internal/endpoints"
+	"boshi-backend.com/internal/logger"
+	"boshi-backend.com/internal/middleware"
+	"boshi-backend.com/internal/redis"
 	"fmt"
 	"net/http"
 	"os"
@@ -13,11 +15,13 @@ import (
 
 var log = logger.GetLogger()
 
+// / The cleanup function is called when the server is shutting down.
 func cleanup() {
 	database.CloseDb()
 	redis.CloseRedis()
 }
 
+// / The main function is the entry point for the server.
 func main() {
 	log.Info("Starting server...")
 	defer cleanup()

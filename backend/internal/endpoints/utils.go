@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// Decode json
 func decodeJson(dst interface{}, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()

@@ -1,3 +1,5 @@
+/// Package to handle CORS headers
+
 package cors
 
 import (
@@ -6,8 +8,10 @@ import (
 	"regexp"
 )
 
+// This package handles CORS headers for the server.
 var remotePattern = regexp.MustCompile(`^https:\/\/(?:\w(?:-|\w)*)?boshi(?:-app|-api)?\.deguzman\.cloud$`)
 
+// validateOrigin checks if the origin is in the allow list.
 func validateOrigin(origin string) bool {
 	if os.Getenv("ENV") == "PROD" {
 		return remotePattern.MatchString(origin)
@@ -16,6 +20,7 @@ func validateOrigin(origin string) bool {
 	return true
 }
 
+// adds CORS headers to the response if the origin is in the allow list.
 func AddCors(w http.ResponseWriter, r *http.Request) bool {
 
 	/* If origin is not in allow list, do not add CORS headers */

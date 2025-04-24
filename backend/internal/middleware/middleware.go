@@ -1,8 +1,10 @@
+// Package for middleware functions
+
 package middleware
 
 import (
-	"boshi-backend/internal/cors"
-	"boshi-backend/internal/logger"
+	"boshi-backend.com/internal/cors"
+	"boshi-backend.com/internal/logger"
 	"context"
 	"log/slog"
 	"net/http"
@@ -12,22 +14,22 @@ import (
 var log = logger.GetLogger()
 var ctx = context.Background()
 
+// logResponseWriter is a custom ResponseWriter that captures the status code
 type logResponseWriter struct {
 	http.ResponseWriter
 	statusCode int
 }
 
+// Write captures the status code and writes the response
 func (lrw *logResponseWriter) WriteHeader(code int) {
 	lrw.statusCode = code
 	lrw.ResponseWriter.WriteHeader(code)
 }
 
+// Middleware type alias
 type Middleware func(http.HandlerFunc) http.HandlerFunc
 
-/*
-Chain adds middleware in a chained fashion to the HTTP handler.
-The middleware is applied in the order in which it is passed.
-*/
+// Chain adds middleware in a chained fashion to the HTTP handler.
 func Chain(h http.HandlerFunc, m ...Middleware) http.HandlerFunc {
 
 	// Applied in reverse to preserve the order
@@ -38,6 +40,7 @@ func Chain(h http.HandlerFunc, m ...Middleware) http.HandlerFunc {
 	return h
 }
 
+// Logs the request method and path
 func LogRequest() Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +55,7 @@ func LogRequest() Middleware {
 	}
 }
 
+// Adds CORS headers to the response
 func AddCors() Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -64,6 +68,7 @@ func AddCors() Middleware {
 	}
 }
 
+// Times the request handling and logs the duration
 func Timer() Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {

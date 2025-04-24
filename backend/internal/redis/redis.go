@@ -1,7 +1,8 @@
+// Package for handling Redis connections
 package redis
 
 import (
-	"boshi-backend/internal/logger"
+	"boshi-backend.com/internal/logger"
 	"log/slog"
 	"os"
 	"sync"

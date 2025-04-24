@@ -1,7 +1,7 @@
 package endpoints
 
 import (
-	"boshi-backend/internal/logger"
+	"boshi-backend.com/internal/logger"
 	"encoding/json"
 	"fmt"
 	"log/slog"
