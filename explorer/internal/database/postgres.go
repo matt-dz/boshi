@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// Defined constants to support a singleton db
 var (
 	log     = logger.GetLogger()
 	once    sync.Once
@@ -17,6 +18,7 @@ var (
 	queries *sqlc.Queries
 )
 
+// Create a new pool connection to the psql db
 func connect(ctx context.Context) {
 	log.Debug("Connecting to postgres")
 	var err error
@@ -28,6 +30,7 @@ func connect(ctx context.Context) {
 	queries = sqlc.New(pool)
 }
 
+// Singleton implementation of the db
 func UseQueries(ctx context.Context) *sqlc.Queries {
 	once.Do(func() {
 		connect(ctx)
@@ -35,6 +38,7 @@ func UseQueries(ctx context.Context) *sqlc.Queries {
 	return queries
 }
 
+// Close the current connection
 func Close() {
 	pool.Close()
 }
