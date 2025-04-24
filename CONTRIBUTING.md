@@ -4,11 +4,8 @@ Welcome! We are eager that you are interested in contributing to Boshi. This doc
 
 ## Environment Setup
 
-We use Go v1.23.0 and are proud to use no dependencies!
-
 1. **Fork the Repository**: Click on the "Fork" button at the top right of the repository page to create your own copy of the repository.
 2. Populate the `.env` file with the required environment variables. You can find a list of required variables in the `.env.example` file.
-3. Run `make run` in the root directory to start the application.
 
 ## Branch Naming
 

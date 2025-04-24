@@ -1,17 +1,6 @@
 # Boshi
 
-The source code for the Boshi application.
-
-## Tech Stack
-
-### Backend
-
-- Go v1.23.0 (no dependencies)
-
-### DevOps
-
-- Docker
-- Kubernetes
+The source code for [Boshi](https://boshi.deguzman.cloud).
 
 ## Contributing
 
